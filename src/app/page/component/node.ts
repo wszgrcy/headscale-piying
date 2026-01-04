@@ -64,15 +64,7 @@ export const NodeItemPageDefine = v.object({
             ],
             body: [
               {
-                define: v.pipe(
-                  v.tuple([]),
-                  setComponent('tr')
-                  // actions.directives.set([
-                  //   {
-                  //     type: ExpandRowDirective,
-                  //   },
-                  // ])
-                ),
+                define: v.pipe(v.tuple([]), setComponent('tr')),
                 columns: [
                   'expand',
                   'online',
@@ -305,8 +297,6 @@ export const NodeItemPageDefine = v.object({
                       content: (field) => {
                         return computed(() => {
                           let item = field.context['item$']() as NodeItem;
-                          console.log(item);
-
                           return (item.user?.displayName || item.user?.name) ?? '';
                         });
                       },

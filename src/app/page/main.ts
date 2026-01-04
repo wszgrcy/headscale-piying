@@ -38,27 +38,10 @@ export const MainPage = v.pipe(
           setComponent('menu-tree'),
           actions.inputs.patch({
             list: [
-              { title: 'form', router: { routerLink: './component/form' } },
-              { title: 'table', router: { routerLink: './component/table' } },
-              { title: 'category', router: { routerLink: './component/category' } },
-              { title: 'login', router: { routerLink: './component/login' } },
-              { title: 'calendar', router: { routerLink: './component/calendar' } },
-              { title: 'select', router: { routerLink: './component/select' } },
-              { title: 'tabs', router: { routerLink: './component/tabs' } },
-              { title: 'card', router: { routerLink: './component/card' } },
-              { title: 'stat', router: { routerLink: './component/stat' } },
-              { type: 'divider' },
-              {
-                type: 'group',
-                title: 'PAGE',
-                children: [{ title: 'login', router: { routerLink: '/login' } }],
-              },
-              { type: 'divider' },
-              {
-                type: 'group',
-                title: 'DEMO',
-                children: [{ title: 'Query Table', router: { routerLink: './demo/query-table' } }],
-              },
+              { title: 'user', router: { routerLink: './user' } },
+              { title: 'node', router: { routerLink: './node' } },
+              { title: 'apikey', router: { routerLink: './apikey' } },
+
               { type: 'divider' },
             ],
           }),

@@ -2,12 +2,14 @@ import * as v from 'valibot';
 import { hideWhen, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
 import { computed } from '@angular/core';
 import { actions } from '@piying/view-angular';
-import { firstValueFrom, map, startWith, Subject } from 'rxjs';
+import { firstValueFrom, map, Observable, startWith, Subject } from 'rxjs';
 import { ExpandRowDirective, TableStatusService } from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
 import { ListUsersRes } from '../../../api/type';
 import { User } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
+import { SelectionModel } from '@angular/cdk/collections';
+import { PreAuthkeyPageDefine } from './preauthkey';
 const RenameDefine = v.pipe(
   v.object({
     name: v.pipe(v.string(), v.title('newName')),
@@ -36,6 +38,7 @@ export const UserPageDefine = v.object({
             head: [
               {
                 columns: [
+                  'expand',
                   'id',
                   'name',
                   'createdAt',
@@ -50,16 +53,9 @@ export const UserPageDefine = v.object({
             ],
             body: [
               {
-                define: v.pipe(
-                  v.tuple([]),
-                  setComponent('tr')
-                  // actions.directives.set([
-                  //   {
-                  //     type: ExpandRowDirective,
-                  //   },
-                  // ])
-                ),
+                define: v.pipe(v.tuple([]), setComponent('tr')),
                 columns: [
+                  'expand',
                   'id',
                   'name',
                   'createdAt',
@@ -71,25 +67,18 @@ export const UserPageDefine = v.object({
                   'actions',
                 ],
               },
-              // { define: v.pipe(v.tuple([]), setComponent('tr')), columns: ['extra'] },
+              { define: v.pipe(v.tuple([]), setComponent('tr')), columns: ['extra'] },
             ],
           },
           columns: {
-            // checkbox: {
-            //   head: ' ',
-            //   body: v.pipe(
-            //     v.boolean(),
-            //     setComponent('checkbox'),
-            //     actions.wrappers.set(['td', 'table-checkbox-body']),
-            //   ),
-            // },
-            // index: {
-            //   head: '索引',
-            //   body: (node: any, index: number) => {
-            //     const { pageQueryParams } = pageFiled!.props();
-            //     return `${index + 1 + pageQueryParams.index * pageQueryParams.size}`;
-            //   },
-            // },
+            expand: {
+              head: ' ',
+              body: v.pipe(
+                NFCSchema,
+                setComponent('table-expand-cell'),
+                actions.wrappers.set(['td'])
+              ),
+            },
             id: {
               head: 'id',
               body: (data: User) => {
@@ -153,14 +142,11 @@ export const UserPageDefine = v.object({
                     actions.inputs.patchAsync({
                       clicked: (field) => {
                         return async () => {
-                          console.log(field.context);
-
                           const dialog: DialogService = field.context['dialog'];
                           let ref = dialog.openDialog({
                             title: 'rename',
                             schema: RenameDefine,
                             async applyValue(value) {
-                              console.log(value);
                               let api: ApiService = field.context['api'];
                               let item = field.context['item$']();
                               await firstValueFrom(api.RenameUser(item.id, value.name));
@@ -195,27 +181,46 @@ export const UserPageDefine = v.object({
                       },
                     })
                   ),
-                })
+                }),
+                actions.wrappers.set(['td']),
+                actions.class.top('flex gap-2')
               ),
             },
 
-            // extra: {
-            //   body: v.pipe(
-            //     NFCSchema,
-            //     setComponent('button'),
-            //     actions.wrappers.set(['td']),
-            //     hideWhen({
-            //       listen(fn, field) {
-            //         return (field.context.status.expanded as Subject<any>).pipe(
-            //           map((item) => {
-            //             return item !== field.context.item$();
-            //           }),
-            //           startWith(true)
-            //         );
-            //       },
-            //     })
-            //   ),
-            // },
+            extra: {
+              body: v.pipe(
+                PreAuthkeyPageDefine,
+                actions.props.patchAsync({
+                  user: (field) => {
+                    return field.context!['item$']() as User;
+                  },
+                }),
+
+                actions.wrappers.set([
+                  {
+                    type: 'td',
+                    attributes: {
+                      colspan: '10',
+                    },
+                  },
+                  { type: 'label-wrapper' },
+                ]),
+                v.title('Preauthkey'),
+                hideWhen({
+                  listen(fn, field) {
+                    let sm = field.context.status['selectionModel$$'] as Observable<
+                      SelectionModel<unknown>
+                    >;
+                    return sm.pipe(
+                      map((value) => {
+                        return !value.isSelected(field.context.item$());
+                      }),
+                      startWith(true)
+                    );
+                  },
+                })
+              ),
+            },
           },
         };
       },

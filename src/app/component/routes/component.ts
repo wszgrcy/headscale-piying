@@ -39,14 +39,6 @@ export class NodeRouterNFCC {
   subnetRoutes$$ = computed(() => {
     return this.#item$$().subnetRoutes ?? [];
   });
-  constructor() {
-    effect(() => {
-      let value = this.field$$().context;
-      console.log('!!', value);
-      let item = value['item$']();
-      console.log(item);
-    });
-  }
 
   isApprovedRoutes = (list: string[], item: string) => {
     return list.includes(item);
