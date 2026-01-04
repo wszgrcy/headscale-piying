@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 import { asControl, hideWhen, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
-import { computed } from '@angular/core';
+import { computed, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
 import { firstValueFrom, map, startWith, Subject } from 'rxjs';
 import { ExpandRowDirective, TableStatusService } from '@piying-lib/angular-daisyui/extension';
@@ -9,6 +9,7 @@ import { ListUsersRes } from '../../../api/type';
 import { PreAuthKeys, User } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { CopyService } from '../../service/copy.service';
+import { requestLoading } from '../../util/request-loading';
 // todo dynamic
 let newDate = new Date();
 newDate.setDate(newDate.getDate() + 90);
@@ -216,11 +217,9 @@ export const PreAuthkeyPageDefine = v.pipe(
       actions.props.patchAsync({
         data: (field) => {
           let api = field.context['api'] as ApiService;
-          let defineField = field.get(['@preauthkey']);
-
-          return () => {
-            let defineProps = defineField?.props()['user'] as User;
-
+          let defineField = field.get(['@preauthkey'])!;
+          return requestLoading(field, ['@preauthkey'], () => {
+            let defineProps = untracked(() => defineField.props()['user'] as User);
             return firstValueFrom(
               api.ListPreAuthKeys({ user: defineProps.id }).pipe(
                 map((item) => {
@@ -228,7 +227,7 @@ export const PreAuthkeyPageDefine = v.pipe(
                 })
               )
             );
-          };
+          });
         },
       }),
       actions.props.mapAsync((field) => {
