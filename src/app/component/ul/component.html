@@ -1,0 +1,11 @@
+<ng-template #templateRef>
+  <ul>
+    @for (field of children$$(); track field.id || $index) {
+    <li>
+      <ng-container
+        *ngTemplateOutlet="fieldTemplateRef(); context: { $implicit: field }"
+      ></ng-container>
+    </li>
+    }
+  </ul>
+</ng-template>

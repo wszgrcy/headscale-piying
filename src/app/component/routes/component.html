@@ -1,0 +1,28 @@
+<ng-template #templateRef>
+  <ul class="flex flex-col gap-2">
+    @for (item of list$$(); track $index) {
+
+    <li class="flex gap-2 items-center">
+      <span class="w-30">
+        {{ item }}
+      </span>
+      @let enable=isApprovedRoutes|pure:approvedRoutes$$():item;
+      <button
+        class="btn btn-xs btn-circle"
+        [class.btn-success]="!enable"
+        [class.btn-error]="enable"
+        (click)="approvedToggle(item, !enable)"
+      >
+        <mat-icon class="micon-4">{{ enable ? 'close' : 'check' }} </mat-icon>
+      </button>
+      @if (enable) {
+
+      <div class="badge badge-success ">enable</div>
+
+      } @if (isSubnetRoutes|pure:approvedRoutes$$():item) {
+      <div class="badge badge-info">subnet</div>
+      }
+    </li>
+    }
+  </ul>
+</ng-template>

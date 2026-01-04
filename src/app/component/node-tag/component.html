@@ -1,0 +1,23 @@
+<div class="flex gap-2 items-center">
+  @for (item of value$(); track $index) {
+  <span class="badge badge-accent">
+    {{ item }}
+    <button class="btn btn-circle btn-xs btn-ghost" (click)="removeItem($index)">
+      <mat-icon class="micon-4">close</mat-icon>
+    </button>
+  </span>
+
+  } @if (isAddEdit$()) {
+  <input type="text" class="input input-accent input-xs" [(ngModel)]="editContent" />
+  <button class="btn btn-circle btn-accent btn-xs" (click)="addNew()">
+    <mat-icon class="micon-4">check</mat-icon>
+  </button>
+  <button class="btn btn-circle btn-accent btn-xs" (click)="isAddEdit$.set(false)">
+    <mat-icon class="micon-4">close</mat-icon>
+  </button>
+  }@else {
+  <button class="btn btn-circle btn-accent btn-xs" (click)="isAddEdit$.set(true)">
+    <mat-icon class="micon-4">add</mat-icon>
+  </button>
+  }
+</div>
