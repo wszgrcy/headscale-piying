@@ -58,6 +58,23 @@ const FilterCondition = v.pipe(
       actions.class.top('flex gap-4'),
       setAlias('filterParams')
     ),
+    __flex: v.pipe(NFCSchema, setComponent('div'), actions.class.top('flex-1')),
+    reset: v.pipe(
+      NFCSchema,
+      setComponent('button'),
+      actions.inputs.patch({
+        content: 'Reset',
+        color: 'error',
+      }),
+      actions.inputs.patchAsync({
+        clicked: (field) => {
+          return () => {
+            const result = field.get(['..', 'params'])!.form.control!;
+            result.reset();
+          };
+        },
+      })
+    ),
     submit: v.pipe(
       NFCSchema,
       setComponent('button'),
@@ -76,7 +93,7 @@ const FilterCondition = v.pipe(
     ),
   }),
   actions.wrappers.set(['div']),
-  actions.class.top('flex justify-between')
+  actions.class.top('flex gap-2')
 );
 export const UserPageDefine = v.pipe(
   v.object({
