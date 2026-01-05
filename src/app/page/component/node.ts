@@ -11,6 +11,7 @@ import { DialogService } from '../../service/dialog.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { metadataList } from '@piying/valibot-visit';
 import { requestLoading } from '../../util/request-loading';
+import { formatDatetimeToStr } from '../../util/time-to-str';
 let newDate = new Date();
 const ExpireNodeDefine = v.pipe(
   v.object({
@@ -58,8 +59,8 @@ export const NodeItemPageDefine = v.pipe(
                     'id',
                     'givenName',
                     'registerMethod',
-                    'createdAt',
                     'lastSeen',
+                    'createdAt',
                     'actions',
                   ],
                 },
@@ -73,8 +74,8 @@ export const NodeItemPageDefine = v.pipe(
                     'id',
                     'givenName',
                     'registerMethod',
-                    'createdAt',
                     'lastSeen',
+                    'createdAt',
                     'actions',
                   ],
                 },
@@ -105,13 +106,13 @@ export const NodeItemPageDefine = v.pipe(
               createdAt: {
                 head: 'createdAt',
                 body: (data: NodeItem) => {
-                  return data.createdAt;
+                  return formatDatetimeToStr(data.createdAt);
                 },
               },
               lastSeen: {
                 head: 'lastSeen',
                 body: (data: NodeItem) => {
-                  return data.lastSeen;
+                  return formatDatetimeToStr(data.lastSeen);
                 },
               },
               online: {
@@ -159,33 +160,6 @@ export const NodeItemPageDefine = v.pipe(
                 head: ' ',
                 body: v.pipe(
                   v.object({
-                    expire: v.pipe(
-                      NFCSchema,
-                      setComponent('button'),
-                      actions.inputs.patch({
-                        content: { icon: { fontIcon: 'update_disabled' } },
-                        shape: 'circle',
-                        size: 'sm',
-                      }),
-                      actions.inputs.patchAsync({
-                        clicked: (field) => {
-                          return async () => {
-                            let dialog: DialogService = field.context['dialog'];
-                            let item = field.context['item$']() as NodeItem;
-                            dialog.openDialog({
-                              title: 'new',
-                              schema: v.pipe(ExpireNodeDefine),
-                              applyValue: async (value) => {
-                                let api: ApiService = field.context['api'];
-                                await firstValueFrom(api.ExpireNode(item.id!, value));
-                                let status: TableStatusService = field.context['status'];
-                                status.needUpdate();
-                              },
-                            });
-                          };
-                        },
-                      })
-                    ),
                     rename: v.pipe(
                       NFCSchema,
                       setComponent('button'),
@@ -213,6 +187,35 @@ export const NodeItemPageDefine = v.pipe(
                         },
                       })
                     ),
+                    expire: v.pipe(
+                      NFCSchema,
+                      setComponent('button'),
+                      actions.inputs.patch({
+                        content: { icon: { fontIcon: 'update_disabled' } },
+                        shape: 'circle',
+                        size: 'sm',
+                      }),
+                      actions.class.top('text-error'),
+                      actions.inputs.patchAsync({
+                        clicked: (field) => {
+                          return async () => {
+                            let dialog: DialogService = field.context['dialog'];
+                            let item = field.context['item$']() as NodeItem;
+                            dialog.openDialog({
+                              title: 'new',
+                              schema: v.pipe(ExpireNodeDefine),
+                              applyValue: async (value) => {
+                                let api: ApiService = field.context['api'];
+                                await firstValueFrom(api.ExpireNode(item.id!, value));
+                                let status: TableStatusService = field.context['status'];
+                                status.needUpdate();
+                              },
+                            });
+                          };
+                        },
+                      })
+                    ),
+
                     delete: v.pipe(
                       NFCSchema,
                       setComponent('button'),
