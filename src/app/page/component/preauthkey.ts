@@ -219,7 +219,7 @@ export const PreAuthkeyPageDefine = v.pipe(
           let api = field.context['api'] as ApiService;
           let defineField = field.get(['@preauthkey'])!;
           return requestLoading(field, ['@preauthkey'], () => {
-            let defineProps = untracked(() => defineField.props()['user'] as User);
+            let defineProps = untracked(() => defineField.props()['user$$']());
             return firstValueFrom(
               api.ListPreAuthKeys({ user: defineProps.id }).pipe(
                 map((item) => {
@@ -262,7 +262,7 @@ export const PreAuthkeyPageDefine = v.pipe(
                   title: 'new',
                   schema: v.pipe(CreateDefine),
                   applyValue: async (value) => {
-                    let defineProps = defineField?.props()['user'] as User;
+                    let defineProps = defineField?.props()['user$$']() as User;
                     let api: ApiService = field.context['api'];
                     await firstValueFrom(api.CreatePreAuthKey({ ...value, user: defineProps.id! }));
                     let status: TableStatusService = tableField.props()['status'];

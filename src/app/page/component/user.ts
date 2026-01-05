@@ -7,9 +7,18 @@ import {
   setAlias,
   setComponent,
 } from '@piying/view-angular-core';
-import { computed, untracked } from '@angular/core';
+import { computed, untracked, WritableSignal } from '@angular/core';
 import { actions } from '@piying/view-angular';
-import { firstValueFrom, map, Observable, startWith, Subject } from 'rxjs';
+import {
+  combineLatest,
+  combineLatestAll,
+  firstValueFrom,
+  map,
+  merge,
+  Observable,
+  startWith,
+  Subject,
+} from 'rxjs';
 import { ExpandRowDirective, TableStatusService } from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
 import { ListUsersRes } from '../../../api/type';
@@ -21,6 +30,7 @@ import { requestLoading } from '../../util/request-loading';
 import { timeInRange } from '../../util/time-in-range';
 import { PickerTimeRangeDefine } from '../../define/picker-time-range';
 import { LeftTitleAction } from '../../define/left-title';
+import { toObservable } from '@angular/core/rxjs-interop';
 const RenameDefine = v.pipe(
   v.object({
     name: v.pipe(v.string(), v.title('newName')),
@@ -137,7 +147,16 @@ export const UserPageDefine = v.pipe(
                 },
               },
               createdAt: {
-                head: 'createdAt',
+                head: v.pipe(
+                  NFCSchema,
+                  setComponent('common-data'),
+                  actions.inputs.patch({ content: 'createdAt' }),
+                  actions.wrappers.set(['td', 'sort-header']),
+                  actions.props.patch({
+                    key: 'createdAt',
+                    direction: -1,
+                  })
+                ),
                 body: (data: User) => {
                   return data.createdAt;
                 },
@@ -236,8 +255,8 @@ export const UserPageDefine = v.pipe(
                 body: v.pipe(
                   PreAuthkeyPageDefine,
                   actions.props.patchAsync({
-                    user: (field) => {
-                      return field.context!['item$']() as User;
+                    user$$: (field) => {
+                      return computed(() => field.context!['item$']);
                     },
                   }),
 
@@ -257,9 +276,14 @@ export const UserPageDefine = v.pipe(
                       let sm = field.context.status['selectionModel$$'] as Observable<
                         SelectionModel<unknown>
                       >;
-                      return sm.pipe(
-                        map((value) => {
-                          return !value.isSelected(field.context.item$());
+                      return combineLatest([
+                        toObservable(field.context['item$'], {
+                          injector: field.form.control!.injector,
+                        }),
+                        sm,
+                      ]).pipe(
+                        map(([item, sm]) => {
+                          return !sm.isSelected(item);
                         }),
                         startWith(true)
                       );
@@ -271,7 +295,7 @@ export const UserPageDefine = v.pipe(
           };
         },
       }),
-      actions.props.patch({ sortList: ['title1', 'badge1'] }),
+      actions.props.patch({ sortList: ['createdAt'] }),
       actions.props.patchAsync({
         data: (field) => {
           let api = field.context['api'] as ApiService;
