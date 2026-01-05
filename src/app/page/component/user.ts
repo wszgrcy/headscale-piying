@@ -1,5 +1,12 @@
 import * as v from 'valibot';
-import { hideWhen, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
+import {
+  asControl,
+  formConfig,
+  hideWhen,
+  NFCSchema,
+  setAlias,
+  setComponent,
+} from '@piying/view-angular-core';
 import { computed, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
 import { firstValueFrom, map, Observable, startWith, Subject } from 'rxjs';
@@ -11,6 +18,9 @@ import { DialogService } from '../../service/dialog.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { PreAuthkeyPageDefine } from './preauthkey';
 import { requestLoading } from '../../util/request-loading';
+import { timeInRange } from '../../util/time-in-range';
+import { PickerTimeRangeDefine } from '../../define/picker-time-range';
+import { LeftTitleAction } from '../../define/left-title';
 const RenameDefine = v.pipe(
   v.object({
     name: v.pipe(v.string(), v.title('newName')),
@@ -24,8 +34,41 @@ const CreateUserDefine = v.pipe(
     pictureUrl: v.pipe(v.optional(v.pipe(v.string(), v.url())), v.title('pictureUrl')),
   })
 );
+const FilterCondition = v.pipe(
+  v.object({
+    params: v.pipe(
+      v.object({
+        name: v.pipe(v.optional(v.string()), v.title('name'), LeftTitleAction),
+        createdAt: v.pipe(v.optional(PickerTimeRangeDefine), v.title('createdAt'), LeftTitleAction),
+      }),
+      formConfig({ updateOn: 'submit' }),
+      actions.wrappers.set(['div']),
+      actions.class.top('flex gap-4'),
+      setAlias('filterParams')
+    ),
+    submit: v.pipe(
+      NFCSchema,
+      setComponent('button'),
+      actions.inputs.patch({
+        content: 'Submit',
+        color: 'primary',
+      }),
+      actions.inputs.patchAsync({
+        clicked: (field) => {
+          return () => {
+            const result = field.get(['..', 'params'])!.form.control!;
+            result.emitSubmit();
+          };
+        },
+      })
+    ),
+  }),
+  actions.wrappers.set(['div']),
+  actions.class.top('flex justify-between')
+);
 export const UserPageDefine = v.pipe(
   v.object({
+    query: FilterCondition,
     table: v.pipe(
       NFCSchema,
       setAlias('table'),
@@ -242,6 +285,32 @@ export const UserPageDefine = v.pipe(
             );
           });
         },
+        localSearchOptions: (field) => {
+          return {
+            filterFn: (item: User, queryParams?: Record<string, any>) => {
+              if (!queryParams) {
+                return true;
+              }
+              let result = true;
+              if (queryParams['name'] && item.name) {
+                result = item.name.toLowerCase().includes(queryParams['name']);
+                if (!result) {
+                  return result;
+                }
+              }
+              if (queryParams['createdAt'] && item.createdAt) {
+                result = timeInRange(item.createdAt, queryParams['createdAt']);
+                if (!result) {
+                  return result;
+                }
+              }
+              return result;
+            },
+          };
+        },
+        filterParams: (field) => {
+          return field.get(['@filterParams'])!.form.control!.valueChanges;
+        },
       }),
       actions.props.mapAsync((field) => {
         const pageProps = field.get(['..', 'bottom', 'page'])!.props;
@@ -253,6 +322,7 @@ export const UserPageDefine = v.pipe(
               page: pageProps?.()['pageQueryParams'],
               // sort-table
               direction: value['sortQueryParams'],
+              filter: value['filterParams'],
             },
           };
         };
