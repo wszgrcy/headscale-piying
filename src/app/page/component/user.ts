@@ -31,6 +31,8 @@ import { timeInRange } from '../../util/time-in-range';
 import { PickerTimeRangeDefine } from '../../define/picker-time-range';
 import { LeftTitleAction } from '../../define/left-title';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { datetimeToStr, formatDatetimeToStr } from '../../util/time-to-str';
+import { deepEqual } from 'fast-equals';
 const RenameDefine = v.pipe(
   v.object({
     name: v.pipe(v.string(), v.title('newName')),
@@ -84,7 +86,7 @@ export const UserPageDefine = v.pipe(
       setAlias('table'),
       setComponent('table'),
       actions.wrappers.set(['table-status', 'sort-table', 'table-resource', 'checkbox-table']),
-
+      actions.props.patch({ expandSelectModel: { _multiple: true, compareWith: deepEqual } }),
       actions.inputs.patchAsync({
         define: (field) => {
           const pageFiled = field.get(['..', 'page']);
@@ -158,7 +160,7 @@ export const UserPageDefine = v.pipe(
                   })
                 ),
                 body: (data: User) => {
-                  return data.createdAt;
+                  return formatDatetimeToStr(data.createdAt);
                 },
               },
               displayName: {
@@ -278,7 +280,7 @@ export const UserPageDefine = v.pipe(
                       >;
                       return combineLatest([
                         toObservable(field.context['item$'], {
-                          injector: field.form.control!.injector,
+                          injector: field.injector,
                         }),
                         sm,
                       ]).pipe(

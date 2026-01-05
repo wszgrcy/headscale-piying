@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 import { asControl, hideWhen, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
-import { computed, untracked } from '@angular/core';
+import { computed, effect, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
 import { firstValueFrom, map, startWith, Subject } from 'rxjs';
 import { ExpandRowDirective, TableStatusService } from '@piying-lib/angular-daisyui/extension';
@@ -10,6 +10,8 @@ import { PreAuthKeys, User } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { CopyService } from '../../service/copy.service';
 import { requestLoading } from '../../util/request-loading';
+import { formatDatetimeToStr } from '../../util/time-to-str';
+import { deepEqual } from 'fast-equals';
 // todo dynamic
 let newDate = new Date();
 newDate.setDate(newDate.getDate() + 90);
@@ -138,13 +140,13 @@ export const PreAuthkeyPageDefine = v.pipe(
               createdAt: {
                 head: 'createdAt',
                 body: (data: PreAuthKeys) => {
-                  return data.createdAt;
+                  return formatDatetimeToStr(data.createdAt);
                 },
               },
               expiration: {
                 head: 'expiration',
                 body: (data: PreAuthKeys) => {
-                  return data.expiration;
+                  return formatDatetimeToStr(data.expiration);
                 },
               },
               aclTags: {
@@ -165,8 +167,8 @@ export const PreAuthkeyPageDefine = v.pipe(
                         content: { icon: { fontIcon: 'update_disabled' } },
                         shape: 'circle',
                         size: 'sm',
-                        color: 'error',
                       }),
+                      actions.class.top('text-error'),
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
@@ -188,8 +190,8 @@ export const PreAuthkeyPageDefine = v.pipe(
                         content: { icon: { fontIcon: 'delete' } },
                         shape: 'circle',
                         size: 'sm',
-                        color: 'error',
                       }),
+                      actions.class.top('text-error'),
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
@@ -214,6 +216,31 @@ export const PreAuthkeyPageDefine = v.pipe(
         },
       }),
       actions.props.patch({ sortList: ['title1', 'badge1'] }),
+      actions.hooks.merge({
+        allFieldsResolved: (field) => {
+          let defineField = field.get(['@preauthkey'])!;
+          let status$ = computed(() => {
+            return field.props()['status'];
+          });
+          let user$$ = computed(() => (defineField.props()['user$$']() as User).id);
+          let init = false;
+          effect(
+            () => {
+              let status = status$() as TableStatusService;
+              if (!status) {
+                return;
+              }
+              user$$();
+              if (!init) {
+                init = true;
+                return;
+              }
+              status.needUpdate();
+            },
+            { injector: field.injector }
+          );
+        },
+      }),
       actions.props.patchAsync({
         data: (field) => {
           let api = field.context['api'] as ApiService;
