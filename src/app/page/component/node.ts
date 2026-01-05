@@ -1,5 +1,12 @@
 import * as v from 'valibot';
-import { asControl, hideWhen, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
+import {
+  asControl,
+  formConfig,
+  hideWhen,
+  NFCSchema,
+  setAlias,
+  setComponent,
+} from '@piying/view-angular-core';
 import { computed, effect, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
 import {
@@ -22,6 +29,9 @@ import { metadataList } from '@piying/valibot-visit';
 import { requestLoading } from '../../util/request-loading';
 import { formatDatetimeToStr } from '../../util/time-to-str';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { LeftTitleAction } from '../../define/left-title';
+import { PickerTimeRangeDefine } from '../../define/picker-time-range';
+import { timeInRange } from '../../util/time-in-range';
 let newDate = new Date();
 const ExpireNodeDefine = v.pipe(
   v.object({
@@ -46,10 +56,45 @@ const ROSTRLabelWrapper = metadataList<any>([
     labelPosition: 'left',
   }),
 ]);
+const FilterCondition = v.pipe(
+  v.object({
+    params: v.pipe(
+      v.object({
+        givenName: v.pipe(v.optional(v.string()), v.title('name'), LeftTitleAction),
+        ip: v.pipe(v.optional(v.string()), v.title('ip'), LeftTitleAction),
+        createdAt: v.pipe(v.optional(PickerTimeRangeDefine), v.title('createdAt'), LeftTitleAction),
+        lastSeen: v.pipe(v.optional(PickerTimeRangeDefine), v.title('lastSeen'), LeftTitleAction),
+      }),
+      formConfig({ updateOn: 'submit' }),
+      actions.wrappers.set(['div']),
+      actions.class.top('flex gap-4'),
+      setAlias('filterParams')
+    ),
+    submit: v.pipe(
+      NFCSchema,
+      setComponent('button'),
+      actions.inputs.patch({
+        content: 'Submit',
+        color: 'primary',
+      }),
+      actions.inputs.patchAsync({
+        clicked: (field) => {
+          return () => {
+            const result = field.get(['..', 'params'])!.form.control!;
+            result.emitSubmit();
+          };
+        },
+      })
+    ),
+  }),
+  actions.wrappers.set(['div']),
+  actions.class.top('flex justify-between')
+);
 // todo dynamic
 const ROStrItemDefine = v.pipe(NFCSchema, setComponent('common-data'), ROSTRLabelWrapper);
 export const NodeItemPageDefine = v.pipe(
   v.object({
+    query: FilterCondition,
     table: v.pipe(
       NFCSchema,
       setAlias('table'),
@@ -426,6 +471,48 @@ export const NodeItemPageDefine = v.pipe(
             );
           });
         },
+        localSearchOptions: (field) => {
+          return {
+            filterFn: (
+              item: NodeItem,
+              queryParams?: v.InferOutput<typeof FilterCondition>['params']
+            ) => {
+              if (!queryParams) {
+                return true;
+              }
+              let result = true;
+              if (queryParams.givenName && item.givenName) {
+                result = item.givenName.toLowerCase().includes(queryParams.givenName);
+                if (!result) {
+                  return result;
+                }
+              }
+              if (queryParams.createdAt && item.createdAt) {
+                result = timeInRange(item.createdAt, queryParams.createdAt);
+                if (!result) {
+                  return result;
+                }
+              }
+              if (queryParams.lastSeen && item.lastSeen) {
+                result = timeInRange(item.lastSeen, queryParams.lastSeen);
+                if (!result) {
+                  return result;
+                }
+              }
+              if (queryParams.ip && item.ipAddresses) {
+                let ip = queryParams.ip.toLowerCase();
+                result = item.ipAddresses.some((item) => item.toLowerCase().includes(ip));
+                if (!result) {
+                  return result;
+                }
+              }
+              return result;
+            },
+          };
+        },
+        filterParams: (field) => {
+          return field.get(['@filterParams'])!.form.control!.valueChanges;
+        },
       }),
       actions.props.mapAsync((field) => {
         const pageProps = field.get(['..', 'bottom', 'page'])!.props;
@@ -437,6 +524,7 @@ export const NodeItemPageDefine = v.pipe(
               page: pageProps?.()['pageQueryParams'],
               // sort-table
               direction: value['sortQueryParams'],
+              filter: value['filterParams'],
             },
           };
         };
