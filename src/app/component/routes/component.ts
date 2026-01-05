@@ -17,7 +17,7 @@ import { firstValueFrom } from 'rxjs';
 import { TableStatusService } from '@piying-lib/angular-daisyui/extension';
 @Component({
   selector: 'app-node-router',
-  imports: [NgTemplateOutlet, PurePipe, MatIconModule],
+  imports: [PurePipe, MatIconModule],
   templateUrl: './component.html',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,

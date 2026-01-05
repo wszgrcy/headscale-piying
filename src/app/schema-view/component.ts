@@ -9,7 +9,7 @@ const defaultValue = Promise.resolve(undefined);
   selector: 'app-schema-view',
   templateUrl: './component.html',
   standalone: true,
-  imports: [PiyingView, AsyncPipe, SelectorlessOutlet],
+  imports: [SelectorlessOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SchemaViewRC {
