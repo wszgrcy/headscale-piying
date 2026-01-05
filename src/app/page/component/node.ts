@@ -1,8 +1,17 @@
 import * as v from 'valibot';
 import { asControl, hideWhen, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
-import { computed } from '@angular/core';
+import { computed, effect, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
-import { filter, firstValueFrom, map, Observable, skip, startWith, Subject } from 'rxjs';
+import {
+  combineLatest,
+  filter,
+  firstValueFrom,
+  map,
+  Observable,
+  skip,
+  startWith,
+  Subject,
+} from 'rxjs';
 import { ExpandRowDirective, TableStatusService } from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
 import { ListUsersRes } from '../../../api/type';
@@ -12,6 +21,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { metadataList } from '@piying/valibot-visit';
 import { requestLoading } from '../../util/request-loading';
 import { formatDatetimeToStr } from '../../util/time-to-str';
+import { toObservable } from '@angular/core/rxjs-interop';
 let newDate = new Date();
 const ExpireNodeDefine = v.pipe(
   v.object({
@@ -92,25 +102,58 @@ export const NodeItemPageDefine = v.pipe(
                 ),
               },
               id: {
-                head: 'id',
+                head: v.pipe(
+                  NFCSchema,
+                  setComponent('common-data'),
+                  actions.inputs.patch({ content: 'id' }),
+                  actions.wrappers.set(['td', 'sort-header']),
+                  actions.props.patch({
+                    key: 'id',
+                  })
+                ),
                 body: (data: NodeItem) => {
                   return data.id;
                 },
               },
               givenName: {
-                head: 'givenName',
+                head: v.pipe(
+                  NFCSchema,
+                  setComponent('common-data'),
+                  actions.inputs.patch({ content: 'givenName' }),
+                  actions.wrappers.set(['td', 'sort-header']),
+                  actions.props.patch({
+                    key: 'givenName',
+                  })
+                ),
                 body: (data: NodeItem) => {
                   return data.givenName;
                 },
               },
               createdAt: {
-                head: 'createdAt',
+                head: v.pipe(
+                  NFCSchema,
+                  setComponent('common-data'),
+                  actions.inputs.patch({ content: 'createdAt' }),
+                  actions.wrappers.set(['td', 'sort-header']),
+                  actions.props.patch({
+                    key: 'createdAt',
+                    direction: -1,
+                  })
+                ),
                 body: (data: NodeItem) => {
                   return formatDatetimeToStr(data.createdAt);
                 },
               },
               lastSeen: {
-                head: 'lastSeen',
+                head: v.pipe(
+                  NFCSchema,
+                  setComponent('common-data'),
+                  actions.inputs.patch({ content: 'lastSeen' }),
+                  actions.wrappers.set(['td', 'sort-header']),
+                  actions.props.patch({
+                    key: 'lastSeen',
+                  })
+                ),
                 body: (data: NodeItem) => {
                   return formatDatetimeToStr(data.lastSeen);
                 },
@@ -311,21 +354,29 @@ export const NodeItemPageDefine = v.pipe(
 
                   actions.hooks.merge({
                     allFieldsResolved: (field) => {
-                      let item = field.context!['item$']() as NodeItem;
+                      effect(
+                        (fn) => {
+                          let item = field.context!['item$']() as NodeItem;
 
-                      setTimeout(() => {
-                        field.form.control!.updateValue({
-                          nodeTag: item.forcedTags,
-                          ipAddresses: item.ipAddresses,
-                        });
-                        let api: ApiService = field.context['api'];
-                        field
-                          .get(['nodeTag'])!
-                          .form.control!.valueChanges.pipe(skip(1), filter(Boolean))
-                          .subscribe(async (value) => {
-                            await firstValueFrom(api.SetTags(item.id!, { tags: value }));
+                          field.form.control!.updateValue({
+                            nodeTag: item.forcedTags,
+                            ipAddresses: item.ipAddresses,
                           });
-                      }, 0);
+                          let api: ApiService = field.context['api'];
+                          untracked(() => {
+                            let ref = field
+                              .get(['nodeTag'])!
+                              .form.control!.valueChanges.pipe(skip(1), filter(Boolean))
+                              .subscribe(async (value) => {
+                                await firstValueFrom(api.SetTags(item.id!, { tags: value }));
+                              });
+                            fn(() => {
+                              ref.unsubscribe();
+                            });
+                          });
+                        },
+                        { injector: field.injector }
+                      );
                     },
                   }),
                   actions.wrappers.set([
@@ -342,9 +393,14 @@ export const NodeItemPageDefine = v.pipe(
                       let sm = field.context.status['selectionModel$$'] as Observable<
                         SelectionModel<unknown>
                       >;
-                      return sm.pipe(
-                        map((value) => {
-                          return !value.isSelected(field.context.item$());
+                      return combineLatest([
+                        toObservable(field.context['item$'], {
+                          injector: field.injector,
+                        }),
+                        sm,
+                      ]).pipe(
+                        map(([item, sm]) => {
+                          return !sm.isSelected(item);
                         }),
                         startWith(true)
                       );
@@ -356,7 +412,7 @@ export const NodeItemPageDefine = v.pipe(
           };
         },
       }),
-      actions.props.patch({ sortList: ['title1', 'badge1'] }),
+      actions.props.patch({ sortList: ['createdAt', 'lastSeen', 'givenName', 'id'] }),
       actions.props.patchAsync({
         data: (field) => {
           let api = field.context['api'] as ApiService;
