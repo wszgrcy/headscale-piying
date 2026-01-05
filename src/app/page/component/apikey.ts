@@ -9,6 +9,7 @@ import { ListUsersRes } from '../../../api/type';
 import { ApiKey } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { requestLoading } from '../../util/request-loading';
+import { formatDatetimeToStr } from '../../util/time-to-str';
 // todo dynamic
 let newDate = new Date();
 newDate.setDate(newDate.getDate() + 90);
@@ -38,7 +39,7 @@ export const ApiKeyPageDefine = v.pipe(
             row: {
               head: [
                 {
-                  columns: ['id', 'prefix', 'expiration', 'createdAt', 'lastSeen', 'actions'],
+                  columns: ['id', 'prefix', 'expiration', 'lastSeen', 'createdAt', 'actions'],
                 },
               ],
               body: [
@@ -52,7 +53,7 @@ export const ApiKeyPageDefine = v.pipe(
                     //   },
                     // ])
                   ),
-                  columns: ['id', 'prefix', 'expiration', 'createdAt', 'lastSeen', 'actions'],
+                  columns: ['id', 'prefix', 'expiration', 'lastSeen', 'createdAt', 'actions'],
                 },
                 // { define: v.pipe(v.tuple([]), setComponent('tr')), columns: ['extra'] },
               ],
@@ -88,19 +89,19 @@ export const ApiKeyPageDefine = v.pipe(
               expiration: {
                 head: 'expiration',
                 body: (data: ApiKey) => {
-                  return data.expiration;
+                  return formatDatetimeToStr(data.expiration);
                 },
               },
               createdAt: {
                 head: 'createdAt',
                 body: (data: ApiKey) => {
-                  return data.createdAt;
+                  return formatDatetimeToStr(data.createdAt);
                 },
               },
               lastSeen: {
                 head: 'lastSeen',
                 body: (data: ApiKey) => {
-                  return data.lastSeen ?? '';
+                  return formatDatetimeToStr(data.lastSeen);
                 },
               },
 
