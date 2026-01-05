@@ -18,18 +18,19 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
+            "polyfills": ["./src/polyfill"],
             "assets": [
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "input": "./node_modules/monaco-editor/min",
+                "glob": "**/*",
+                "output": "lib/monaco-editor"
               }
             ],
-            "styles": ["src/styles.css", "material-icons/iconfont/filled.css"],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "styles": ["src/styles.css", "material-icons/iconfont/filled.css"]
           },
           "configurations": {
             "production": {
@@ -64,7 +65,7 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-           "prebundle": false
+            "prebundle": false
           },
           "configurations": {
             "production": {

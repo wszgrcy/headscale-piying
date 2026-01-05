@@ -15,6 +15,7 @@ import { DialogService } from './service/dialog.service';
 import { ApiKeyPageDefine } from './page/component/apikey';
 import { NodeItemPageDefine } from './page/component/node';
 import { CopyService } from './service/copy.service';
+import { ACLPageDefine } from './page/component/acl';
 
 export const routes: Routes = [
   {
@@ -73,6 +74,19 @@ export const routes: Routes = [
         component: SchemaViewRC,
         data: {
           schema: () => NodeItemPageDefine,
+          context: () => {
+            return {
+              api: inject(ApiService),
+              dialog: inject(DialogService),
+            };
+          },
+        },
+      },
+      {
+        path: 'acl',
+        component: SchemaViewRC,
+        data: {
+          schema: () => ACLPageDefine,
           context: () => {
             return {
               api: inject(ApiService),

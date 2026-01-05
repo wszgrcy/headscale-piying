@@ -41,6 +41,7 @@ export const MainPage = v.pipe(
               { title: 'user', router: { routerLink: './user' } },
               { title: 'node', router: { routerLink: './node' } },
               { title: 'apikey', router: { routerLink: './apikey' } },
+              { title: 'acl', router: { routerLink: './acl' } },
 
               { type: 'divider' },
             ],

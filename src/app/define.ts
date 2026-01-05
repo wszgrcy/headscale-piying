@@ -14,6 +14,8 @@ import { actions, setComponent } from '@piying/view-angular-core';
 import { NodeTagFCC } from './component/node-tag/component';
 import { UlGroup } from './component/ul/component';
 import { NodeRouterNFCC } from './component/routes/component';
+import { ACLTxtEditorFCC } from './component/acl-text-editor/component';
+import { InputButtonNFCC } from './component/input-button/component';
 const selectorPrefix = 'app-';
 
 const list = [
@@ -125,6 +127,12 @@ export const FieldGlobalConfig: PiViewConfig = {
     },
     'node-router': {
       type: NodeRouterNFCC,
+    },
+    'acl-text-editor': {
+      type: ACLTxtEditorFCC,
+    },
+    'input-button': {
+      type: InputButtonNFCC,
     },
   },
   wrappers: {

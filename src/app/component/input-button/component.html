@@ -1,0 +1,11 @@
+<ng-template #templateRef let-attr="attributes" let-events="events">
+  <input
+    [type]="type()"
+    [events]="events()"
+    [attributes]="attr()"
+    [excludes]="['class']"
+    [class]="'btn' | mergeClass : wrapperClass$$()"
+    (click)="onClick($event)"
+    [disabled]="isLoading$() || disabled()"
+  />
+</ng-template>

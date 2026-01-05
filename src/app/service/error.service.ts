@@ -9,6 +9,8 @@ export class MyErrorHandler implements ErrorHandler {
   handleError(error: any) {
     if (error instanceof HttpErrorResponse) {
       this.#toast.add(`${JSON.stringify(error.error)}\n${error.message}`, { type: 'error' });
+    } else {
+      throw error;
     }
   }
 }
