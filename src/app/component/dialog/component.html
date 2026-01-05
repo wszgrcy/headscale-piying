@@ -1,5 +1,5 @@
 <div class="card bg-base-100 h-full">
-  <div class="card-body overflow-hidden">
+  <div class="card-body overflow-hidden relative">
     <h2 class="card-title">{{ data.title }}</h2>
 
     <piying-view
@@ -20,5 +20,13 @@
         [disabled]="ref.form$$()?.invalid ?? true"
       />
     </div>
+    @if (loading$()) {
+
+    <div
+      class="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center bg-base-200/70"
+    >
+      <span class="loading text-primary"></span>
+    </div>
+    }
   </div>
 </div>
