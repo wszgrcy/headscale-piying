@@ -1,5 +1,12 @@
 import * as v from 'valibot';
-import { hideWhen, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
+import {
+  _PiResolvedCommonViewFieldConfig,
+  formConfig,
+  hideWhen,
+  NFCSchema,
+  setAlias,
+  setComponent,
+} from '@piying/view-angular-core';
 import { computed } from '@angular/core';
 import { actions } from '@piying/view-angular';
 import { firstValueFrom, map, startWith, Subject } from 'rxjs';
@@ -10,26 +17,58 @@ import { ApiKey } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { requestLoading } from '../../util/request-loading';
 import { formatDatetimeToStr } from '../../util/time-to-str';
+async function requestACL(field: _PiResolvedCommonViewFieldConfig) {
+  let api = field.context['api'] as ApiService;
+
+  let value = await firstValueFrom(api.GetPolicy());
+
+  let editorField = field.get(['@editor'])!;
+  editorField.form.control!.updateValue(JSON.parse(value.policy ?? '{}'));
+}
 export const ACLPageDefine = v.object({
   editor: v.pipe(
-    v.string(),
+    v.any(),
     setComponent('acl-text-editor'),
+    setAlias('editor'),
+
     actions.class.component('h-100'),
     actions.hooks.merge({
       allFieldsResolved: async (field) => {
-        let api = field.context['api'] as ApiService;
-        let value = await firstValueFrom(api.GetPolicy());
-        console.log(value);
+        requestACL(field);
       },
     })
   ),
   bottom: v.pipe(
     v.object({
+      reset: v.pipe(
+        NFCSchema,
+        setComponent('input-button'),
+        actions.inputs.patch({ type: 'reset', color: 'error' }),
+        actions.inputs.patchAsync({
+          clicked: (field) => {
+            return () => {
+              return requestACL(field);
+            };
+          },
+        })
+      ),
       submit: v.pipe(
         NFCSchema,
         setComponent('input-button'),
-        actions.inputs.patch({ type: 'submit' })
+        actions.inputs.patch({ type: 'submit', color: 'primary' }),
+        actions.inputs.patchAsync({
+          clicked: (field) => {
+            return async () => {
+              let api = field.context['api'] as ApiService;
+              let editorField = field.get(['@editor'])!;
+              let content = editorField.form.control!.value;
+              await firstValueFrom(api.SetPolicy({ policy: JSON.stringify(content) }));
+            };
+          },
+        })
       ),
-    })
+    }),
+    actions.wrappers.set(['div']),
+    actions.class.top('flex gap-2 justify-end')
   ),
 });

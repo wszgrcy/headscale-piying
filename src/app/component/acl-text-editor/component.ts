@@ -31,7 +31,7 @@ export class ACLTxtEditorFCC extends BaseControl {
   override writeValue(value: any): void {
     super.writeValue(value);
     this.#inited.promise.then((instance) => {
-      instance.setValue(value ?? '');
+      instance.setValue(JSON.stringify(value ?? {}));
     });
   }
   async init() {
@@ -55,9 +55,11 @@ export class ACLTxtEditorFCC extends BaseControl {
       language: 'json',
       minimap: { enabled: false },
     });
-    instance.onDidChangeModelContent((e) => {
-      this.valueChange(instance.getValue());
+
+    instance.onDidBlurEditorText((e) => {
+      this.valueAndTouchedChange(JSON.parse(instance.getValue()));
     });
+
     return instance;
   }
 }
