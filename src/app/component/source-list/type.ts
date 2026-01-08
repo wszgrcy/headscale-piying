@@ -1,3 +1,4 @@
+import { ResourceRef } from '@angular/core';
 import { Observable } from 'rxjs';
 import * as v from 'valibot';
 export enum SourceType {
@@ -13,10 +14,10 @@ export enum SourceType {
 }
 export interface SourceOption {
   //   type: SourceType;
-  type: 'list' | 'item';
-  label: string;
+  // type: 'list' | 'item';
+  label?: string;
   value?: string;
-  children$$?: Observable<SourceOption[]>;
+  children$$?: ResourceRef<SourceOption[]>;
   children?: SourceOption[];
   prefix?: string;
 

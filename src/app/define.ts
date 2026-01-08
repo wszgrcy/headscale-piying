@@ -19,6 +19,8 @@ import { InputButtonNFCC } from './component/input-button/component';
 import { RowGroupFGC } from './component/row-group/component';
 import { ColumnGroupFGC } from './component/column-group/component';
 import { SourceListFCC } from './component/source-list';
+import { SourceInputFCC } from './component/source-input';
+import { EditableBadgeFCC } from './component/edit-badge';
 const selectorPrefix = 'app-';
 
 const list = [
@@ -116,11 +118,17 @@ export const FormDefine = {
   record: {
     actions: [setComponent(PiyingViewGroup)],
   },
+  tuple: {
+    actions: [setComponent(PiyingViewGroup)],
+  },
   'row-group': {
     actions: [setComponent(RowGroupFGC)],
   },
   'column-group': {
     actions: [setComponent(ColumnGroupFGC)],
+  },
+  'editable-badge': {
+    actions: [setComponent(EditableBadgeFCC)],
   },
 } as PiViewConfig['types'];
 
@@ -154,6 +162,9 @@ export const FieldGlobalConfig: PiViewConfig = {
     },
     'source-list': {
       type: SourceListFCC,
+    },
+    'source-input': {
+      actions: [setComponent(SourceInputFCC)],
     },
   },
   wrappers: {

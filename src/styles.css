@@ -4,13 +4,13 @@
 @plugin "daisyui";
 @source '../node_modules/@piying-lib/angular-daisyui/fesm2022';
 @source '../node_modules/@piying-lib/angular-daisyui/preset-css/ts';
-.pi-valid > * {
+.input.pi-valid {
   @apply border-success;
 }
-.pi-invalid > * {
+.input.pi-invalid {
   @apply border-error;
 }
-.pi-untouched.pi-invalid:not(.pi-dirty) > * {
+.input.pi-untouched.pi-invalid:not(.pi-dirty) {
   @apply border-warning;
 }
 .micon-4 {

@@ -1,5 +1,6 @@
 import * as v from 'valibot';
 import {
+  _PiResolvedCommonViewFieldConfig,
   actions,
   asControl,
   NFCSchema,
@@ -7,6 +8,50 @@ import {
   renderConfig,
   setComponent,
 } from '@piying/view-angular-core';
+import { SourceOption } from '../component/source-list/type';
+import { of } from 'rxjs';
+import { AclSourceService } from '../service/acl-source.service';
+export const IP_CIDR_REGEX: RegExp =
+  /^(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])(?:\.(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])){3}\/(?:\d|[1|2]\d|3[0-2])$|^(?:(?:[\da-f]{1,4}:){7}[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,7}:|(?:[\da-f]{1,4}:){1,6}:[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,5}(?::[\da-f]{1,4}){1,2}|(?:[\da-f]{1,4}:){1,4}(?::[\da-f]{1,4}){1,3}|(?:[\da-f]{1,4}:){1,3}(?::[\da-f]{1,4}){1,4}|(?:[\da-f]{1,4}:){1,2}(?::[\da-f]{1,4}){1,5}|[\da-f]{1,4}:(?::[\da-f]{1,4}){1,6}|:(?:(?::[\da-f]{1,4}){1,7}|:)|fe80:(?::[\da-f]{0,4}){0,4}%[\da-z]+|::(?:f{4}(?::0{1,4})?:)?(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d)|(?:[\da-f]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d))\/(?:\d|[1-9]\d|1(?:[0|1]\d|2[0-8]))$/iu;
+const SrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
+  let aclSource = field.context['aclSource'] as AclSourceService;
+  return [
+    { value: '*', label: 'Any' },
+    { label: 'User', children$$: aclSource.user$ },
+    // todo 应该需要先定义
+    // { label: 'Group', children$$: of([]) },
+    { label: 'Ip', children: [], define: v.pipe(v.string(), v.ip(), setComponent('source-input')) },
+
+    {
+      label: 'Cidr',
+      children: [],
+      define: v.pipe(
+        v.string(),
+        v.check((value) => {
+          return IP_CIDR_REGEX.test(value);
+        }),
+        setComponent('source-input'),
+      ),
+    },
+    {
+      label: 'Host',
+      // 根据后面的定义
+      children: [],
+    },
+    {
+      label: 'Tag',
+      prefix: 'tag:',
+      // 根据后面的定义
+      children: [],
+      define: v.pipe(v.string(), setComponent('source-input')),
+    },
+    {
+      label: 'Autogroup',
+      // 根据后面的定义
+      children: [],
+    },
+  ];
+};
 const AddDefine = v.pipe(
   v.any(),
   setComponent('picker-ref'),
@@ -14,13 +59,15 @@ const AddDefine = v.pipe(
     overlayConfig: {
       panelClass: 'bg-base-100',
     },
+    changeClose: true,
   }),
   actions.inputs.patch({
     trigger: v.pipe(
       NFCSchema,
       setComponent('button'),
       actions.inputs.patch({
-        shape: 'primary',
+        color: 'primary',
+        shape: 'circle',
       }),
       actions.inputs.patchAsync({
         content: (field) => {
@@ -35,7 +82,7 @@ const AddDefine = v.pipe(
       setComponent('source-list'),
       actions.inputs.patchAsync({
         options: (field) => {
-          return [{ value: '123' }];
+          return SrcList(field);
         },
       }),
     ),
@@ -49,7 +96,7 @@ export const ACLSchema = v.object({
         v.object({
           action: v.pipe(v.literal('accept'), renderConfig({ hidden: true }), setComponent('')),
           src: v.pipe(
-            v.array(v.string()),
+            v.array(v.pipe(v.string(), setComponent('editable-badge'))),
 
             setComponent('column-group'),
             actions.inputs.patch({

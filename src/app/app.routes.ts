@@ -16,6 +16,7 @@ import { ApiKeyPageDefine } from './page/component/apikey';
 import { NodeItemPageDefine } from './page/component/node';
 import { CopyService } from './service/copy.service';
 import { ACLPageDefine } from './page/component/acl';
+import { AclSourceService } from './service/acl-source.service';
 
 export const routes: Routes = [
   {
@@ -91,6 +92,7 @@ export const routes: Routes = [
             return {
               api: inject(ApiService),
               dialog: inject(DialogService),
+              aclSource: inject(AclSourceService),
             };
           },
         },

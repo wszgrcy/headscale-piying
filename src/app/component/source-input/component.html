@@ -1,0 +1,22 @@
+<ng-template #templateRef let-attr="attributes">
+  <label [class]="'input' | mergeClass: classStatus$$()">
+    <input
+      type="text"
+      [ngModel]="value$()"
+      (ngModelChange)="valueChange($event)"
+      (blur)="touchedChange()"
+    />
+    @if (isError$$()) {
+      <button
+        class="btn btn-circle btn-error btn-ghost btn-xs tooltip"
+        [attr.data-tip]="errorStr$$()"
+      >
+        <mat-icon class="micon-4">help</mat-icon>
+      </button>
+    } @else {
+      <button class="btn btn-circle btn-success btn-ghost btn-xs" (click)="submit()">
+        <mat-icon class="micon-4">check</mat-icon>
+      </button>
+    }
+  </label>
+</ng-template>

@@ -1,4 +1,4 @@
-import { Component, forwardRef, inject, input, signal, viewChild } from '@angular/core';
+import { Component, computed, forwardRef, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BaseControl, PI_INPUT_OPTIONS_TOKEN, PiyingView } from '@piying/view-angular';
 import {
@@ -13,10 +13,37 @@ import { StrOrTemplateComponent } from '@piying-lib/angular-core';
 import { SelectorlessOutlet } from '@cyia/ngx-common/directive';
 import { PurePipe } from '@cyia/ngx-common/pipe';
 import { SourceOption } from './type';
+import {
+  CdkMenu,
+  CdkMenuBar,
+  CdkMenuGroup,
+  CdkMenuItem,
+  CdkMenuItemCheckbox,
+  CdkMenuItemRadio,
+  CdkMenuTrigger,
+} from '@angular/cdk/menu';
+import { ConnectedPosition } from '@angular/cdk/overlay';
+import { MatIconModule } from '@angular/material/icon';
+import * as v from 'valibot';
+import { formConfig } from '@piying/view-angular-core';
+type a = ConnectedPosition;
 @Component({
   selector: 'app-source-list',
   templateUrl: './component.html',
-  imports: [FormsModule, NgTemplateOutlet, SelectorlessOutlet, PurePipe, AsyncPipe],
+  imports: [
+    FormsModule,
+    NgTemplateOutlet,
+    SelectorlessOutlet,
+    PurePipe,
+    AsyncPipe,
+    CdkMenu,
+    CdkMenuTrigger,
+    CdkMenuItem,
+    MatIconModule,
+    CdkMenuItem,
+    CdkMenuTrigger,
+    CdkMenu,
+  ],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -34,7 +61,11 @@ export class SourceListFCC extends BaseControl {
   options = input<SourceOption[], SourceOption[] | undefined>([], {
     transform: (input) => input ?? [],
   });
-
+  root$$ = computed<SourceOption>(() => {
+    return {
+      children: this.options(),
+    };
+  });
   optionInput = (content: any) => {
     return {
       content: signal(content),
@@ -45,22 +76,28 @@ export class SourceListFCC extends BaseControl {
   }
 
   parentPyOptions = inject(PI_INPUT_OPTIONS_TOKEN, { optional: true });
-  getInput$$ = (schema: any) => {
+  getInput$$ = (schema: v.BaseSchema<any, any, any>) => {
     return {
-      schema: schema,
+      schema: v.pipe(
+        v.tuple([v.pipe(schema, formConfig({ updateOn: 'change' }))]),
+        formConfig({ updateOn: 'submit' }),
+      ),
       options: this.parentPyOptions!,
       selectorless: true,
     } as any;
   };
   modelOutput = (option: SourceOption) => {
     return {
-      modelChange: (value: any) => {
-        console.log(option, value);
+      modelChange: ([value]: any) => {
+        let emitValue = option.prefix ? `${option.prefix}${value}` : value;
+        this.valueAndTouchedChange(emitValue);
       },
     };
   };
   activateClass = (a: any, b: any) => {
     return a === b ? 'menu-active' : '';
   };
+  listContenxt(list: any, parent?: any) {
+    return { list: list, parent };
+  }
 }
-
