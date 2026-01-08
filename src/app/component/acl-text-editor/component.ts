@@ -54,6 +54,7 @@ export class ACLTxtEditorFCC extends BaseControl {
       model,
       language: 'json',
       minimap: { enabled: false },
+      automaticLayout: true,
     });
 
     instance.onDidBlurEditorText((e) => {

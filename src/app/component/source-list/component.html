@@ -1,0 +1,43 @@
+<ng-template #itemTemplate let-option>
+  @let rOption = option;
+  @if (rOption.value) {
+    <li (click)="selectOption(rOption)">
+      <button [class]="activateClass | pure: rOption.value : value$()">
+        {{ rOption.label ?? rOption.value }}
+      </button>
+    </li>
+  } @else if (rOption.children || rOption.children$$) {
+    <li>
+      <details open>
+        <summary>
+          {{ rOption.label }}
+        </summary>
+        <ul>
+          @if (rOption.define) {
+            <ng-container
+              [selectlessOutlet]="PiyingView"
+              [selectlessOutletInputs]="getInput$$ | pure: rOption.define"
+              [selectlessOutletOutputs]="modelOutput | pure: rOption"
+            ></ng-container>
+          }
+          @let children =
+            rOption.children$$ ? ((rOption.children$$ | async) ?? []) : rOption.children;
+
+          @for (child of children; track $index) {
+            <ng-container
+              *ngTemplateOutlet="itemTemplate; context: { $implicit: child }"
+            ></ng-container>
+          }
+        </ul>
+      </details>
+    </li>
+  }
+</ng-template>
+
+<ng-template #templateRef let-attr="attributes">
+  <ul class="menu">
+    @for (option of options(); track $index) {
+      <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: option }"></ng-container>
+    }
+  </ul>
+</ng-template>

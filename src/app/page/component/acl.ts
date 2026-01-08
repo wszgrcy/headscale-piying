@@ -17,6 +17,7 @@ import { ApiKey } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { requestLoading } from '../../util/request-loading';
 import { formatDatetimeToStr } from '../../util/time-to-str';
+import { ACLSchema } from '../../define/acl';
 async function requestACL(field: _PiResolvedCommonViewFieldConfig) {
   let api = field.context['api'] as ApiService;
 
@@ -26,18 +27,25 @@ async function requestACL(field: _PiResolvedCommonViewFieldConfig) {
   editorField.form.control!.updateValue(JSON.parse(value.policy ?? '{}'));
 }
 export const ACLPageDefine = v.object({
-  editor: v.pipe(
-    v.any(),
-    setComponent('acl-text-editor'),
-    setAlias('editor'),
-
-    actions.class.component('h-100'),
-    actions.hooks.merge({
-      allFieldsResolved: async (field) => {
-        requestACL(field);
-      },
-    })
+  acl: v.pipe(
+    v.object({
+      view: v.pipe(ACLSchema, v.title('View')),
+      editor: v.pipe(
+        v.any(),
+        setComponent('acl-text-editor'),
+        setAlias('editor'),
+        actions.class.component('h-100'),
+        actions.hooks.merge({
+          allFieldsResolved: async (field) => {
+            requestACL(field);
+          },
+        }),
+        v.title('Editor'),
+      ),
+    }),
+    setComponent('tabs'),
   ),
+
   bottom: v.pipe(
     v.object({
       reset: v.pipe(
@@ -50,7 +58,7 @@ export const ACLPageDefine = v.object({
               return requestACL(field);
             };
           },
-        })
+        }),
       ),
       submit: v.pipe(
         NFCSchema,
@@ -65,10 +73,10 @@ export const ACLPageDefine = v.object({
               await firstValueFrom(api.SetPolicy({ policy: JSON.stringify(content) }));
             };
           },
-        })
+        }),
       ),
     }),
     actions.wrappers.set(['div']),
-    actions.class.top('flex gap-2 justify-end')
+    actions.class.top('flex gap-2 justify-end'),
   ),
 });

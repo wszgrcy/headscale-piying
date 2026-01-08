@@ -16,6 +16,9 @@ import { UlGroup } from './component/ul/component';
 import { NodeRouterNFCC } from './component/routes/component';
 import { ACLTxtEditorFCC } from './component/acl-text-editor/component';
 import { InputButtonNFCC } from './component/input-button/component';
+import { RowGroupFGC } from './component/row-group/component';
+import { ColumnGroupFGC } from './component/column-group/component';
+import { SourceListFCC } from './component/source-list';
 const selectorPrefix = 'app-';
 
 const list = [
@@ -25,20 +28,23 @@ const list = [
   ...Object.values(ExtComponentGroup),
 ] as Type<any>[];
 
-const types = list.reduce((obj, item) => {
-  const result = reflectComponentType(item);
-  if (!result) {
+const types = list.reduce(
+  (obj, item) => {
+    const result = reflectComponentType(item);
+    if (!result) {
+      return obj;
+    }
+    obj[
+      result.selector.startsWith(selectorPrefix)
+        ? result.selector.slice(selectorPrefix.length)
+        : result.selector
+    ] = {
+      type: item,
+    };
     return obj;
-  }
-  obj[
-    result.selector.startsWith(selectorPrefix)
-      ? result.selector.slice(selectorPrefix.length)
-      : result.selector
-  ] = {
-    type: item,
-  };
-  return obj;
-}, {} as Record<string, any>);
+  },
+  {} as Record<string, any>,
+);
 const defaultWrapper = [...Object.values(WrapperGroup), ...Object.values(ExtWrapperGroup)].reduce(
   (obj, item) => {
     const result = reflectComponentType(item as any);
@@ -54,7 +60,7 @@ const defaultWrapper = [...Object.values(WrapperGroup), ...Object.values(ExtWrap
     };
     return obj;
   },
-  {} as Record<string, any>
+  {} as Record<string, any>,
 );
 export const FormDefine = {
   string: {
@@ -104,6 +110,18 @@ export const FormDefine = {
   textarea: {
     actions: [setComponent(FCCGroup.TextareaFCC), actions.wrappers.set(['label-wrapper'])],
   },
+  array: {
+    actions: [setComponent(PiyingViewGroup)],
+  },
+  record: {
+    actions: [setComponent(PiyingViewGroup)],
+  },
+  'row-group': {
+    actions: [setComponent(RowGroupFGC)],
+  },
+  'column-group': {
+    actions: [setComponent(ColumnGroupFGC)],
+  },
 } as PiViewConfig['types'];
 
 export const FieldGlobalConfig: PiViewConfig = {
@@ -133,6 +151,9 @@ export const FieldGlobalConfig: PiViewConfig = {
     },
     'input-button': {
       type: InputButtonNFCC,
+    },
+    'source-list': {
+      type: SourceListFCC,
     },
   },
   wrappers: {
