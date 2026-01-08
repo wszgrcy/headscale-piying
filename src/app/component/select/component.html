@@ -1,0 +1,82 @@
+<ng-template #templateRef let-attr="attributes">
+  @let selected = selectedOption$$();
+  <div
+    [class]="'btn rounded-full' | mergeClass: attr()?.class"
+    [ngClass]="selected?.class"
+    [cdkMenuTriggerFor]="optionTmp"
+    [attributes]="attr()"
+    [excludes]="['class']"
+  >
+    @if (triggerTemplate(); as optTemp) {
+      <ng-container *ngTemplateOutlet="optTemp; context: { $implicit: selected }"></ng-container>
+    } @else {
+      <span class="text-ellipsis overflow-hidden whitespace-nowrap flex-1">
+        {{ selected?.label ?? '' }}
+      </span>
+    }
+    <mat-icon class="flex-none"> keyboard_arrow_down </mat-icon>
+  </div>
+
+  <ng-template #optionTmp>
+    <ul
+      class="menu bg-base-200 rounded-box w-56 gap-2 flex-nowrap overflow-auto"
+      cdkMenu
+      [ngStyle]="ulStyle$$()"
+    >
+      @if (filterEnable() || inputEnable()) {
+        <label class="input px-2! outline-0! flex-none">
+          <mat-icon class="micon-4">search</mat-icon>
+          <input
+            type="text"
+            [placeholder]="inputPlaceholder()"
+            [(ngModel)]="inputContent$"
+            (keydown)="stopKeyboardListen($event)"
+          />
+          @if (inputEnable()) {
+            <mat-icon class="micon-4 text-success cursor-pointer" (click)="addInputOption()"
+              >add</mat-icon
+            >
+          }
+        </label>
+      }
+
+      @if (inputEnable() && inputOption$$(); as option) {
+        <li
+          (click)="valueChange(option.value)"
+          cdkMenuItem
+          [class.menu-active]="value$() === option.value"
+          class="rounded-box"
+        >
+          @if (optionTemplate(); as optTemp) {
+            <ng-container
+              *ngTemplateOutlet="optTemp; context: { $implicit: option }"
+            ></ng-container>
+          } @else {
+            <button class="rounded-box" [ngClass]="option.class">
+              {{ option.label }}
+            </button>
+          }
+        </li>
+      }
+      @for (option of showOptions$$(); track option.value) {
+        <li
+          (click)="valueChange(option.value)"
+          cdkMenuItem
+          [class.menu-active]="value$() === option.value"
+          class="rounded-box overflow-hidden"
+          [ngClass]="option.class"
+        >
+          @if (optionTemplate(); as optTemp) {
+            <ng-container
+              *ngTemplateOutlet="optTemp; context: { $implicit: option }"
+            ></ng-container>
+          } @else {
+            <button>
+              {{ option.label }}
+            </button>
+          }
+        </li>
+      }
+    </ul>
+  </ng-template>
+</ng-template>

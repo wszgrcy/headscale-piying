@@ -1,6 +1,11 @@
 import { Component, computed, forwardRef, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { BaseControl, PI_VIEW_FIELD_TOKEN, PiyingView } from '@piying/view-angular';
+import {
+  AttributesDirective,
+  BaseControl,
+  PI_VIEW_FIELD_TOKEN,
+  PiyingView,
+} from '@piying/view-angular';
 
 import { StrOrTemplateComponent } from '@piying-lib/angular-core';
 import { fieldControlStatusClass } from '@piying/view-angular-core';

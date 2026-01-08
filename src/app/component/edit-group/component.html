@@ -1,0 +1,35 @@
+<ng-template #templateRef let-attr="attributes" let-events="events">
+  @for (field of children$$(); track field.id || $index) {
+    <div class="flex items-center gap-2">
+      @let key = field.key!;
+      <!-- <input type="text" [ngModel]="key" (ngModelChange)="" /> -->
+      {{ key }}
+      <ng-container
+        *ngTemplateOutlet="fieldTemplateRef(); context: { $implicit: field }"
+      ></ng-container>
+      <button class="btn btn-circle" (click)="removeItem(key)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  }
+  <div class="flex items-center gap-2">
+    <ng-container
+      [selectlessOutlet]="PiyingView"
+      [selectlessOutletInputs]="
+        schemaOptions$$ | pure: field$$().form.control!.config$().groupKeySchema
+      "
+      [selectlessOutletOutputs]="modelOutput | pure: newKey$"
+    ></ng-container>
+    <ng-container
+      [selectlessOutlet]="PiyingView"
+      [selectlessOutletInputs]="
+        schemaOptions$$ | pure: field$$().form.control!.config$().groupValueSchema
+      "
+      [selectlessOutletOutputs]="modelOutput | pure: newValue$"
+    ></ng-container>
+
+    <button class="btn btn-circle" (click)="addNew()" color="primary">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+</ng-template>

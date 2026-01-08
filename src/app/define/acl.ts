@@ -11,6 +11,7 @@ import {
 import { SourceOption } from '../component/source-list/type';
 import { of } from 'rxjs';
 import { AclSourceService } from '../service/acl-source.service';
+import ms from 'ms';
 export const IP_CIDR_REGEX: RegExp =
   /^(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])(?:\.(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])){3}\/(?:\d|[1|2]\d|3[0-2])$|^(?:(?:[\da-f]{1,4}:){7}[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,7}:|(?:[\da-f]{1,4}:){1,6}:[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,5}(?::[\da-f]{1,4}){1,2}|(?:[\da-f]{1,4}:){1,4}(?::[\da-f]{1,4}){1,3}|(?:[\da-f]{1,4}:){1,3}(?::[\da-f]{1,4}){1,4}|(?:[\da-f]{1,4}:){1,2}(?::[\da-f]{1,4}){1,5}|[\da-f]{1,4}:(?::[\da-f]{1,4}){1,6}|:(?:(?::[\da-f]{1,4}){1,7}|:)|fe80:(?::[\da-f]{0,4}){0,4}%[\da-z]+|::(?:f{4}(?::0{1,4})?:)?(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d)|(?:[\da-f]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d))\/(?:\d|[1-9]\d|1(?:[0|1]\d|2[0-8]))$/iu;
 const SrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
@@ -88,6 +89,95 @@ const AddDefine = v.pipe(
     ),
   }),
 );
+// todo dst是host:port,所以之间选择不行
+const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
+  let aclSource = field.context['aclSource'] as AclSourceService;
+  return [
+    { value: '*', label: 'Any' },
+    { label: 'User', children$$: aclSource.user$ },
+    // todo 应该需要先定义
+    // { label: 'Group', children$$: of([]) },
+    { label: 'Ip', children: [], define: v.pipe(v.string(), v.ip(), setComponent('source-input')) },
+
+    {
+      label: 'Cidr',
+      children: [],
+      define: v.pipe(
+        v.string(),
+        v.check((value) => {
+          return IP_CIDR_REGEX.test(value);
+        }),
+        setComponent('source-input'),
+      ),
+    },
+    {
+      label: 'Host',
+      // 根据后面的定义
+      children: [],
+    },
+    {
+      label: 'Tag',
+      prefix: 'tag:',
+      // 根据后面的定义
+      children: [],
+      define: v.pipe(v.string(), setComponent('source-input')),
+    },
+    {
+      label: 'Autogroup',
+      // 根据后面的定义
+      children: [
+        'self',
+        'member',
+        'admin',
+        'network-admin',
+        'it-admin',
+        'billing-admin',
+        'auditor',
+        'owner',
+      ].map((item) => {
+        return {
+          value: item,
+        };
+      }),
+    },
+  ];
+};
+const DstDefine = v.pipe(
+  v.any(),
+  setComponent('picker-ref'),
+  actions.inputs.patch({
+    overlayConfig: {
+      panelClass: 'bg-base-100',
+    },
+    changeClose: true,
+  }),
+  actions.inputs.patch({
+    trigger: v.pipe(
+      NFCSchema,
+      setComponent('button'),
+      actions.inputs.patch({
+        color: 'primary',
+        shape: 'circle',
+      }),
+      actions.inputs.patchAsync({
+        content: (field) => {
+          return {
+            icon: { fontIcon: 'add' },
+          };
+        },
+      }),
+    ),
+    content: v.pipe(
+      v.any(),
+      setComponent('source-list'),
+      actions.inputs.patchAsync({
+        options: (field) => {
+          return DstList(field);
+        },
+      }),
+    ),
+  }),
+);
 export const ACLSchema = v.object({
   // 有
   acls: v.pipe(
@@ -97,7 +187,6 @@ export const ACLSchema = v.object({
           action: v.pipe(v.literal('accept'), renderConfig({ hidden: true }), setComponent('')),
           src: v.pipe(
             v.array(v.pipe(v.string(), setComponent('editable-badge'))),
-
             setComponent('column-group'),
             actions.inputs.patch({
               addDefine: AddDefine,
@@ -107,15 +196,11 @@ export const ACLSchema = v.object({
           proto: v.pipe(
             v.optional(
               v.union([
-                v.pipe(
-                  v.number(),
-                  v.check((a) => {
-                    return a > 0 && a < 256;
-                  }),
-                ),
+                v.string(),
                 v.picklist([
                   'igmp',
-                  'ipv4, ip-in-ip',
+                  'ipv4',
+                  'ip-in-ip',
                   'tcp',
                   'egp',
                   'igp',
@@ -127,8 +212,25 @@ export const ACLSchema = v.object({
                 ]),
               ]),
             ),
-            setComponent('number'),
+            setComponent('editable-select'),
             asControl(),
+            actions.class.component('min-w-20'),
+            actions.inputs.patch({
+              inputEnable: true,
+              options: [
+                'igmp',
+                'ipv4',
+                'ip-in-ip',
+                'tcp',
+                'egp',
+                'igp',
+                'udp',
+                'gre',
+                'esp',
+                'ah',
+                'sctp',
+              ],
+            }),
           ),
         }),
       ),
@@ -151,11 +253,20 @@ export const ACLSchema = v.object({
         src: v.array(v.string()),
         dst: v.array(v.string()),
         users: v.optional(v.array(v.string())),
-        checkPeriod: v.optional(v.string()),
+        checkPeriod: v.pipe(
+          v.optional(
+            v.pipe(
+              v.string(),
+              v.transform((value) => {
+                return ms(value as ms.StringValue);
+              }),
+            ),
+          ),
+        ),
       }),
     ),
   ),
-  hosts: v.optional(v.record(v.string(), v.string())),
+  hosts: v.optional(v.pipe(v.record(v.string(), v.string()), setComponent('edit-group'))),
   groups: v.optional(v.record(v.string(), v.array(v.string()))),
   tagOwners: v.optional(v.record(v.string(), v.array(v.string()))),
   autoApprovers: v.optional(

@@ -21,6 +21,8 @@ import { ColumnGroupFGC } from './component/column-group/component';
 import { SourceListFCC } from './component/source-list';
 import { SourceInputFCC } from './component/source-input';
 import { EditableBadgeFCC } from './component/edit-badge';
+import { EditableSelectFCC } from './component/select/component';
+import { EditGroupFGC } from './component/edit-group/component';
 const selectorPrefix = 'app-';
 
 const list = [
@@ -129,6 +131,12 @@ export const FormDefine = {
   },
   'editable-badge': {
     actions: [setComponent(EditableBadgeFCC)],
+  },
+  'editable-select': {
+    actions: [setComponent(EditableSelectFCC)],
+  },
+  'edit-group': {
+    actions: [setComponent(EditGroupFGC)],
   },
 } as PiViewConfig['types'];
 
