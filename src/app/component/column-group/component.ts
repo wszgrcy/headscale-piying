@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { SelectorlessOutlet } from '@cyia/ngx-common/directive';
 import { NgTemplateOutlet } from '@angular/common';
 @Component({
-  selector: 'app-row-group',
+  selector: 'app-column-group',
   templateUrl: './component.html',
   imports: [
     EventsDirective,

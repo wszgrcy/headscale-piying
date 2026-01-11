@@ -267,7 +267,24 @@ export const ACLSchema = v.object({
     ),
   ),
   hosts: v.optional(v.pipe(v.record(v.string(), v.string()), setComponent('edit-group'))),
-  groups: v.optional(v.record(v.string(), v.array(v.string()))),
+  groups: v.optional(
+    v.pipe(
+      v.record(
+        v.pipe(
+          v.string(),
+          v.transform((input) => {
+            return `group:${input}`;
+          }),
+        ),
+        v.pipe(
+          v.array(v.pipe(v.string(), setComponent('editable-badge'))),
+          setComponent('column-group'),
+        ),
+      ),
+      // todo 更新kv定义
+      setComponent('edit-group'),
+    ),
+  ),
   tagOwners: v.optional(v.record(v.string(), v.array(v.string()))),
   autoApprovers: v.optional(
     v.object({

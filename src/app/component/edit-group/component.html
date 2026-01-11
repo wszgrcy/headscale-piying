@@ -7,7 +7,7 @@
       <ng-container
         *ngTemplateOutlet="fieldTemplateRef(); context: { $implicit: field }"
       ></ng-container>
-      <button class="btn btn-circle" (click)="removeItem(key)">
+      <button class="btn btn-circle btn-error" (click)="removeItem(key)">
         <mat-icon>delete</mat-icon>
       </button>
     </div>
