@@ -31,10 +31,9 @@ const SrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
 
   return [
     { value: '*', label: 'Any' },
-    { label: 'User', children$$: service.user$$ },
+    { label: 'User', children$$: service.users$$ },
     { label: 'Group', children$$: service.groups$$ },
     { label: 'Ip', children: [], define: v.pipe(v.string(), v.ip(), setComponent('source-input')) },
-
     {
       label: 'Cidr',
       children: [],
@@ -48,8 +47,7 @@ const SrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
     },
     {
       label: 'Host',
-      // 根据后面的定义
-      children: [],
+      children$$: service.hosts$$,
     },
     {
       label: 'Tag',
@@ -61,7 +59,7 @@ const SrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
     {
       label: 'Autogroup',
       // 根据后面的定义
-      children: [],
+      children: [{ value: 'autogroup:member' }, { value: 'autogroup:tagged' }],
     },
   ];
 };
@@ -71,7 +69,7 @@ const TagOwnerList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] 
   let service: AclService = rootField.props()['service'];
 
   return [
-    { label: 'User', children$$: service.user$$ },
+    { label: 'User', children$$: service.users$$ },
     // todo 应该需要先定义
     { label: 'Group', children$$: service.groups$$ },
 
@@ -82,42 +80,7 @@ const TagOwnerList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] 
     },
   ];
 };
-const AddDefine = v.pipe(
-  v.string(),
-  setComponent('picker-ref'),
-  actions.inputs.patch({
-    overlayConfig: {
-      panelClass: 'bg-base-100',
-    },
-    changeClose: true,
-  }),
-  actions.inputs.patch({
-    trigger: v.pipe(
-      NFCSchema,
-      setComponent('button'),
-      actions.inputs.patch({
-        color: 'primary',
-        shape: 'circle',
-      }),
-      actions.inputs.patchAsync({
-        content: (field) => {
-          return {
-            icon: { fontIcon: 'add' },
-          };
-        },
-      }),
-    ),
-    content: v.pipe(
-      v.any(),
-      setComponent('source-list'),
-      actions.inputs.patchAsync({
-        options: (field) => {
-          return SrcList(field);
-        },
-      }),
-    ),
-  }),
-);
+
 function createSourceListDefine(
   optionListFn: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[],
 ) {
@@ -166,7 +129,7 @@ const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
 
   return [
     { value: '*', label: 'Any' },
-    { label: 'User', children$$: service.user$$ },
+    { label: 'User', children$$: service.users$$ },
     // todo 应该需要先定义
     { label: 'Group', children$$: service.groups$$ },
     { label: 'Ip', children: [], define: v.pipe(v.string(), v.ip(), setComponent('source-input')) },
@@ -262,7 +225,7 @@ export const ACLSchema = v.pipe(
               v.array(v.pipe(v.string(), setComponent('editable-badge'))),
               setComponent('column-group'),
               actions.inputs.patch({
-                addDefine: AddDefine,
+                addDefine: createSourceListDefine(SrcList),
               }),
             ),
             dst: v.array(v.string()),
@@ -304,6 +267,7 @@ export const ACLSchema = v.pipe(
                   'sctp',
                 ],
               }),
+              v.title('proto'),
             ),
           }),
         ),

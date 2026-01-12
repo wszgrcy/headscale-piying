@@ -9,14 +9,23 @@ export class AclService {
 
   groups$$ = computed(() => {
     let value = this.#field$$().get(['groups'])!.form.control!.value$$();
-    return Object.keys(value).map((value) => {
+    return Object.keys(value ?? {}).map((value) => {
       return {
         label: value.slice('group:'.length),
         value: value,
       };
     });
   });
-  user$$ = computed(() => {
+  hosts$$ = computed(() => {
+    let value = this.#field$$().get(['hosts'])!.form.control!.value$$();
+    return Object.keys(value ?? {}).map((value) => {
+      return {
+        label: value,
+        value: value,
+      };
+    });
+  });
+  users$$ = computed(() => {
     return this.#aclSource.user$.value();
   });
 }
