@@ -11,7 +11,7 @@
       <ng-container *ngTemplateOutlet="optTemp; context: { $implicit: selected }"></ng-container>
     } @else {
       <span class="text-ellipsis overflow-hidden whitespace-nowrap flex-1">
-        {{ selected?.label ?? '' }}
+        {{ selected?.label ?? emptyContent() }}
       </span>
     }
     <mat-icon class="flex-none"> keyboard_arrow_down </mat-icon>

@@ -17,12 +17,13 @@ import { NodeRouterNFCC } from './component/routes/component';
 import { ACLTxtEditorFCC } from './component/acl-text-editor/component';
 import { InputButtonNFCC } from './component/input-button/component';
 import { RowGroupFGC } from './component/row-group/component';
-import { ColumnGroupFGC } from './component/column-group/component';
+import { ArrayGroupFGC } from './component/column-group/component';
 import { SourceListFCC } from './component/source-list';
 import { SourceInputFCC } from './component/source-input';
 import { EditableBadgeFCC } from './component/edit-badge';
 import { EditableSelectFCC } from './component/select/component';
 import { EditGroupFGC } from './component/edit-group/component';
+import { ValidateTooltipbWC } from './component/wrapper/validate-tooltip/component';
 const selectorPrefix = 'app-';
 
 const list = [
@@ -68,7 +69,10 @@ const defaultWrapper = [...Object.values(WrapperGroup), ...Object.values(ExtWrap
 );
 export const FormDefine = {
   string: {
-    actions: [setComponent(InputFCC), actions.wrappers.set(['label-wrapper'])],
+    actions: [
+      setComponent(InputFCC),
+      actions.wrappers.set(['label-wrapper', 'validate-tooltip-wrapper']),
+    ],
   },
   number: {
     actions: [
@@ -127,7 +131,7 @@ export const FormDefine = {
     actions: [setComponent(RowGroupFGC)],
   },
   'column-group': {
-    actions: [setComponent(ColumnGroupFGC)],
+    actions: [setComponent(ArrayGroupFGC)],
   },
   'editable-badge': {
     actions: [setComponent(EditableBadgeFCC)],
@@ -179,6 +183,9 @@ export const FieldGlobalConfig: PiViewConfig = {
     ...defaultWrapper,
     div: {
       type: DivWC,
+    },
+    'validate-tooltip-wrapper': {
+      type: ValidateTooltipbWC,
     },
   },
 };

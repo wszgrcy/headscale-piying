@@ -41,8 +41,8 @@ export class EditGroupFGC extends PiyingViewGroupBase {
   templateRef = viewChild.required('templateRef');
   PiyingView = PiyingView;
   defaultValue = input<(index: number) => any>();
-  newKey$ = signal('');
-  newValue$ = signal('');
+  newKey$ = signal(undefined);
+  newValue$ = signal(undefined);
   parentPyOptions = inject(PI_INPUT_OPTIONS_TOKEN, { optional: true });
   schemaOptions$$ = (define: any) => {
     return {
@@ -51,8 +51,10 @@ export class EditGroupFGC extends PiyingViewGroupBase {
       selectorless: true,
     };
   };
-  addNew() {
+  addNew(keyF: SelectorlessOutlet<PiyingView>, valueF: SelectorlessOutlet<PiyingView>) {
     this.field$$().action.set(this.newValue$(), this.newKey$());
+    keyF.componentInstance!.form$$()!.root.reset();
+    valueF.componentInstance!.form$$()!.root.reset();
   }
 
   removeItem(key: string) {

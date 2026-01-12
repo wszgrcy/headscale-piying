@@ -1,6 +1,6 @@
 <ng-template #templateRef let-attr="attributes">
-  @if (isEdit$()) {
-    <span class="badge">
+  <div class="flex items-center">
+    @if (isEdit$()) {
       <input type="text" class="input input-xs" [(ngModel)]="editContent$" />
       <button class="btn btn-circle btn-success btn-xs btn-ghost" (click)="valueChange2()">
         <mat-icon class="micon-4">check</mat-icon>
@@ -8,17 +8,13 @@
       <button class="btn btn-circle btn-error btn-xs btn-ghost" (click)="isEdit$.set(false)">
         <mat-icon class="micon-4">close</mat-icon>
       </button>
-    </span>
-  } @else if (value$()) {
-    <span class="badge">
-      {{ value$() }}
+    } @else {
+      @if (value$()) {
+        {{ value$() }}
+      }
       <button class="btn btn-circle btn-accent btn-xs btn-ghost" (click)="isEdit$.set(true)">
         <mat-icon class="micon-4">edit</mat-icon>
       </button>
-    </span>
-  } @else {
-    <button class="btn btn-circle btn-accent btn-xs btn-ghost" (click)="isEdit$.set(true)">
-      <mat-icon class="micon-4">edit</mat-icon>
-    </button>
-  }
+    }
+  </div>
 </ng-template>

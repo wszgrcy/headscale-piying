@@ -53,6 +53,7 @@ export class EditableSelectFCC<T> extends BaseControl {
   inputEnable = input<boolean>();
   filterEnable = input<boolean>();
   inputPlaceholder = input<string>('Search...');
+  emptyContent = input<string>('[[Select]]');
   filterFn = input<(list: any[], filterContent: string) => any[]>((list, filterContent) => {
     filterContent = filterContent.toLowerCase();
     return list.filter((item) => {

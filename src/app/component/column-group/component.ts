@@ -25,7 +25,7 @@ import { PurePipe } from '@cyia/ngx-common/pipe';
     PurePipe,
   ],
 })
-export class ColumnGroupFGC extends PiyingViewGroupBase {
+export class ArrayGroupFGC extends PiyingViewGroupBase {
   static __version = 2;
   templateRef = viewChild.required('templateRef');
   PiyingView = PiyingView;
@@ -33,7 +33,7 @@ export class ColumnGroupFGC extends PiyingViewGroupBase {
   parentPyOptions = inject(PI_INPUT_OPTIONS_TOKEN, { optional: true });
   schemaOptions$$ = computed(() => {
     return {
-      schema: this.addDefine(),
+      schema: this.addDefine() ?? this.field$$().form.control!.config$().groupValueSchema,
       options: this.parentPyOptions!(),
       selectorless: true,
     };

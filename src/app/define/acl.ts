@@ -6,6 +6,7 @@ import {
   NFCSchema,
   nonFieldControl,
   renderConfig,
+  setAlias,
   setComponent,
 } from '@piying/view-angular-core';
 import { SourceOption } from '../component/source-list/type';
@@ -14,6 +15,13 @@ import { AclSourceService } from '../service/acl-source.service';
 import ms from 'ms';
 export const IP_CIDR_REGEX: RegExp =
   /^(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])(?:\.(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])){3}\/(?:\d|[1|2]\d|3[0-2])$|^(?:(?:[\da-f]{1,4}:){7}[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,7}:|(?:[\da-f]{1,4}:){1,6}:[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,5}(?::[\da-f]{1,4}){1,2}|(?:[\da-f]{1,4}:){1,4}(?::[\da-f]{1,4}){1,3}|(?:[\da-f]{1,4}:){1,3}(?::[\da-f]{1,4}){1,4}|(?:[\da-f]{1,4}:){1,2}(?::[\da-f]{1,4}){1,5}|[\da-f]{1,4}:(?::[\da-f]{1,4}){1,6}|:(?:(?::[\da-f]{1,4}){1,7}|:)|fe80:(?::[\da-f]{0,4}){0,4}%[\da-z]+|::(?:f{4}(?::0{1,4})?:)?(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d)|(?:[\da-f]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d))\/(?:\d|[1-9]\d|1(?:[0|1]\d|2[0-8]))$/iu;
+const IpDefine = v.pipe(v.string(), v.ip());
+const CidrDefine = v.pipe(
+  v.string(),
+  v.check((value) => {
+    return IP_CIDR_REGEX.test(value);
+  }),
+);
 const SrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
   let aclSource = field.context['aclSource'] as AclSourceService;
   return [
@@ -53,8 +61,22 @@ const SrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
     },
   ];
 };
+const TagOwnerList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
+  let aclSource = field.context['aclSource'] as AclSourceService;
+  return [
+    { label: 'User', children$$: aclSource.user$ },
+    // todo 应该需要先定义
+    // { label: 'Group', children$$: of([]) },
+
+    {
+      label: 'Autogroup',
+      // 根据后面的定义
+      children: [],
+    },
+  ];
+};
 const AddDefine = v.pipe(
-  v.any(),
+  v.string(),
   setComponent('picker-ref'),
   actions.inputs.patch({
     overlayConfig: {
@@ -89,6 +111,46 @@ const AddDefine = v.pipe(
     ),
   }),
 );
+function createSourceListDefine(
+  optionListFn: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[],
+) {
+  return v.pipe(
+    v.string(),
+    setComponent('picker-ref'),
+    actions.inputs.patch({
+      overlayConfig: {
+        panelClass: 'bg-base-100',
+      },
+      changeClose: true,
+    }),
+    actions.inputs.patch({
+      trigger: v.pipe(
+        NFCSchema,
+        setComponent('button'),
+        actions.inputs.patch({
+          color: 'primary',
+          shape: 'circle',
+        }),
+        actions.inputs.patchAsync({
+          content: (field) => {
+            return {
+              icon: { fontIcon: 'add' },
+            };
+          },
+        }),
+      ),
+      content: v.pipe(
+        v.any(),
+        setComponent('source-list'),
+        actions.inputs.patchAsync({
+          options: (field) => {
+            return optionListFn(field);
+          },
+        }),
+      ),
+    }),
+  );
+}
 // todo dst是host:port,所以之间选择不行
 const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
   let aclSource = field.context['aclSource'] as AclSourceService;
@@ -270,12 +332,33 @@ export const ACLSchema = v.object({
         }),
       ),
     ),
+    setComponent('row-group'),
     v.title('ssh'),
     actions.wrappers.patch(['fieldset-wrapper']),
     actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
   ),
   hosts: v.pipe(
-    v.optional(v.pipe(v.record(v.string(), v.string()), setComponent('edit-group'))),
+    v.optional(
+      v.pipe(
+        v.record(
+          v.pipe(
+            v.string(),
+            v.minLength(1),
+            actions.attributes.patch({ placeholder: 'host' }),
+            v.check((item) => {
+              return !item.includes('@');
+            }, 'The human-friendly hostname cannot include the character @.'),
+          ),
+          v.pipe(
+            v.union([IpDefine, CidrDefine]),
+            asControl(),
+            setComponent('string'),
+            actions.attributes.patch({ placeholder: 'ip/cidr' }),
+          ),
+        ),
+        setComponent('edit-group'),
+      ),
+    ),
     v.title('hosts'),
     actions.wrappers.patch(['fieldset-wrapper']),
     actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
@@ -293,11 +376,20 @@ export const ACLSchema = v.object({
             actions.class.top('min-w-20'),
           ),
           v.pipe(
-            v.array(v.pipe(v.string(), setComponent('editable-badge'))),
+            v.array(
+              v.pipe(
+                v.string(),
+                setComponent('editable-select'),
+                actions.inputs.patch({ filterEnable: true }),
+                actions.inputs.patchAsync({
+                  options: (field) => {
+                    let aclSource: AclSourceService = field.context['aclSource'];
+                    return aclSource.user$.value;
+                  },
+                }),
+              ),
+            ),
             setComponent('column-group'),
-            actions.inputs.patch({
-              addDefine: v.pipe(v.string(), setComponent('editable-badge')),
-            }),
           ),
         ),
         // todo 更新kv定义
@@ -319,12 +411,11 @@ export const ACLSchema = v.object({
           actions.attributes.patch({ placeholder: 'name' }),
           actions.class.top('min-w-20'),
         ),
-        // todo 感觉应该用动态选择
         v.pipe(
           v.array(v.pipe(v.string(), setComponent('editable-badge'))),
           setComponent('column-group'),
           actions.inputs.patch({
-            addDefine: v.pipe(v.string(), setComponent('editable-badge')),
+            addDefine: v.pipe(createSourceListDefine(TagOwnerList)),
           }),
         ),
       ),
