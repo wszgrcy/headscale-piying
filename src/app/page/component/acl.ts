@@ -28,9 +28,13 @@ async function requestACL(field: _PiResolvedCommonViewFieldConfig) {
 }
 export const ACLPageDefine = v.object({
   acl: v.pipe(
-    v.object({
-      view: v.pipe(ACLSchema, v.title('View')),
-      editor: v.pipe(
+    v.union([
+      v.pipe(
+        ACLSchema,
+        v.title('View'),
+        actions.wrappers.patchAsync('div', [actions.class.component('*:w-full')]),
+      ),
+      v.pipe(
         v.any(),
         setComponent('acl-text-editor'),
         setAlias('editor'),
@@ -42,7 +46,8 @@ export const ACLPageDefine = v.object({
         }),
         v.title('Editor'),
       ),
-    }),
+    ]),
+    setAlias('aclContent'),
     setComponent('tabs'),
   ),
 
