@@ -216,108 +216,6 @@ const DstDefine = v.pipe(
 );
 export const ACLSchema = v.pipe(
   v.object({
-    // 有
-    acls: v.pipe(
-      v.optional(
-        v.array(
-          v.object({
-            action: v.pipe(v.literal('accept'), renderConfig({ hidden: true }), setComponent('')),
-            src: v.pipe(
-              v.array(v.pipe(v.string(), setComponent('editable-badge'))),
-              setComponent('column-group'),
-              actions.inputs.patch({
-                addDefine: createSourceListDefine(SrcList),
-              }),
-            ),
-            dst: v.array(v.string()),
-            proto: v.pipe(
-              v.optional(
-                v.union([
-                  v.string(),
-                  v.picklist([
-                    'igmp',
-                    'ipv4',
-                    'ip-in-ip',
-                    'tcp',
-                    'egp',
-                    'igp',
-                    'udp',
-                    'gre',
-                    'esp',
-                    'ah',
-                    'sctp',
-                  ]),
-                ]),
-              ),
-              setComponent('editable-select'),
-              asControl(),
-              actions.class.component('min-w-20'),
-              actions.inputs.patch({
-                inputEnable: true,
-                inputPlaceholder:'Select Or Input',
-                options: [
-                  'igmp',
-                  'ipv4',
-                  'ip-in-ip',
-                  'tcp',
-                  'egp',
-                  'igp',
-                  'udp',
-                  'gre',
-                  'esp',
-                  'ah',
-                  'sctp',
-                ],
-              }),
-              actions.wrappers.set(['label-wrapper']),
-              actions.props.patch({
-                labelPosition: 'left',
-              }),
-              v.title('proto'),
-            ),
-          }),
-        ),
-      ),
-      actions.inputs.patch({
-        defaultValue: () => {
-          return {
-            action: ['accept'],
-            src: [],
-            dst: [],
-          };
-        },
-      }),
-      setComponent('row-group'),
-      v.title('acls'),
-      actions.wrappers.patch(['fieldset-wrapper']),
-      actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
-    ),
-    ssh: v.pipe(
-      v.optional(
-        v.array(
-          v.object({
-            action: v.picklist(['accept', 'check']),
-            src: v.array(v.string()),
-            dst: v.array(v.string()),
-            users: v.optional(v.array(v.string())),
-            checkPeriod: v.pipe(
-              v.optional(
-                v.pipe(
-                  v.string(),
-                  v.transform((value) => {
-                    return ms(value as ms.StringValue);
-                  }),
-                ),
-              ),
-            ),
-          }),
-        ),
-      ),
-      setComponent('row-group'),
-      v.title('ssh'),
-      actions.wrappers.patch(['fieldset-wrapper']),
-      actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
-    ),
     hosts: v.pipe(
       v.optional(
         v.pipe(
@@ -381,6 +279,109 @@ export const ACLSchema = v.pipe(
       actions.wrappers.patch(['fieldset-wrapper']),
       actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
     ),
+    // 有
+    acls: v.pipe(
+      v.optional(
+        v.array(
+          v.object({
+            action: v.pipe(v.literal('accept'), renderConfig({ hidden: true }), setComponent('')),
+            src: v.pipe(
+              v.array(v.pipe(v.string(), setComponent('editable-badge'))),
+              setComponent('column-group'),
+              actions.inputs.patch({
+                addDefine: createSourceListDefine(SrcList),
+              }),
+            ),
+            dst: v.array(v.string()),
+            proto: v.pipe(
+              v.optional(
+                v.union([
+                  v.string(),
+                  v.picklist([
+                    'igmp',
+                    'ipv4',
+                    'ip-in-ip',
+                    'tcp',
+                    'egp',
+                    'igp',
+                    'udp',
+                    'gre',
+                    'esp',
+                    'ah',
+                    'sctp',
+                  ]),
+                ]),
+              ),
+              setComponent('editable-select'),
+              asControl(),
+              actions.class.component('min-w-20'),
+              actions.inputs.patch({
+                inputEnable: true,
+                inputPlaceholder: 'Select Or Input',
+                options: [
+                  'igmp',
+                  'ipv4',
+                  'ip-in-ip',
+                  'tcp',
+                  'egp',
+                  'igp',
+                  'udp',
+                  'gre',
+                  'esp',
+                  'ah',
+                  'sctp',
+                ],
+              }),
+              actions.wrappers.set(['label-wrapper']),
+              actions.props.patch({
+                labelPosition: 'left',
+              }),
+              v.title('proto'),
+            ),
+          }),
+        ),
+      ),
+      actions.inputs.patch({
+        defaultValue: () => {
+          return {
+            action: ['accept'],
+            src: [],
+            dst: [],
+          };
+        },
+      }),
+      setComponent('row-group'),
+      v.title('acls'),
+      actions.wrappers.patch(['fieldset-wrapper']),
+      actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
+    ),
+    ssh: v.pipe(
+      v.optional(
+        v.array(
+          v.object({
+            action: v.picklist(['accept', 'check']),
+            src: v.array(v.string()),
+            dst: v.array(v.string()),
+            users: v.optional(v.array(v.string())),
+            checkPeriod: v.pipe(
+              v.optional(
+                v.pipe(
+                  v.string(),
+                  v.transform((value) => {
+                    return ms(value as ms.StringValue);
+                  }),
+                ),
+              ),
+            ),
+          }),
+        ),
+      ),
+      setComponent('row-group'),
+      v.title('ssh'),
+      actions.wrappers.patch(['fieldset-wrapper']),
+      actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
+    ),
+
     tagOwners: v.pipe(
       v.optional(
         v.record(
