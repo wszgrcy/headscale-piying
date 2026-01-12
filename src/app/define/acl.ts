@@ -100,6 +100,7 @@ function createSourceListDefine(
         actions.inputs.patch({
           color: 'primary',
           shape: 'circle',
+          size: 'xs',
         }),
         actions.inputs.patchAsync({
           content: (field) => {

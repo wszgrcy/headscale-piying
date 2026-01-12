@@ -21,7 +21,11 @@
   @apply h-4!;
   @apply text-[16px]!;
 }
-
+.btn-xs > mat-icon {
+  @apply w-4!;
+  @apply h-4!;
+  @apply text-[16px]!;
+}
 .cdk-global-overlay-wrapper {
   justify-content: center;
   align-items: center;
@@ -39,6 +43,6 @@ select,
 textarea {
   outline: none !important;
 }
-.tooltip-content{
+.tooltip-content {
   z-index: 100;
 }
