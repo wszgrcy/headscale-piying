@@ -254,6 +254,7 @@ export const ACLSchema = v.pipe(
               actions.class.component('min-w-20'),
               actions.inputs.patch({
                 inputEnable: true,
+                inputPlaceholder:'Select Or Input',
                 options: [
                   'igmp',
                   'ipv4',
@@ -267,6 +268,10 @@ export const ACLSchema = v.pipe(
                   'ah',
                   'sctp',
                 ],
+              }),
+              actions.wrappers.set(['label-wrapper']),
+              actions.props.patch({
+                labelPosition: 'left',
               }),
               v.title('proto'),
             ),
