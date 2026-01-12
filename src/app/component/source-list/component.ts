@@ -1,6 +1,11 @@
 import { Component, computed, forwardRef, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { BaseControl, PI_INPUT_OPTIONS_TOKEN, PiyingView } from '@piying/view-angular';
+import {
+  BaseControl,
+  PI_INPUT_OPTIONS_TOKEN,
+  PI_VIEW_FIELD_TOKEN,
+  PiyingView,
+} from '@piying/view-angular';
 import {
   DefaultOptionConvert,
   OptionConvert,
@@ -76,13 +81,23 @@ export class SourceListFCC extends BaseControl {
   }
 
   parentPyOptions = inject(PI_INPUT_OPTIONS_TOKEN, { optional: true });
+  field$$ = inject(PI_VIEW_FIELD_TOKEN);
   getInput$$ = (schema: v.BaseSchema<any, any, any>) => {
     return {
       schema: v.pipe(
         v.tuple([v.pipe(schema, formConfig({ updateOn: 'change' }))]),
         formConfig({ updateOn: 'submit' }),
       ),
-      options: this.parentPyOptions!,
+      options: {
+        ...this.parentPyOptions!(),
+        context: {
+          ...this.parentPyOptions!().context,
+          parent: this.field$$(),
+          parentCtx: this.parentPyOptions!().context,
+          root: this.parentPyOptions!().context?.['root'] ?? this.field$$(),
+          rootCtx: this.parentPyOptions!().context?.['rootCtx'] ?? this.parentPyOptions!().context,
+        },
+      },
       selectorless: true,
     } as any;
   };

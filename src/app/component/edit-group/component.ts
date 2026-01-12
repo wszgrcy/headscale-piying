@@ -47,7 +47,16 @@ export class EditGroupFGC extends PiyingViewGroupBase {
   schemaOptions$$ = (define: any) => {
     return {
       schema: define,
-      options: this.parentPyOptions!(),
+      options: {
+        ...this.parentPyOptions!(),
+        context: {
+          ...this.parentPyOptions!().context,
+          parent: this.field$$(),
+          parentCtx: this.parentPyOptions!().context,
+          root: this.parentPyOptions!().context?.['root'] ?? this.field$$(),
+          rootCtx: this.parentPyOptions!().context?.['rootCtx'] ?? this.parentPyOptions!().context,
+        },
+      },
       selectorless: true,
     };
   };

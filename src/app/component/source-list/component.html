@@ -14,7 +14,7 @@
           </button>
         </li>
       } @else if (option.children || option.children$$) {
-        @let children = option.children$$ ? (option.children$$.value() ?? []) : option.children;
+        @let children = option.children$$ ? (option.children$$() ?? []) : option.children;
 
         <li
           [cdkMenuTriggerFor]="menuTemplate"
