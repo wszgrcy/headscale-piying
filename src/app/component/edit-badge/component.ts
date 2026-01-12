@@ -33,9 +33,10 @@ export class EditableBadgeFCC extends BaseControl {
   templateRef = viewChild.required('templateRef');
   isEdit$ = signal(false);
   editContent$ = linkedSignal(this.value$);
-  pendingValue$ = signal('');
 
   valueChange2() {
+    this.isEdit$.set(false);
     this.valueChange(this.editContent$());
+    this.editContent$.set('');
   }
 }

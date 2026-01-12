@@ -11,6 +11,7 @@ import { MergeClassPipe } from '@piying-lib/angular-daisyui/pipe';
 import { MatIconModule } from '@angular/material/icon';
 import { SelectorlessOutlet } from '@cyia/ngx-common/directive';
 import { NgTemplateOutlet } from '@angular/common';
+import { PurePipe } from '@cyia/ngx-common/pipe';
 @Component({
   selector: 'app-column-group',
   templateUrl: './component.html',
@@ -21,6 +22,7 @@ import { NgTemplateOutlet } from '@angular/common';
     MatIconModule,
     SelectorlessOutlet,
     NgTemplateOutlet,
+    PurePipe,
   ],
 })
 export class ColumnGroupFGC extends PiyingViewGroupBase {
@@ -37,11 +39,13 @@ export class ColumnGroupFGC extends PiyingViewGroupBase {
     };
   });
 
-  modelOutput = {
-    modelChange: (value: any) => {
-      const index = this.children$$().length;
-
-      this.field$$().action.set(value, index);
-    },
+  modelOutput = (newItem: any) => {
+    return {
+      modelChange: (value: any) => {
+        const index = this.children$$().length;
+        this.field$$().action.set(value, index);
+        (newItem.componentInstance as PiyingView).form$$()!.reset();
+      },
+    };
   };
 }

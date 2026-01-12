@@ -9,7 +9,8 @@
     <ng-container
       [selectlessOutlet]="PiyingView"
       [selectlessOutletInputs]="schemaOptions$$()"
-      [selectlessOutletOutputs]="modelOutput"
+      [selectlessOutletOutputs]="modelOutput | pure: newItem"
+      #newItem="selectlessOutlet"
     ></ng-container>
   </div>
 </ng-template>

@@ -245,51 +245,137 @@ export const ACLSchema = v.object({
       },
     }),
     setComponent('row-group'),
+    v.title('acls'),
+    actions.wrappers.patch(['fieldset-wrapper']),
+    actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
   ),
-  ssh: v.optional(
-    v.array(
-      v.object({
-        action: v.picklist(['accept', 'check']),
-        src: v.array(v.string()),
-        dst: v.array(v.string()),
-        users: v.optional(v.array(v.string())),
-        checkPeriod: v.pipe(
-          v.optional(
-            v.pipe(
-              v.string(),
-              v.transform((value) => {
-                return ms(value as ms.StringValue);
-              }),
+  ssh: v.pipe(
+    v.optional(
+      v.array(
+        v.object({
+          action: v.picklist(['accept', 'check']),
+          src: v.array(v.string()),
+          dst: v.array(v.string()),
+          users: v.optional(v.array(v.string())),
+          checkPeriod: v.pipe(
+            v.optional(
+              v.pipe(
+                v.string(),
+                v.transform((value) => {
+                  return ms(value as ms.StringValue);
+                }),
+              ),
             ),
           ),
-        ),
-      }),
+        }),
+      ),
     ),
+    v.title('ssh'),
+    actions.wrappers.patch(['fieldset-wrapper']),
+    actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
   ),
-  hosts: v.optional(v.pipe(v.record(v.string(), v.string()), setComponent('edit-group'))),
-  groups: v.optional(
-    v.pipe(
+  hosts: v.pipe(
+    v.optional(v.pipe(v.record(v.string(), v.string()), setComponent('edit-group'))),
+    v.title('hosts'),
+    actions.wrappers.patch(['fieldset-wrapper']),
+    actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
+  ),
+  groups: v.pipe(
+    v.optional(
+      v.pipe(
+        v.record(
+          v.pipe(
+            v.string(),
+            v.transform((input) => {
+              return `group:${input}`;
+            }),
+            actions.attributes.patch({ placeholder: 'name' }),
+            actions.class.top('min-w-20'),
+          ),
+          v.pipe(
+            v.array(v.pipe(v.string(), setComponent('editable-badge'))),
+            setComponent('column-group'),
+            actions.inputs.patch({
+              addDefine: v.pipe(v.string(), setComponent('editable-badge')),
+            }),
+          ),
+        ),
+        // todo 更新kv定义
+        setComponent('edit-group'),
+      ),
+    ),
+    v.title('groups'),
+    actions.wrappers.patch(['fieldset-wrapper']),
+    actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
+  ),
+  tagOwners: v.pipe(
+    v.optional(
       v.record(
         v.pipe(
           v.string(),
           v.transform((input) => {
-            return `group:${input}`;
+            return `tag:${input}`;
           }),
+          actions.attributes.patch({ placeholder: 'name' }),
+          actions.class.top('min-w-20'),
         ),
+        // todo 感觉应该用动态选择
         v.pipe(
           v.array(v.pipe(v.string(), setComponent('editable-badge'))),
           setComponent('column-group'),
+          actions.inputs.patch({
+            addDefine: v.pipe(v.string(), setComponent('editable-badge')),
+          }),
         ),
       ),
-      // todo 更新kv定义
-      setComponent('edit-group'),
     ),
+    setComponent('edit-group'),
+    v.title('tagOwners'),
+    actions.wrappers.patch(['fieldset-wrapper']),
+    actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
   ),
-  tagOwners: v.optional(v.record(v.string(), v.array(v.string()))),
-  autoApprovers: v.optional(
-    v.object({
-      routes: v.optional(v.record(v.string(), v.array(v.string()))),
-      exitNode: v.optional(v.array(v.string())),
-    }),
+  autoApprovers: v.pipe(
+    v.optional(
+      v.object({
+        routes: v.optional(
+          v.pipe(
+            v.record(
+              v.pipe(
+                v.string(),
+                actions.attributes.patch({ placeholder: 'name' }),
+                actions.class.top('min-w-20'),
+              ),
+              // todo 感觉应该用动态选择
+              v.pipe(
+                v.array(v.pipe(v.string(), setComponent('editable-badge'))),
+                setComponent('column-group'),
+                actions.inputs.patch({
+                  addDefine: v.pipe(v.string(), setComponent('editable-badge')),
+                }),
+              ),
+            ),
+            setComponent('edit-group'),
+            v.title('routes'),
+            actions.wrappers.patch(['fieldset-wrapper']),
+            actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
+          ),
+        ),
+        exitNode: v.optional(
+          v.pipe(
+            v.array(v.pipe(v.string(), setComponent('editable-badge'))),
+            setComponent('column-group'),
+            actions.inputs.patch({
+              addDefine: v.pipe(v.string(), setComponent('editable-badge')),
+            }),
+            v.title('exitNode'),
+            actions.props.patch({ labelPosition: 'left' }),
+            actions.wrappers.patch(['label-wrapper']),
+          ),
+        ),
+      }),
+    ),
+    v.title('autoApprovers'),
+    actions.wrappers.patch(['fieldset-wrapper']),
+    actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
   ),
 });
