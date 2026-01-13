@@ -1,6 +1,7 @@
 import * as v from 'valibot';
 import {
   _PiResolvedCommonViewFieldConfig,
+  FieldLogicGroup,
   formConfig,
   hideWhen,
   NFCSchema,
@@ -50,6 +51,14 @@ export const ACLPageDefine = v.object({
     actions.inputs.patch({
       isUnion: true,
     }),
+    actions.inputs.patchAsync({
+      beforeChange: (field) => {
+        return (index: number) => {
+          let control = (field.form.control as FieldLogicGroup).fixedControls$()[index];
+          control.updateValue(field.form.control!.value$$());
+        };
+      },
+    }),
     setAlias('aclContent'),
     setComponent('tabs'),
   ),
@@ -78,7 +87,9 @@ export const ACLPageDefine = v.object({
               let api = field.context['api'] as ApiService;
               let editorField = field.get(['@aclContent'])!;
               let content = editorField.form.control!.value;
-              await firstValueFrom(api.SetPolicy({ policy: JSON.stringify(content) }));
+              console.log(content);
+
+              // await firstValueFrom(api.SetPolicy({ policy: JSON.stringify(content) }));
             };
           },
         }),
