@@ -553,29 +553,7 @@ export const NodeItemPageDefine = v.pipe(
 
     bottom: v.pipe(
       v.object({
-        add: v.pipe(
-          NFCSchema,
-          setComponent('button'),
-          actions.inputs.patch({ content: { icon: { fontIcon: 'add' }, title: 'add' } }),
-          actions.inputs.patchAsync({
-            clicked: (field) => {
-              let tableField = field.get(['@table'])!;
-              return () => {
-                const dialog: DialogService = field.context['dialog'];
-                // dialog.openDialog({
-                //   title: 'new',
-                //   schema: v.pipe(CreateNodeItemDefine),
-                //   applyValue: async (value) => {
-                //     let api: ApiService = field.context['api'];
-                //     await firstValueFrom(api.CreateNodeItem(value));
-                //     let status: TableStatusService = tableField.props()['status'];
-                //     status.needUpdate();
-                //   },
-                // });
-              };
-            },
-          }),
-        ),
+        _: v.pipe(NFCSchema, setComponent('div')),
         page: v.pipe(
           NFCSchema,
           setComponent('pagination'),
