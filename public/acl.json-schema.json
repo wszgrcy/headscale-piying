@@ -8,24 +8,54 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["action", "src", "dst"],
+        "required": [
+          "action",
+          "src",
+          "dst"
+        ],
         "properties": {
           "action": {
             "type": "string",
-            "enum": ["accept"]
+            "enum": [
+              "accept"
+            ]
           },
           "src": {
             "type": "array",
             "items": {
               "oneOf": [
-                { "type": "string", "pattern": "^autogroup:[a-z]+$" },
-                { "type": "string", "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$" },
-                { "type": "string", "pattern": "^[^@]+@[^@]+\\.[^@]+$" },
-                { "type": "string", "pattern": "^tag:[a-zA-Z0-9_-]+$" },
-                { "type": "string", "pattern": "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?:/[0-9]{1,2})?$" },
-                { "type": "string", "pattern": "^(?:[0-9a-fA-F:]+)(?:/[0-9]{1,3})?$" },
-                { "type": "string", "pattern": "^[a-zA-Z0-9._-]+$" },
-                { "type": "string", "const": "*" }
+                {
+                  "type": "string",
+                  "pattern": "^autogroup:[a-z]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[^@]+@[^@]+\\.[^@]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^tag:[a-zA-Z0-9_-]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?:/[0-9]{1,2})?$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^(?:[0-9a-fA-F:]+)(?:/[0-9]{1,3})?$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9._-]+$"
+                },
+                {
+                  "type": "string",
+                  "const": "*"
+                }
               ]
             },
             "minItems": 1
@@ -38,24 +68,65 @@
                   "type": "string",
                   "pattern": "^autogroup:(self|member|admin|network-admin|it-admin|billing-admin|auditor|owner|tagged|shared|internet)$"
                 },
-                { "type": "string", "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$" },
-                { "type": "string", "pattern": "^[^@]+@[^@]+\\.[^@]+$" },
-                { "type": "string", "pattern": "^tag:[a-zA-Z0-9_-]+(:\\*|:([0-9]+(,[0-9]+)*))?$" },
-                { "type": "string", "pattern": "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?:/[0-9]{1,2})?$" },
-                { "type": "string", "pattern": "^(?:[0-9a-fA-F:]+)(?:/[0-9]{1,3})?$" },
-                { "type": "string", "pattern": "^[a-zA-Z0-9._-]+$" },
-                { "type": "string", "pattern": "^ipset:[a-zA-Z0-9_-]+$" },
-                { "type": "string", "const": "*" },
-                { "type": "string" }
+                {
+                  "type": "string",
+                  "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[^@]+@[^@]+\\.[^@]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^tag:[a-zA-Z0-9_-]+(:\\*|:([0-9]+(,[0-9]+)*))?$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?:/[0-9]{1,2})?$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^(?:[0-9a-fA-F:]+)(?:/[0-9]{1,3})?$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9._-]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^ipset:[a-zA-Z0-9_-]+$"
+                },
+                {
+                  "type": "string",
+                  "const": "*"
+                },
+                {
+                  "type": "string"
+                }
               ]
             },
             "minItems": 1
           },
           "proto": {
-            "type": ["number", "string"],
+            "type": [
+              "number",
+              "string"
+            ],
             "oneOf": [
-              { "type": "number", "minimum": 1, "maximum": 255 },
-              { "type": "string", "enum": ["tcp", "udp", "sctp", "icmp"] }
+              {
+                "type": "number",
+                "minimum": 1,
+                "maximum": 255
+              },
+              {
+                "type": "string",
+                "enum": [
+                  "tcp",
+                  "udp",
+                  "sctp",
+                  "icmp"
+                ]
+              }
             ]
           }
         },
@@ -67,20 +138,39 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["action", "src", "dst"],
+        "required": [
+          "action",
+          "src",
+          "dst"
+        ],
         "properties": {
           "action": {
             "type": "string",
-            "enum": ["accept", "check"]
+            "enum": [
+              "accept",
+              "check"
+            ]
           },
           "src": {
             "type": "array",
             "items": {
               "oneOf": [
-                { "type": "string", "pattern": "^autogroup:[a-z]+$" },
-                { "type": "string", "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$" },
-                { "type": "string", "pattern": "^[^@]+@[^@]+\\.[^@]+$" },
-                { "type": "string", "pattern": "^tag:[a-zA-Z0-9_-]+$" }
+                {
+                  "type": "string",
+                  "pattern": "^autogroup:[a-z]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[^@]+@[^@]+\\.[^@]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^tag:[a-zA-Z0-9_-]+$"
+                }
               ]
             },
             "minItems": 1
@@ -89,9 +179,18 @@
             "type": "array",
             "items": {
               "oneOf": [
-                { "type": "string", "const": "autogroup:self" },
-                { "type": "string", "pattern": "^tag:[a-zA-Z0-9_-]+$" },
-                { "type": "string", "pattern": "^[^@]+@[^@]+\\.[^@]+$" }
+                {
+                  "type": "string",
+                  "const": "autogroup:self"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^tag:[a-zA-Z0-9_-]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[^@]+@[^@]+\\.[^@]+$"
+                }
               ]
             },
             "minItems": 1
@@ -100,9 +199,21 @@
             "type": "array",
             "items": {
               "oneOf": [
-                { "type": "string", "enum": ["root", "autogroup:nonroot"] },
-                { "type": "string", "pattern": "^[^@]+@[^@]+\\.[^@]+$" },
-                { "type": "string", "pattern": "^localpart:\\*@[a-zA-Z0-9.-]+$" }
+                {
+                  "type": "string",
+                  "enum": [
+                    "root",
+                    "autogroup:nonroot"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[^@]+@[^@]+\\.[^@]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^localpart:\\*@[a-zA-Z0-9.-]+$"
+                }
               ]
             },
             "minItems": 0
@@ -157,10 +268,22 @@
             "type": "array",
             "items": {
               "oneOf": [
-                { "type": "string", "pattern": "^autogroup:(admin|network-admin)$" },
-                { "type": "string", "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$" },
-                { "type": "string", "pattern": "^[^@]+@[^@]+\\.[^@]+$" },
-                { "type": "string", "pattern": "^tag:[a-zA-Z0-9_-]+$" }
+                {
+                  "type": "string",
+                  "pattern": "^autogroup:(admin|network-admin)$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[^@]+@[^@]+\\.[^@]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^tag:[a-zA-Z0-9_-]+$"
+                }
               ]
             },
             "minItems": 1
@@ -187,10 +310,22 @@
             "type": "array",
             "items": {
               "oneOf": [
-                { "type": "string", "pattern": "^autogroup:[a-z]+$" },
-                { "type": "string", "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$" },
-                { "type": "string", "pattern": "^[^@]+@[^@]+\\.[^@]+$" },
-                { "type": "string", "pattern": "^tag:[a-zA-Z0-9_-]+$" }
+                {
+                  "type": "string",
+                  "pattern": "^autogroup:[a-z]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[^@]+@[^@]+\\.[^@]+$"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^tag:[a-zA-Z0-9_-]+$"
+                }
               ]
             },
             "minItems": 1
@@ -204,10 +339,22 @@
           "type": "array",
           "items": {
             "oneOf": [
-              { "type": "string", "pattern": "^autogroup:[a-z]+$" },
-              { "type": "string", "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$" },
-              { "type": "string", "pattern": "^[^@]+@[^@]+\\.[^@]+$" },
-              { "type": "string", "pattern": "^tag:[a-zA-Z0-9_-]+$" }
+              {
+                "type": "string",
+                "pattern": "^autogroup:[a-z]+$"
+              },
+              {
+                "type": "string",
+                "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$"
+              },
+              {
+                "type": "string",
+                "pattern": "^[^@]+@[^@]+\\.[^@]+$"
+              },
+              {
+                "type": "string",
+                "pattern": "^tag:[a-zA-Z0-9_-]+$"
+              }
             ]
           },
           "minItems": 1
@@ -230,175 +377,6 @@
         "pattern": "^posture:[a-zA-Z0-9_-]+$"
       },
       "minProperties": 0
-    },
-    "nodeAttrs": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["target", "attr"],
-        "properties": {
-          "target": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                { "type": "string", "pattern": "^autogroup:[a-z]+$" },
-                { "type": "string", "pattern": "^group:[^@]+(@[a-zA-Z0-9.-]+)?$" },
-                { "type": "string", "pattern": "^[^@]+@[^@]+\\.[^@]+$" },
-                { "type": "string", "pattern": "^tag:[a-zA-Z0-9_-]+$" },
-                { "type": "string", "const": "*" }
-              ]
-            },
-            "minItems": 1
-          },
-          "attr": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "pattern": "^[a-zA-Z][a-zA-Z0-9_.:-]*$"
-            },
-            "minItems": 1
-          },
-          "app": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "array",
-              "items": {
-                "type": "object"
-              }
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "minItems": 0
-    },
-    "tests": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["src"],
-        "properties": {
-          "src": {
-            "type": "string",
-            "pattern": "^[^@]+@[^@]+\\.[^@]+$|^autogroup:[a-z]+$|^group:[^@]+(@[a-zA-Z0-9.-]+)?$|^tag:[a-zA-Z0-9_-]+$"
-          },
-          "srcPostureAttrs": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "proto": {
-            "type": "string",
-            "enum": ["tcp", "udp", "icmp"]
-          },
-          "accept": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "pattern": "^tag:[a-zA-Z0-9_-]+(:[0-9]+(,[0-9]+)*)?$|^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?:/[0-9]{1,2})?(:[0-9]+(,[0-9]+)*)?$|^[a-zA-Z0-9._-]+(:[0-9]+(,[0-9]+)*)?$|^autogroup:(self|member|admin|network-admin|it-admin|billing-admin|auditor|owner|tagged|internet)(:[0-9]+(,[0-9]+)*)?$"
-            },
-            "minItems": 1
-          },
-          "deny": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "pattern": "^tag:[a-zA-Z0-9_-]+(:[0-9]+(,[0-9]+)*)?$|^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?:/[0-9]{1,2})?(:[0-9]+(,[0-9]+)*)?$|^[a-zA-Z0-9._-]+(:[0-9]+(,[0-9]+)*)?$|^autogroup:(self|member|admin|network-admin|it-admin|billing-admin|auditor|owner|tagged|internet)(:[0-9]+(,[0-9]+)*)?$"
-            },
-            "minItems": 1
-          }
-        },
-        "additionalProperties": false,
-        "anyOf": [{ "required": ["accept"] }, { "required": ["deny"] }]
-      },
-      "minItems": 0
-    },
-    "sshTests": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["src", "dst"],
-        "properties": {
-          "src": {
-            "type": "string",
-            "pattern": "^[^@]+@[^@]+\\.[^@]+$|^autogroup:[a-z]+$|^group:[^@]+(@[a-zA-Z0-9.-]+)?$|^tag:[a-zA-Z0-9_-]+$"
-          },
-          "dst": {
-            "type": "array",
-            "items": {
-              "oneOf": [
-                { "type": "string", "const": "autogroup:self" },
-                { "type": "string", "pattern": "^tag:[a-zA-Z0-9_-]+$" },
-                { "type": "string", "pattern": "^[^@]+@[^@]+\\.[^@]+$" }
-              ]
-            },
-            "minItems": 1
-          },
-          "accept": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "pattern": "^[^@]+@[^@]+\\.[^@]+$|root|autogroup:nonroot|^localpart:\\*@[a-zA-Z0-9.-]+$"
-            },
-            "minItems": 0
-          },
-          "check": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "pattern": "^[^@]+@[^@]+\\.[^@]+$|root|autogroup:nonroot|^localpart:\\*@[a-zA-Z0-9.-]+$"
-            },
-            "minItems": 0
-          },
-          "deny": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "pattern": "^[^@]+@[^@]+\\.[^@]+$|root|autogroup:nonroot|^localpart:\\*@[a-zA-Z0-9.-]+$"
-            },
-            "minItems": 0
-          }
-        },
-        "additionalProperties": false,
-        "anyOf": [{ "required": ["accept"] }, { "required": ["check"] }, { "required": ["deny"] }]
-      },
-      "minItems": 0
-    },
-    "ipsets": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "array",
-        "items": {
-          "oneOf": [
-            { "type": "string", "pattern": "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}(?:/[0-9]{1,2})?$" },
-            { "type": "string", "pattern": "^(?:[0-9a-fA-F:]+)(?:/[0-9]{1,3})?$" },
-            { "type": "string", "pattern": "^[a-zA-Z0-9._-]+$" },
-            { "type": "string", "pattern": "^autogroup:[a-z]+$" },
-            { "type": "string", "pattern": "^ipset:[a-zA-Z0-9_-]+$" }
-          ]
-        },
-        "minItems": 1
-      },
-      "propertyNames": {
-        "pattern": "^ipset:[a-zA-Z0-9_-]+$"
-      },
-      "minProperties": 0
-    },
-    "derpMap": {
-      "type": "object",
-      "additionalProperties": true,
-      "description": "Custom DERP server configuration. See Tailscale docs for structure."
-    },
-    "disableIPv4": {
-      "type": "boolean"
-    },
-    "oneCGNATRoute": {
-      "type": "string",
-      "enum": ["", "mac-always", "mac-never"]
-    },
-    "randomizeClientPort": {
-      "type": "boolean"
     }
   },
   "additionalProperties": false,
@@ -406,56 +384,55 @@
     {
       "grants": [
         {
-          "src": ["group:engineering"],
-          "dst": ["tag:webserver"],
-          "ip": ["*"]
+          "src": [
+            "group:engineering"
+          ],
+          "dst": [
+            "tag:webserver"
+          ],
+          "ip": [
+            "*"
+          ]
         }
       ],
       "ssh": [
         {
           "action": "check",
-          "src": ["autogroup:member"],
-          "dst": ["autogroup:self"],
-          "users": ["autogroup:nonroot"]
+          "src": [
+            "autogroup:member"
+          ],
+          "dst": [
+            "autogroup:self"
+          ],
+          "users": [
+            "autogroup:nonroot"
+          ]
         }
       ],
       "hosts": {
         "db-server": "100.64.0.5"
       },
       "groups": {
-        "group:engineering": ["alice@example.com", "bob@example.com"]
+        "group:engineering": [
+          "alice@example.com",
+          "bob@example.com"
+        ]
       },
       "tagOwners": {
         "tag:webserver": [],
-        "tag:prod": ["group:sre"]
+        "tag:prod": [
+          "group:sre"
+        ]
       },
       "autoApprovers": {
         "routes": {
-          "192.168.1.0/24": ["group:network-admin"]
+          "192.168.1.0/24": [
+            "group:network-admin"
+          ]
         },
-        "exitNode": ["tag:exit-node-allowed"]
-      },
-      "postures": {
-        "posture:secure-mac": ["node:os == 'macos'", "node:tsVersion >= '1.70'"]
-      },
-      "tests": [
-        {
-          "src": "alice@example.com",
-          "accept": ["tag:webserver:80"],
-          "deny": ["autogroup:internet:443"]
-        }
-      ],
-      "sshTests": [
-        {
-          "src": "alice@example.com",
-          "dst": ["autogroup:self"],
-          "accept": ["alice"],
-          "check": ["admin"],
-          "deny": ["root"]
-        }
-      ],
-      "ipsets": {
-        "ipset:internal-networks": ["192.168.0.0/16", "10.0.0.0/8"]
+        "exitNode": [
+          "tag:exit-node-allowed"
+        ]
       }
     }
   ]
