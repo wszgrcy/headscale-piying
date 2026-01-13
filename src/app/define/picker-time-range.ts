@@ -9,7 +9,6 @@ export const PickerTimeRangeDefine = v.pipe(
   asControl(),
   setComponent('picker-ref'),
   actions.inputs.patch({
-    overlayConfig: { panelClass: 'bg-base-100' },
     trigger: v.pipe(
       NFCSchema,
       setComponent('button'),

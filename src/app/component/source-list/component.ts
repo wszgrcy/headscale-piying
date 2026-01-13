@@ -1,4 +1,13 @@
-import { Component, computed, forwardRef, inject, input, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  forwardRef,
+  inject,
+  input,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {
   BaseControl,
@@ -66,6 +75,9 @@ export class SourceListFCC extends BaseControl {
   options = input<SourceOption[], SourceOption[] | undefined>([], {
     transform: (input) => input ?? [],
   });
+  usePort = input(false);
+  hostValue$ = signal('');
+  #portValue$ = signal('');
   root$$ = computed<SourceOption>(() => {
     return {
       children: this.options(),
@@ -77,9 +89,24 @@ export class SourceListFCC extends BaseControl {
     };
   };
   selectOption(item: SourceOption) {
-    this.valueAndTouchedChange(item.value);
+    this.hostValue$.set(item.value!);
   }
-
+  constructor() {
+    super();
+    effect(() => {
+      let value = this.hostValue$();
+      if (this.usePort()) {
+        let portValue = this.#portValue$();
+        if (value && portValue) {
+          this.valueAndTouchedChange(`${value}:${portValue}`);
+        }
+      } else {
+        if (value) {
+          this.valueAndTouchedChange(value);
+        }
+      }
+    });
+  }
   parentPyOptions = inject(PI_INPUT_OPTIONS_TOKEN, { optional: true });
   field$$ = inject(PI_VIEW_FIELD_TOKEN);
   getInput$$ = (schema: v.BaseSchema<any, any, any>) => {
@@ -105,7 +132,7 @@ export class SourceListFCC extends BaseControl {
     return {
       modelChange: ([value]: any) => {
         let emitValue = option.prefix ? `${option.prefix}${value}` : value;
-        this.valueAndTouchedChange(emitValue);
+        this.hostValue$.set(emitValue);
       },
     };
   };
@@ -114,5 +141,8 @@ export class SourceListFCC extends BaseControl {
   };
   listContenxt(list: any, parent?: any) {
     return { list: list, parent };
+  }
+  submitPort(value: any) {
+    this.#portValue$.set(value);
   }
 }

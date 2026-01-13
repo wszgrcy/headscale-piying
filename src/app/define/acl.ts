@@ -83,14 +83,12 @@ const TagOwnerList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] 
 
 function createSourceListDefine(
   optionListFn: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[],
+  usePort?: boolean,
 ) {
   return v.pipe(
     v.string(),
     setComponent('picker-ref'),
     actions.inputs.patch({
-      overlayConfig: {
-        panelClass: 'bg-base-100',
-      },
       changeClose: true,
     }),
     actions.inputs.patch({
@@ -113,6 +111,9 @@ function createSourceListDefine(
       content: v.pipe(
         v.any(),
         setComponent('source-list'),
+        actions.inputs.patch({
+          usePort: usePort,
+        }),
         actions.inputs.patchAsync({
           options: (field) => {
             return optionListFn(field);
@@ -122,6 +123,7 @@ function createSourceListDefine(
     }),
   );
 }
+
 // todo dst是host:port,所以之间选择不行
 const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
   let topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
@@ -131,10 +133,8 @@ const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
   return [
     { value: '*', label: 'Any' },
     { label: 'User', children$$: service.users$$ },
-    // todo 应该需要先定义
     { label: 'Group', children$$: service.groups$$ },
     { label: 'Ip', children: [], define: v.pipe(v.string(), v.ip(), setComponent('source-input')) },
-
     {
       label: 'Cidr',
       children: [],
@@ -148,8 +148,7 @@ const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
     },
     {
       label: 'Host',
-      // 根据后面的定义
-      children: [],
+      children$$: service.hosts$$,
     },
     {
       label: 'Tag',
@@ -162,6 +161,8 @@ const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
       label: 'Autogroup',
       // 根据后面的定义
       children: [
+        'internet',
+        'monitoring',
         'self',
         'member',
         'admin',
@@ -172,48 +173,13 @@ const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
         'owner',
       ].map((item) => {
         return {
-          value: item,
+          value: `autogroup:${item}`,
         };
       }),
     },
   ];
 };
-const DstDefine = v.pipe(
-  v.any(),
-  setComponent('picker-ref'),
-  actions.inputs.patch({
-    overlayConfig: {
-      panelClass: 'bg-base-100',
-    },
-    changeClose: true,
-  }),
-  actions.inputs.patch({
-    trigger: v.pipe(
-      NFCSchema,
-      setComponent('button'),
-      actions.inputs.patch({
-        color: 'primary',
-        shape: 'circle',
-      }),
-      actions.inputs.patchAsync({
-        content: (field) => {
-          return {
-            icon: { fontIcon: 'add' },
-          };
-        },
-      }),
-    ),
-    content: v.pipe(
-      v.any(),
-      setComponent('source-list'),
-      actions.inputs.patchAsync({
-        options: (field) => {
-          return DstList(field);
-        },
-      }),
-    ),
-  }),
-);
+
 export const ACLSchema = v.pipe(
   v.object({
     hosts: v.pipe(
@@ -291,8 +257,24 @@ export const ACLSchema = v.pipe(
               actions.inputs.patch({
                 addDefine: createSourceListDefine(SrcList),
               }),
+              actions.wrappers.set(['label-wrapper']),
+              actions.props.patch({
+                labelPosition: 'left',
+              }),
+              v.title('src'),
             ),
-            dst: v.array(v.string()),
+            dst: v.pipe(
+              v.array(v.pipe(v.string(), setComponent('editable-badge'))),
+              setComponent('column-group'),
+              actions.inputs.patch({
+                addDefine: createSourceListDefine(DstList, true),
+              }),
+              actions.wrappers.set(['label-wrapper']),
+              actions.props.patch({
+                labelPosition: 'left',
+              }),
+              v.title('dst'),
+            ),
             proto: v.pipe(
               v.optional(
                 v.union([
@@ -344,7 +326,7 @@ export const ACLSchema = v.pipe(
       actions.inputs.patch({
         defaultValue: () => {
           return {
-            action: ['accept'],
+            action: 'accept',
             src: [],
             dst: [],
           };

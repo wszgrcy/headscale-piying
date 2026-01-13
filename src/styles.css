@@ -16,7 +16,7 @@
 .pi-untouched.pi-invalid:not(.pi-dirty) > .input {
   @apply border-warning;
 }
-.micon-4 {
+@utility micon-4 {
   @apply w-4!;
   @apply h-4!;
   @apply text-[16px]!;
@@ -45,4 +45,10 @@ textarea {
 }
 .tooltip-content {
   z-index: 100;
+}
+
+.cdk-overlay-pane{
+  @apply bg-base-100;
+  @apply rounded-box;
+  @apply shadow-xl;
 }
