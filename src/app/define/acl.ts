@@ -216,7 +216,7 @@ const SSHUsersList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] 
   ];
 };
 export const ACLSchema = v.pipe(
-  v.object({
+  v.looseObject({
     hosts: v.pipe(
       v.optional(
         v.pipe(
@@ -317,7 +317,7 @@ export const ACLSchema = v.pipe(
     acls: v.pipe(
       v.optional(
         v.array(
-          v.object({
+          v.looseObject({
             action: v.pipe(v.literal('accept'), renderConfig({ hidden: true }), setComponent('')),
             src: v.pipe(
               v.array(v.pipe(v.string(), setComponent('editable-badge'))),
@@ -408,7 +408,7 @@ export const ACLSchema = v.pipe(
     ssh: v.pipe(
       v.optional(
         v.array(
-          v.object({
+          v.looseObject({
             action: v.pipe(
               v.picklist(['accept', 'check']),
               actions.inputs.patchAsync({
@@ -519,7 +519,7 @@ export const ACLSchema = v.pipe(
     ),
     autoApprovers: v.pipe(
       v.optional(
-        v.object({
+        v.looseObject({
           routes: v.optional(
             v.pipe(
               v.record(
