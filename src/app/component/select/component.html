@@ -33,9 +33,9 @@
             (keydown)="stopKeyboardListen($event)"
           />
           @if (inputEnable()) {
-            <mat-icon class="micon-4 text-success cursor-pointer" (click)="addInputOption()"
-              >add</mat-icon
-            >
+            <button class="btn btn-circle btn-ghost btn-xs" (click)="addInputOption()">
+              <mat-icon class="micon-4 text-success cursor-pointer">add</mat-icon>
+            </button>
           }
         </label>
       }

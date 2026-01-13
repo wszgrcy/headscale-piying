@@ -237,12 +237,22 @@ export const ACLSchema = v.pipe(
             v.pipe(
               v.union([IpDefine, CidrDefine]),
               asControl(),
-              setComponent('string'),
-              actions.attributes.patch({ placeholder: 'ip/cidr' }),
+              setComponent('editable-select'),
+              actions.inputs.patchAsync({
+                options: (field) => {
+                  let topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
+                  let rootField = topField.get(['#', '@aclView'])!;
+                  let service: AclService = rootField.props()['service'];
+                  return computed(() => {
+                    return [...service.ipList$$(), ...service.routes$$()];
+                  });
+                },
+              }),
+              actions.inputs.patch({ emptyContent: '[ip/cidr]', inputEnable: true }),
+              actions.wrappers.patch(['label-wrapper']),
               v.title('ip/cidr'),
               actions.props.patch({
-                floating: true,
-                labelInline: true,
+                labelPosition: 'left',
               }),
             ),
           ),

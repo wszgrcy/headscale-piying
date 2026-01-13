@@ -21,7 +21,7 @@ export interface DaisyuiOption {
   type?: string;
 }
 @Component({
-  selector: 'dai-select',
+  selector: 'app-editable-select',
   templateUrl: './component.html',
   providers: [
     {
