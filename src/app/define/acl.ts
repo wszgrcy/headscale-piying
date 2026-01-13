@@ -73,12 +73,18 @@ const TagOwnerList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] 
     { label: 'User', children$$: service.users$$ },
     // todo 应该需要先定义
     { label: 'Group', children$$: service.groups$$ },
-
     {
-      label: 'Autogroup',
+      label: 'Tag',
+      prefix: 'tag:',
       // 根据后面的定义
       children: [],
+      define: v.pipe(v.string(), setComponent('source-input')),
     },
+    // {
+    //   label: 'Autogroup',
+    //   // 根据后面的定义
+    //   children: [],
+    // },
   ];
 };
 
@@ -553,7 +559,7 @@ export const ACLSchema = v.pipe(
                   v.array(v.pipe(v.string(), setComponent('editable-badge'))),
                   setComponent('column-group'),
                   actions.inputs.patch({
-                    addDefine: v.pipe(v.string(), setComponent('editable-badge')),
+                    addDefine: createSourceListDefine(TagOwnerList),
                   }),
                 ),
               ),
@@ -568,7 +574,7 @@ export const ACLSchema = v.pipe(
               v.array(v.pipe(v.string(), setComponent('editable-badge'))),
               setComponent('column-group'),
               actions.inputs.patch({
-                addDefine: v.pipe(v.string(), setComponent('editable-badge')),
+                addDefine: createSourceListDefine(TagOwnerList),
               }),
               v.title('exitNode'),
               actions.props.patch({ labelPosition: 'left' }),
