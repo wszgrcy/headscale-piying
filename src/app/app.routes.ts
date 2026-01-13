@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { ActivatedRoute, Router, Routes } from '@angular/router';
 import { SchemaViewRC } from './schema-view/component';
 import { MainPage } from './page/main';
 import { LoginDefine } from './page/component/login';
@@ -17,12 +17,16 @@ import { NodeItemPageDefine } from './page/component/node';
 import { CopyService } from './service/copy.service';
 import { ACLPageDefine } from './page/component/acl';
 import { AclSourceService } from './service/acl-source.service';
-
+import { NodeRegistryDefine } from './page/component/node-registry';
 export const routes: Routes = [
   {
     path: '',
     redirectTo: '/web/user',
     pathMatch: 'full',
+  },
+  {
+    path: 'register/:key',
+    redirectTo: '/web/register/:key',
   },
   {
     path: 'web',
@@ -39,6 +43,20 @@ export const routes: Routes = [
           context: () => {
             return {
               account: inject(AccountService),
+            };
+          },
+        },
+      },
+      {
+        path: 'register/:key',
+        component: SchemaViewRC,
+        data: {
+          schema: () => NodeRegistryDefine,
+          context: () => {
+            return {
+              api: inject(ApiService),
+              activatedRoute: inject(ActivatedRoute),
+              router: inject(Router),
             };
           },
         },
