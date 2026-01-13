@@ -92,7 +92,7 @@ export class AclService {
         tagSet.add(item);
       });
     });
-    return [...tagSet].map((item) => {
+    return [...tagSet].sort().map((item) => {
       return {
         label: item,
         value: item,
