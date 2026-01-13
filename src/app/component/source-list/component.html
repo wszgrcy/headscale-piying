@@ -25,7 +25,7 @@
 </ng-template>
 
 <ng-template #menuTemplate let-list="list" let-parent="parent">
-  <div class="menu" cdkMenu>
+  <div class="menu max-h-100 overflow-auto flex-nowrap" cdkMenu>
     <ng-template #itemTemplate let-option>
       @if (option.value) {
         <li (click)="selectOption(option)" cdkMenuItem>

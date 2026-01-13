@@ -70,6 +70,7 @@ export class AclService {
       .flatMap((item) => {
         return item.ipAddresses ?? [];
       })
+      .sort()
       .map((item) => {
         return {
           label: item,
