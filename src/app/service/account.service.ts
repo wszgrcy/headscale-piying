@@ -17,7 +17,7 @@ export class AccountService {
     this.apiKey.set(data.apiKey);
     return this.api.Health().subscribe({
       next: () => {
-        return this.router.navigateByUrl('/main/component');
+        return this.router.navigateByUrl('/web/user');
       },
       error: () => {
         this.apiKey.clear();
