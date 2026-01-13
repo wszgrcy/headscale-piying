@@ -1,9 +1,9 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { ApiKeyService } from '../service/apikey.service';
+import { LocalSaveService } from '../service/apikey.service';
 
 export const localStorageGuard: CanActivateFn = () => {
-  let apiKey = inject(ApiKeyService);
+  let apiKey = inject(LocalSaveService);
   const router = inject(Router);
   if (apiKey.key$$()) {
     return true;

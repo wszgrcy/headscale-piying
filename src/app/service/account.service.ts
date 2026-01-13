@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { ApiService } from './api.service';
 import { catchError, tap } from 'rxjs';
-import { ApiKeyService } from './apikey.service';
+import { LocalSaveService } from './apikey.service';
 @Injectable({
   providedIn: 'root',
 })
@@ -12,15 +12,18 @@ export class AccountService {
   router = inject(Router);
   http = inject(HttpClient);
   api = inject(ApiService);
-  apiKey = inject(ApiKeyService);
-  login(data: any) {
-    this.apiKey.set(data.apiKey);
+  apiKey = inject(LocalSaveService);
+  login(data: { apiKey: string; prefix?: string }) {
+    this.apiKey.setKey(data.apiKey);
+    if (data.prefix) {
+      this.apiKey.setPrefix(data.prefix);
+    }
     return this.api.Health().subscribe({
       next: () => {
         return this.router.navigateByUrl('/web/user');
       },
       error: () => {
-        this.apiKey.clear();
+        this.apiKey.clearKey();
       },
     });
   }
