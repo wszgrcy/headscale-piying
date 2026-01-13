@@ -47,6 +47,9 @@ export const ACLPageDefine = v.object({
         v.title('Editor'),
       ),
     ]),
+    actions.inputs.patch({
+      isUnion: true,
+    }),
     setAlias('aclContent'),
     setComponent('tabs'),
   ),
@@ -73,7 +76,7 @@ export const ACLPageDefine = v.object({
           clicked: (field) => {
             return async () => {
               let api = field.context['api'] as ApiService;
-              let editorField = field.get(['@editor'])!;
+              let editorField = field.get(['@aclContent'])!;
               let content = editorField.form.control!.value;
               await firstValueFrom(api.SetPolicy({ policy: JSON.stringify(content) }));
             };
