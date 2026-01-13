@@ -37,4 +37,65 @@ export class AclService {
       } as SourceOption;
     });
   });
+  tagList$$ = computed(() => {
+    let list = this.#aclSource.getNodeList$.value();
+    let tagSet = new Set<string>();
+    list.forEach((item) => {
+      item.validTags?.forEach((tag) => {
+        if (tag.startsWith('tag:')) {
+          tagSet.add(tag);
+        }
+      });
+      item.forcedTags?.forEach((tag) => {
+        if (tag.startsWith('tag:')) {
+          tagSet.add(tag);
+        }
+      });
+      item.invalidTags?.forEach((tag) => {
+        if (tag.startsWith('tag:')) {
+          tagSet.add(tag);
+        }
+      });
+    });
+    return [...tagSet].map((item) => {
+      return {
+        label: item.slice('tag:'.length),
+        value: item,
+      };
+    });
+  });
+  ipList$$ = computed(() => {
+    let list = this.#aclSource.getNodeList$.value();
+    return list
+      .flatMap((item) => {
+        return item.ipAddresses ?? [];
+      })
+      .map((item) => {
+        return {
+          label: item,
+          value: item,
+        };
+      });
+  });
+  routes$$ = computed(() => {
+    let list = this.#aclSource.getNodeList$.value();
+    let tagSet = new Set<string>();
+    list.forEach((item) => {
+      item.subnetRoutes?.forEach((item) => {
+        tagSet.add(item);
+      });
+      item.approvedRoutes?.forEach((item) => {
+        tagSet.add(item);
+      });
+      item.availableRoutes?.forEach((item) => {
+        tagSet.add(item);
+      });
+    });
+    return [...tagSet].map((item) => {
+      return {
+        label: item,
+        value: item,
+      };
+    });
+  });
 }

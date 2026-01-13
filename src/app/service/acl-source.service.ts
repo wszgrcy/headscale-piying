@@ -22,4 +22,17 @@ export class AclSourceService {
       } as SourceOption;
     });
   });
+  getNodeList$ = resource({
+    loader: () => {
+      return firstValueFrom(
+        this.api.ListNodes().pipe(
+          map((result) => {
+            return result.nodes ?? [];
+          }),
+        ),
+      );
+    },
+    defaultValue: [],
+  });
+
 }

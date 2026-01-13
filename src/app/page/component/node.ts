@@ -40,14 +40,14 @@ const ExpireNodeDefine = v.pipe(
       v.title('expiration'),
       v.transform((input) => {
         return input.toISOString();
-      })
+      }),
     ),
-  })
+  }),
 );
 const RenameNodeDefine = v.pipe(
   v.object({
     name: v.pipe(v.string(), v.title('name')),
-  })
+  }),
 );
 const ROSTRLabelWrapper = metadataList<any>([
   actions.class.top('[&_label]:w-30'),
@@ -68,7 +68,7 @@ const FilterCondition = v.pipe(
       formConfig({ updateOn: 'submit' }),
       actions.wrappers.set(['div']),
       actions.class.top('flex gap-4'),
-      setAlias('filterParams')
+      setAlias('filterParams'),
     ),
     __flex: v.pipe(NFCSchema, setComponent('div'), actions.class.top('flex-1')),
     reset: v.pipe(
@@ -85,7 +85,7 @@ const FilterCondition = v.pipe(
             result.reset();
           };
         },
-      })
+      }),
     ),
     submit: v.pipe(
       NFCSchema,
@@ -101,11 +101,11 @@ const FilterCondition = v.pipe(
             result.emitSubmit();
           };
         },
-      })
+      }),
     ),
   }),
   actions.wrappers.set(['div']),
-  actions.class.top('flex gap-2')
+  actions.class.top('flex gap-2'),
 );
 // todo dynamic
 const ROStrItemDefine = v.pipe(NFCSchema, setComponent('common-data'), ROSTRLabelWrapper);
@@ -160,7 +160,7 @@ export const NodeItemPageDefine = v.pipe(
                 body: v.pipe(
                   NFCSchema,
                   setComponent('table-expand-cell'),
-                  actions.wrappers.set(['td'])
+                  actions.wrappers.set(['td']),
                 ),
               },
               id: {
@@ -171,7 +171,7 @@ export const NodeItemPageDefine = v.pipe(
                   actions.wrappers.set(['td', 'sort-header']),
                   actions.props.patch({
                     key: 'id',
-                  })
+                  }),
                 ),
                 body: (data: NodeItem) => {
                   return data.id;
@@ -185,7 +185,7 @@ export const NodeItemPageDefine = v.pipe(
                   actions.wrappers.set(['td', 'sort-header']),
                   actions.props.patch({
                     key: 'givenName',
-                  })
+                  }),
                 ),
                 body: (data: NodeItem) => {
                   return data.givenName;
@@ -200,7 +200,7 @@ export const NodeItemPageDefine = v.pipe(
                   actions.props.patch({
                     key: 'createdAt',
                     direction: -1,
-                  })
+                  }),
                 ),
                 body: (data: NodeItem) => {
                   return formatDatetimeToStr(data.createdAt);
@@ -214,7 +214,7 @@ export const NodeItemPageDefine = v.pipe(
                   actions.wrappers.set(['td', 'sort-header']),
                   actions.props.patch({
                     key: 'lastSeen',
-                  })
+                  }),
                 ),
                 body: (data: NodeItem) => {
                   return formatDatetimeToStr(data.lastSeen);
@@ -230,10 +230,10 @@ export const NodeItemPageDefine = v.pipe(
                   actions.inputs.patchAsync({
                     color: ({ context }) => {
                       return computed(() =>
-                        (context.item$() as NodeItem).online ? 'success' : 'error'
+                        (context.item$() as NodeItem).online ? 'success' : 'error',
                       );
                     },
-                  })
+                  }),
                 ),
               },
               registerMethod: {
@@ -257,7 +257,7 @@ export const NodeItemPageDefine = v.pipe(
                         }
                       });
                     },
-                  })
+                  }),
                 ),
               },
 
@@ -290,7 +290,7 @@ export const NodeItemPageDefine = v.pipe(
                             });
                           };
                         },
-                      })
+                      }),
                     ),
                     expire: v.pipe(
                       NFCSchema,
@@ -318,7 +318,7 @@ export const NodeItemPageDefine = v.pipe(
                             });
                           };
                         },
-                      })
+                      }),
                     ),
 
                     delete: v.pipe(
@@ -340,10 +340,13 @@ export const NodeItemPageDefine = v.pipe(
                             status.needUpdate();
                           };
                         },
-                      })
+                      }),
                     ),
                   }),
-                  actions.wrappers.set(['td', { type: 'div', attributes: { class: 'flex gap-2' } }])
+                  actions.wrappers.set([
+                    'td',
+                    { type: 'div', attributes: { class: 'flex gap-2' } },
+                  ]),
                 ),
               },
 
@@ -359,7 +362,7 @@ export const NodeItemPageDefine = v.pipe(
                       actions.wrappers.set(['label-wrapper']),
                       actions.props.patch({
                         labelPosition: 'left',
-                      })
+                      }),
                     ),
                     machineKey: v.pipe(
                       ROStrItemDefine,
@@ -368,7 +371,7 @@ export const NodeItemPageDefine = v.pipe(
                         content: (field) => {
                           return computed(() => field.context['item$']().machineKey);
                         },
-                      })
+                      }),
                     ),
                     discoKey: v.pipe(
                       ROStrItemDefine,
@@ -377,7 +380,7 @@ export const NodeItemPageDefine = v.pipe(
                         content: (field) => {
                           return computed(() => field.context['item$']().discoKey);
                         },
-                      })
+                      }),
                     ),
                     name: v.pipe(
                       ROStrItemDefine,
@@ -386,19 +389,19 @@ export const NodeItemPageDefine = v.pipe(
                         content: (field) => {
                           return computed(() => field.context['item$']().name);
                         },
-                      })
+                      }),
                     ),
                     ipAddresses: v.pipe(
                       v.array(v.pipe(v.string(), setComponent('common-data'))),
                       setComponent('ul'),
                       v.title('ipAddresses'),
-                      ROSTRLabelWrapper
+                      ROSTRLabelWrapper,
                     ),
                     routes: v.pipe(
                       NFCSchema,
                       setComponent('node-router'),
                       v.title('routes'),
-                      ROSTRLabelWrapper
+                      ROSTRLabelWrapper,
                     ),
                     user: v.pipe(
                       ROStrItemDefine,
@@ -410,7 +413,7 @@ export const NodeItemPageDefine = v.pipe(
                             return (item.user?.displayName || item.user?.name) ?? '';
                           });
                         },
-                      })
+                      }),
                     ),
                   }),
 
@@ -437,7 +440,7 @@ export const NodeItemPageDefine = v.pipe(
                             });
                           });
                         },
-                        { injector: field.injector }
+                        { injector: field.injector },
                       );
                     },
                   }),
@@ -464,10 +467,10 @@ export const NodeItemPageDefine = v.pipe(
                         map(([item, sm]) => {
                           return !sm.isSelected(item);
                         }),
-                        startWith(true)
+                        startWith(true),
                       );
                     },
-                  })
+                  }),
                 ),
               },
             },
@@ -483,8 +486,8 @@ export const NodeItemPageDefine = v.pipe(
               api.ListNodes().pipe(
                 map((item) => {
                   return item.nodes ?? [];
-                })
-              )
+                }),
+              ),
             );
           });
         },
@@ -492,10 +495,8 @@ export const NodeItemPageDefine = v.pipe(
           return {
             filterFn: (
               item: NodeItem,
-              queryParams?: v.InferOutput<typeof FilterCondition>['params']
+              queryParams?: v.InferOutput<typeof FilterCondition>['params'],
             ) => {
-              console.log(queryParams);
-              
               if (!queryParams) {
                 return true;
               }
@@ -547,7 +548,7 @@ export const NodeItemPageDefine = v.pipe(
             },
           };
         };
-      })
+      }),
     ),
 
     bottom: v.pipe(
@@ -573,7 +574,7 @@ export const NodeItemPageDefine = v.pipe(
                 // });
               };
             },
-          })
+          }),
         ),
         page: v.pipe(
           NFCSchema,
@@ -592,13 +593,13 @@ export const NodeItemPageDefine = v.pipe(
                 return tableField.props()['count$$']();
               });
             },
-          })
+          }),
         ),
       }),
       actions.wrappers.set(['div']),
-      actions.class.top('flex justify-between items-center')
+      actions.class.top('flex justify-between items-center'),
     ),
   }),
   actions.wrappers.set([{ type: 'loading-wrapper' }]),
-  setAlias('table-block')
+  setAlias('table-block'),
 );

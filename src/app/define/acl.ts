@@ -25,69 +25,6 @@ const CidrDefine = v.pipe(
     return IP_CIDR_REGEX.test(value);
   }),
 );
-const SrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
-  let topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
-  let rootField = topField.get(['#', '@aclView'])!;
-  let service: AclService = rootField.props()['service'];
-
-  return [
-    { value: '*', label: 'Any' },
-    { label: 'User', children$$: service.users$$ },
-    { label: 'Group', children$$: service.groups$$ },
-    { label: 'Ip', children: [], define: v.pipe(v.string(), v.ip(), setComponent('source-input')) },
-    {
-      label: 'Cidr',
-      children: [],
-      define: v.pipe(
-        v.string(),
-        v.check((value) => {
-          return IP_CIDR_REGEX.test(value);
-        }),
-        setComponent('source-input'),
-      ),
-    },
-    {
-      label: 'Host',
-      children$$: service.hosts$$,
-    },
-    {
-      label: 'Tag',
-      prefix: 'tag:',
-      // 根据后面的定义
-      children: [],
-      define: v.pipe(v.string(), setComponent('source-input')),
-    },
-    {
-      label: 'Autogroup',
-      // 根据后面的定义
-      children: [{ value: 'autogroup:member' }, { value: 'autogroup:tagged' }],
-    },
-  ];
-};
-const TagOwnerList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
-  let topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
-  let rootField = topField.get(['#', '@aclView'])!;
-  let service: AclService = rootField.props()['service'];
-
-  return [
-    { label: 'User', children$$: service.users$$ },
-    // todo 应该需要先定义
-    { label: 'Group', children$$: service.groups$$ },
-    {
-      label: 'Tag',
-      prefix: 'tag:',
-      // 根据后面的定义
-      children: [],
-      define: v.pipe(v.string(), setComponent('source-input')),
-    },
-    // {
-    //   label: 'Autogroup',
-    //   // 根据后面的定义
-    //   children: [],
-    // },
-  ];
-};
-
 function createSourceListDefine(
   optionListFn: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[],
   usePort?: boolean,
@@ -130,6 +67,69 @@ function createSourceListDefine(
     }),
   );
 }
+function getIpSource(service: AclService) {
+  return {
+    label: 'Ip',
+    children$$: service.ipList$$,
+    define: v.pipe(v.string(), v.ip(), setComponent('source-input')),
+  };
+}
+function getCidrSource(service: AclService) {
+  return {
+    label: 'Cidr',
+    children$$: service.routes$$,
+    define: v.pipe(
+      v.string(),
+      v.check((value) => {
+        return IP_CIDR_REGEX.test(value);
+      }),
+      setComponent('source-input'),
+    ),
+  };
+}
+function getTagSource(service: AclService) {
+  return {
+    label: 'Tag',
+    prefix: 'tag:',
+    children$$: service.tagList$$,
+    define: v.pipe(v.string(), setComponent('source-input')),
+  };
+}
+const SrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
+  let topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
+  let rootField = topField.get(['#', '@aclView'])!;
+  let service: AclService = rootField.props()['service'];
+
+  return [
+    { value: '*', label: 'Any' },
+    { label: 'User', children$$: service.users$$ },
+    { label: 'Group', children$$: service.groups$$ },
+    getIpSource(service),
+    getCidrSource(service),
+    {
+      label: 'Host',
+      children$$: service.hosts$$,
+    },
+    getTagSource(service),
+    {
+      label: 'Autogroup',
+      // 根据后面的定义
+      children: [{ value: 'autogroup:member' }, { value: 'autogroup:tagged' }],
+    },
+  ];
+};
+const TagOwnerList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
+  let topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
+  let rootField = topField.get(['#', '@aclView'])!;
+  let service: AclService = rootField.props()['service'];
+
+  return [
+    { label: 'User', children$$: service.users$$ },
+    // todo 应该需要先定义
+    { label: 'Group', children$$: service.groups$$ },
+    getTagSource(service),
+  ];
+};
 
 // todo dst是host:port,所以之间选择不行
 const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
@@ -141,29 +141,13 @@ const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
     { value: '*', label: 'Any' },
     { label: 'User', children$$: service.users$$ },
     { label: 'Group', children$$: service.groups$$ },
-    { label: 'Ip', children: [], define: v.pipe(v.string(), v.ip(), setComponent('source-input')) },
-    {
-      label: 'Cidr',
-      children: [],
-      define: v.pipe(
-        v.string(),
-        v.check((value) => {
-          return IP_CIDR_REGEX.test(value);
-        }),
-        setComponent('source-input'),
-      ),
-    },
+    getIpSource(service),
+    getCidrSource(service),
     {
       label: 'Host',
       children$$: service.hosts$$,
     },
-    {
-      label: 'Tag',
-      prefix: 'tag:',
-      // 根据后面的定义
-      children: [],
-      define: v.pipe(v.string(), setComponent('source-input')),
-    },
+    getTagSource(service),
     {
       label: 'Autogroup',
       // 根据后面的定义
@@ -193,12 +177,7 @@ const SSHSrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = 
   let service: AclService = rootField.props()['service'];
   return [
     { label: 'User', children$$: service.users$$ },
-    {
-      label: 'Tag',
-      prefix: 'tag:',
-      children: [],
-      define: v.pipe(v.string(), setComponent('source-input')),
-    },
+    getTagSource(service),
     {
       label: 'Autogroup',
       children: [{ value: 'autogroup:self' }],
@@ -211,12 +190,7 @@ const SSHDstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = 
   let service: AclService = rootField.props()['service'];
   return [
     { label: 'User', children$$: service.users$$ },
-    {
-      label: 'Tag',
-      prefix: 'tag:',
-      children: [],
-      define: v.pipe(v.string(), setComponent('source-input')),
-    },
+    getTagSource(service),
     {
       label: 'Autogroup',
       children: [{ value: 'autogroup:member' }],
@@ -234,12 +208,7 @@ const SSHUsersList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] 
       children$$: service.username$$,
       define: v.pipe(v.string(), setComponent('source-input')),
     },
-    {
-      label: 'Tag',
-      prefix: 'tag:',
-      children: [],
-      define: v.pipe(v.string(), setComponent('source-input')),
-    },
+    getTagSource(service),
     {
       label: 'Autogroup',
       children: [{ value: 'autogroup:nonroot' }],
