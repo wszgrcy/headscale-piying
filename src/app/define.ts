@@ -72,6 +72,9 @@ export const FormDefine = {
     actions: [
       setComponent(InputFCC),
       actions.wrappers.set(['label-wrapper', 'validate-tooltip-wrapper']),
+      actions.props.patch({
+        labelPosition: 'left',
+      }),
     ],
   },
   number: {

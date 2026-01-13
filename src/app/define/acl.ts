@@ -15,6 +15,7 @@ import { AclSourceService } from '../service/acl-source.service';
 import ms from 'ms';
 import { AclServiceWC } from '../component/wrapper/acl-service/component';
 import { AclService } from '../component/wrapper/acl-service/service';
+import { computed } from '@angular/core';
 export const IP_CIDR_REGEX: RegExp =
   /^(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])(?:\.(?:(?:[1-9]|1\d|2[0-4])?\d|25[0-5])){3}\/(?:\d|[1|2]\d|3[0-2])$|^(?:(?:[\da-f]{1,4}:){7}[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,7}:|(?:[\da-f]{1,4}:){1,6}:[\da-f]{1,4}|(?:[\da-f]{1,4}:){1,5}(?::[\da-f]{1,4}){1,2}|(?:[\da-f]{1,4}:){1,4}(?::[\da-f]{1,4}){1,3}|(?:[\da-f]{1,4}:){1,3}(?::[\da-f]{1,4}){1,4}|(?:[\da-f]{1,4}:){1,2}(?::[\da-f]{1,4}){1,5}|[\da-f]{1,4}:(?::[\da-f]{1,4}){1,6}|:(?:(?::[\da-f]{1,4}){1,7}|:)|fe80:(?::[\da-f]{0,4}){0,4}%[\da-z]+|::(?:f{4}(?::0{1,4})?:)?(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d)|(?:[\da-f]{1,4}:){1,4}:(?:(?:25[0-5]|(?:2[0-4]|1?\d)?\d)\.){3}(?:25[0-5]|(?:2[0-4]|1?\d)?\d))\/(?:\d|[1-9]\d|1(?:[0|1]\d|2[0-8]))$/iu;
 const IpDefine = v.pipe(v.string(), v.ip());
@@ -249,6 +250,11 @@ export const ACLSchema = v.pipe(
               v.string(),
               v.minLength(1),
               actions.attributes.patch({ placeholder: 'host' }),
+              v.title('host'),
+              actions.props.patch({
+                floating: true,
+                labelInline: true,
+              }),
               v.check((item) => {
                 return !item.includes('@');
               }, 'The human-friendly hostname cannot include the character @.'),
@@ -258,6 +264,11 @@ export const ACLSchema = v.pipe(
               asControl(),
               setComponent('string'),
               actions.attributes.patch({ placeholder: 'ip/cidr' }),
+              v.title('ip/cidr'),
+              actions.props.patch({
+                floating: true,
+                labelInline: true,
+              }),
             ),
           ),
           setComponent('edit-group'),
@@ -278,22 +289,35 @@ export const ACLSchema = v.pipe(
               }),
               actions.attributes.patch({ placeholder: 'name' }),
               actions.class.top('min-w-20'),
+              v.title('name'),
+              actions.props.patch({
+                floating: true,
+                labelInline: true,
+              }),
             ),
             v.pipe(
               v.array(
                 v.pipe(
                   v.string(),
                   setComponent('editable-select'),
-                  actions.inputs.patch({ filterEnable: true }),
+                  actions.inputs.patch({ filterEnable: true, emptyContent: '[User]' }),
                   actions.inputs.patchAsync({
                     options: (field) => {
-                      let aclSource: AclSourceService = field.context['aclSource'];
-                      return aclSource.user$.value;
+                      let topField = field.context['root'] ?? field;
+                      let aclSource: AclService = topField.get(['#', '@aclView'])?.props()[
+                        'service'
+                      ];
+                      return aclSource.users$$;
                     },
                   }),
                 ),
               ),
               setComponent('column-group'),
+              v.title('users'),
+              actions.wrappers.patch(['label-wrapper']),
+              actions.props.patch({
+                labelPosition: 'left',
+              }),
             ),
           ),
           // todo 更新kv定义
@@ -400,7 +424,21 @@ export const ACLSchema = v.pipe(
       v.optional(
         v.array(
           v.object({
-            action: v.picklist(['accept', 'check']),
+            action: v.pipe(
+              v.picklist(['accept', 'check']),
+              actions.inputs.patchAsync({
+                options: (field) => {
+                  return computed(() => {
+                    return field.props()['options'];
+                  });
+                },
+              }),
+              actions.wrappers.set(['label-wrapper']),
+              actions.props.patch({
+                labelPosition: 'left',
+              }),
+              v.title('action'),
+            ),
             src: v.pipe(
               v.array(v.pipe(v.string(), setComponent('editable-badge'))),
               setComponent('column-group'),
@@ -448,6 +486,7 @@ export const ACLSchema = v.pipe(
                   }),
                 ),
               ),
+              v.title('checkPeriod'),
             ),
           }),
         ),
@@ -466,7 +505,12 @@ export const ACLSchema = v.pipe(
             v.transform((input) => {
               return `tag:${input}`;
             }),
-            actions.attributes.patch({ placeholder: 'name' }),
+            actions.attributes.patch({ placeholder: 'tag' }),
+            v.title('tag'),
+            actions.props.patch({
+              floating: true,
+              labelInline: true,
+            }),
             actions.class.top('min-w-20'),
           ),
           v.pipe(
@@ -475,6 +519,11 @@ export const ACLSchema = v.pipe(
             actions.inputs.patch({
               addDefine: v.pipe(createSourceListDefine(TagOwnerList)),
             }),
+            v.title('owners'),
+            actions.props.patch({
+              labelPosition: 'left',
+            }),
+            actions.wrappers.patch(['label-wrapper']),
           ),
         ),
       ),
@@ -491,7 +540,12 @@ export const ACLSchema = v.pipe(
               v.record(
                 v.pipe(
                   v.string(),
-                  actions.attributes.patch({ placeholder: 'name' }),
+                  actions.attributes.patch({ placeholder: 'cidr' }),
+                  v.title('cidr'),
+                  actions.props.patch({
+                    floating: true,
+                    labelInline: true,
+                  }),
                   actions.class.top('min-w-20'),
                 ),
                 // todo 感觉应该用动态选择
