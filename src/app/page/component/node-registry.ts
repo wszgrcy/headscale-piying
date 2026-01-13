@@ -57,6 +57,8 @@ export const NodeRegistryDefine = v.pipe(
           actions.props.patch({
             labelPosition: 'left',
           }),
+          actions.class.top('w-full *:last:w-full'),
+          actions.class.component('w-full'),
         ),
       }),
       setAlias('form'),
@@ -91,6 +93,12 @@ export const NodeRegistryDefine = v.pipe(
       }),
     ),
   }),
-  actions.wrappers.patch(['fieldset-wrapper']),
-  actions.class.top('bg-base-200 border-base-300 rounded-box w-xs border p-4'),
+  actions.wrappers.patch([
+    { type: 'div', attributes: { class: 'h-full w-full flex items-center justify-center' } },
+    {
+      type: 'fieldset-wrapper',
+      attributes: { class: 'bg-base-200 border-base-300 rounded-box  border p-4  w-lg' },
+    },
+  ]),
+  v.title('Register Node'),
 );
