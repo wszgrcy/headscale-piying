@@ -156,6 +156,7 @@ export const FieldGlobalConfig: PiViewConfig = {
     ...FormDefine,
     'router-outlet': { type: RouterOutlet },
     object: { type: PiyingViewGroup },
+    loose_object: { type: PiyingViewGroup },
     div: {
       type: DivNFCC,
     },
