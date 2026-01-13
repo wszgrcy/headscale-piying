@@ -1,7 +1,6 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { PI_VIEW_FIELD_TOKEN } from '@piying/view-angular';
 import { AclSourceService } from '../../../service/acl-source.service';
-import { SourceOption } from '../../source-list/type';
 
 @Injectable()
 export class AclService {
@@ -27,14 +26,6 @@ export class AclService {
     });
   });
   users$$ = computed(() => {
-    return this.#aclSource.user$$();
-  });
-  username$$ = computed(() => {
-    return this.#aclSource.user$.value().map((item) => {
-      return {
-        label: item.displayName || item.name || '',
-        value: `${item.name}`,
-      } as SourceOption;
-    });
+    return this.#aclSource.user$.value();
   });
 }

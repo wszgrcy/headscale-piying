@@ -112,6 +112,9 @@ export const FormDefine = {
   select: {
     actions: [setComponent(FCCGroup.SelectFCC), actions.wrappers.set(['label-wrapper'])],
   },
+  picklist: {
+    actions: [setComponent(FCCGroup.SelectFCC), actions.wrappers.set(['label-wrapper'])],
+  },
   radio: {
     actions: [setComponent(FCCGroup.RadioFCC), actions.wrappers.set(['label-wrapper'])],
   },

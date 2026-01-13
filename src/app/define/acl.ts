@@ -180,6 +180,65 @@ const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
   ];
 };
 
+const SSHSrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
+  let topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
+  let rootField = topField.get(['#', '@aclView'])!;
+  let service: AclService = rootField.props()['service'];
+  return [
+    { label: 'User', children$$: service.users$$ },
+    {
+      label: 'Tag',
+      prefix: 'tag:',
+      children: [],
+      define: v.pipe(v.string(), setComponent('source-input')),
+    },
+    {
+      label: 'Autogroup',
+      children: [{ value: 'autogroup:self' }],
+    },
+  ];
+};
+const SSHDstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
+  let topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
+  let rootField = topField.get(['#', '@aclView'])!;
+  let service: AclService = rootField.props()['service'];
+  return [
+    { label: 'User', children$$: service.users$$ },
+    {
+      label: 'Tag',
+      prefix: 'tag:',
+      children: [],
+      define: v.pipe(v.string(), setComponent('source-input')),
+    },
+    {
+      label: 'Autogroup',
+      children: [{ value: 'autogroup:member' }],
+    },
+  ];
+};
+const SSHUsersList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
+  let topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
+  let rootField = topField.get(['#', '@aclView'])!;
+  let service: AclService = rootField.props()['service'];
+  return [
+    { value: '*', label: 'Any' },
+    {
+      label: 'User',
+      children$$: service.username$$,
+      define: v.pipe(v.string(), setComponent('source-input')),
+    },
+    {
+      label: 'Tag',
+      prefix: 'tag:',
+      children: [],
+      define: v.pipe(v.string(), setComponent('source-input')),
+    },
+    {
+      label: 'Autogroup',
+      children: [{ value: 'autogroup:nonroot' }],
+    },
+  ];
+};
 export const ACLSchema = v.pipe(
   v.object({
     hosts: v.pipe(
@@ -342,9 +401,44 @@ export const ACLSchema = v.pipe(
         v.array(
           v.object({
             action: v.picklist(['accept', 'check']),
-            src: v.array(v.string()),
-            dst: v.array(v.string()),
-            users: v.optional(v.array(v.string())),
+            src: v.pipe(
+              v.array(v.pipe(v.string(), setComponent('editable-badge'))),
+              setComponent('column-group'),
+              actions.inputs.patch({
+                addDefine: createSourceListDefine(SSHSrcList),
+              }),
+              actions.wrappers.set(['label-wrapper']),
+              actions.props.patch({
+                labelPosition: 'left',
+              }),
+              v.title('src'),
+            ),
+            dst: v.pipe(
+              v.array(v.pipe(v.string(), setComponent('editable-badge'))),
+              setComponent('column-group'),
+              actions.inputs.patch({
+                addDefine: createSourceListDefine(SSHDstList),
+              }),
+              actions.wrappers.set(['label-wrapper']),
+              actions.props.patch({
+                labelPosition: 'left',
+              }),
+              v.title('dst'),
+            ),
+            users: v.optional(
+              v.pipe(
+                v.array(v.pipe(v.string(), setComponent('editable-badge'))),
+                setComponent('column-group'),
+                actions.inputs.patch({
+                  addDefine: createSourceListDefine(SSHUsersList),
+                }),
+                actions.wrappers.set(['label-wrapper']),
+                actions.props.patch({
+                  labelPosition: 'left',
+                }),
+                v.title('users'),
+              ),
+            ),
             checkPeriod: v.pipe(
               v.optional(
                 v.pipe(
