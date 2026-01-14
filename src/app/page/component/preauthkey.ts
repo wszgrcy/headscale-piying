@@ -12,6 +12,7 @@ import { CopyService } from '../../service/copy.service';
 import { requestLoading } from '../../util/request-loading';
 import { formatDatetimeToStr } from '../../util/time-to-str';
 import { deepEqual } from 'fast-equals';
+import { timeCompare } from '../../util/time';
 // todo dynamic
 let newDate = new Date();
 newDate.setDate(newDate.getDate() + 90);
@@ -24,16 +25,16 @@ const CreateDefine = v.pipe(
       v.title('expiration'),
       v.transform((input) => {
         return input.toISOString();
-      })
+      }),
     ),
     aclTags: v.pipe(
       v.optional(v.array(v.string())),
       asControl(),
       setComponent('node-tag'),
       v.title('aclTags'),
-      actions.wrappers.set(['label-wrapper'])
+      actions.wrappers.set(['label-wrapper']),
     ),
-  })
+  }),
 );
 export const PreAuthkeyPageDefine = v.pipe(
   v.object({
@@ -96,7 +97,7 @@ export const PreAuthkeyPageDefine = v.pipe(
                   setComponent('badge'),
                   actions.wrappers.set(['td']),
                   actions.class.component(
-                    'whitespace-nowrap overflow-hidden text-ellipsis min-w-20 cursor-pointer'
+                    'whitespace-nowrap overflow-hidden text-ellipsis min-w-20 cursor-pointer',
                   ),
                   actions.inputs.patch({
                     color: 'info',
@@ -116,7 +117,7 @@ export const PreAuthkeyPageDefine = v.pipe(
                         copy.copy(key);
                       };
                     },
-                  })
+                  }),
                 ),
               },
               reusable: {
@@ -146,7 +147,8 @@ export const PreAuthkeyPageDefine = v.pipe(
               expiration: {
                 head: 'expiration',
                 body: (data: PreAuthKeys) => {
-                  return formatDatetimeToStr(data.expiration);
+                  let icon = timeCompare(data.expiration!) ? '✔️' : '❌';
+                  return `${icon}${formatDatetimeToStr(data.expiration)}`;
                 },
               },
               aclTags: {
@@ -175,13 +177,13 @@ export const PreAuthkeyPageDefine = v.pipe(
                             let api: ApiService = field.context['api'];
                             let item = field.context['item$']() as PreAuthKeys;
                             await firstValueFrom(
-                              api.ExpirePreAuthKey({ user: item.user!.id!, key: item.key! })
+                              api.ExpirePreAuthKey({ user: item.user!.id!, key: item.key! }),
                             );
                             let status: TableStatusService = field.context['status'];
                             status.needUpdate();
                           };
                         },
-                      })
+                      }),
                     ),
                     delete: v.pipe(
                       NFCSchema,
@@ -198,17 +200,17 @@ export const PreAuthkeyPageDefine = v.pipe(
                             let api: ApiService = field.context['api'];
                             let item = field.context['item$']() as PreAuthKeys;
                             await firstValueFrom(
-                              api.DeletePreAuthKey({ user: item.user!.id!, key: item.key })
+                              api.DeletePreAuthKey({ user: item.user!.id!, key: item.key }),
                             );
                             let status: TableStatusService = field.context['status'];
                             status.needUpdate();
                           };
                         },
-                      })
+                      }),
                     ),
                   }),
                   actions.wrappers.set(['td']),
-                  actions.class.top('flex gap-2')
+                  actions.class.top('flex gap-2'),
                 ),
               },
             },
@@ -237,7 +239,7 @@ export const PreAuthkeyPageDefine = v.pipe(
               }
               status.needUpdate();
             },
-            { injector: field.injector }
+            { injector: field.injector },
           );
         },
       }),
@@ -251,8 +253,8 @@ export const PreAuthkeyPageDefine = v.pipe(
               api.ListPreAuthKeys({ user: defineProps.id }).pipe(
                 map((item) => {
                   return item.preAuthKeys ?? [];
-                })
-              )
+                }),
+              ),
             );
           });
         },
@@ -270,7 +272,7 @@ export const PreAuthkeyPageDefine = v.pipe(
             },
           };
         };
-      })
+      }),
     ),
 
     bottom: v.pipe(
@@ -298,7 +300,7 @@ export const PreAuthkeyPageDefine = v.pipe(
                 });
               };
             },
-          })
+          }),
         ),
         page: v.pipe(
           NFCSchema,
@@ -317,12 +319,12 @@ export const PreAuthkeyPageDefine = v.pipe(
                 return tableField.props()['count$$']();
               });
             },
-          })
+          }),
         ),
       }),
       actions.wrappers.set(['div']),
-      actions.class.top('flex justify-between items-center')
+      actions.class.top('flex justify-between items-center'),
     ),
   }),
-  setAlias('preauthkey')
+  setAlias('preauthkey'),
 );

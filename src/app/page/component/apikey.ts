@@ -10,6 +10,7 @@ import { ApiKey } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { requestLoading } from '../../util/request-loading';
 import { formatDatetimeToStr } from '../../util/time-to-str';
+import { timeCompare } from '../../util/time';
 // todo dynamic
 let newDate = new Date();
 newDate.setDate(newDate.getDate() + 90);
@@ -20,9 +21,9 @@ const CreateApiKeyDefine = v.pipe(
       v.title('expiration'),
       v.transform((input) => {
         return input.toISOString();
-      })
+      }),
     ),
-  })
+  }),
 );
 export const ApiKeyPageDefine = v.pipe(
   v.object({
@@ -46,7 +47,7 @@ export const ApiKeyPageDefine = v.pipe(
                 {
                   define: v.pipe(
                     v.tuple([]),
-                    setComponent('tr')
+                    setComponent('tr'),
                     // actions.directives.set([
                     //   {
                     //     type: ExpandRowDirective,
@@ -89,7 +90,8 @@ export const ApiKeyPageDefine = v.pipe(
               expiration: {
                 head: 'expiration',
                 body: (data: ApiKey) => {
-                  return formatDatetimeToStr(data.expiration);
+                  let icon = timeCompare(data.expiration!) ? '✔️' : '❌';
+                  return `${icon}${formatDatetimeToStr(data.expiration)}`;
                 },
               },
               createdAt: {
@@ -127,7 +129,7 @@ export const ApiKeyPageDefine = v.pipe(
                             status.needUpdate();
                           };
                         },
-                      })
+                      }),
                     ),
                     delete: v.pipe(
                       NFCSchema,
@@ -148,9 +150,9 @@ export const ApiKeyPageDefine = v.pipe(
                             status.needUpdate();
                           };
                         },
-                      })
+                      }),
                     ),
-                  })
+                  }),
                 ),
               },
 
@@ -184,8 +186,8 @@ export const ApiKeyPageDefine = v.pipe(
               api.ListApiKeys().pipe(
                 map((item) => {
                   return item.apiKeys ?? [];
-                })
-              )
+                }),
+              ),
             );
           });
         },
@@ -203,7 +205,7 @@ export const ApiKeyPageDefine = v.pipe(
             },
           };
         };
-      })
+      }),
     ),
 
     bottom: v.pipe(
@@ -229,7 +231,7 @@ export const ApiKeyPageDefine = v.pipe(
                 });
               };
             },
-          })
+          }),
         ),
         page: v.pipe(
           NFCSchema,
@@ -248,13 +250,13 @@ export const ApiKeyPageDefine = v.pipe(
                 return tableField.props()['count$$']();
               });
             },
-          })
+          }),
         ),
       }),
       actions.wrappers.set(['div']),
-      actions.class.top('flex justify-between items-center')
+      actions.class.top('flex justify-between items-center'),
     ),
   }),
   actions.wrappers.set([{ type: 'loading-wrapper' }]),
-  setAlias('table-block')
+  setAlias('table-block'),
 );
