@@ -1,7 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
-@plugin "daisyui";
+
+@plugin "daisyui" {
+  themes:
+    light --default,
+    dark --prefersdark;
+}
 @source '../node_modules/@piying-lib/angular-daisyui/fesm2022';
 @source '../node_modules/@piying-lib/angular-daisyui/preset-css/ts';
 .input.pi-valid,
@@ -47,7 +52,7 @@ textarea {
   z-index: 100;
 }
 
-.cdk-overlay-pane{
+.cdk-overlay-pane {
   @apply bg-base-100;
   @apply rounded-box;
   @apply shadow-xl;

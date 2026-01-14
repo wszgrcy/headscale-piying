@@ -21,6 +21,9 @@ export const MainPage = v.pipe(
               }),
             ),
           }),
+          end: v.object({
+            theme: v.pipe(NFCSchema, setComponent('theme-controller')),
+          }),
         }),
         setComponent('navbar'),
         actions.class.top('sticky top-0 bg-base-100 z-9'),
