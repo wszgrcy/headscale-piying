@@ -1,3 +1,1 @@
-export const environment = {
-  prefix: 'https://nb.tbontop.top',
-};
+export const environment = {};
