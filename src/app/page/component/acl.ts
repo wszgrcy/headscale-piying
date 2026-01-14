@@ -78,9 +78,8 @@ export const ACLPageDefine = v.object({
               const api = field.context['api'] as ApiService;
               const editorField = field.get(['@aclContent'])!;
               const content = editorField.form.control!.value;
-              console.log(content);
 
-              // await firstValueFrom(api.SetPolicy({ policy: JSON.stringify(content) }));
+              await firstValueFrom(api.SetPolicy({ policy: JSON.stringify(content) }));
             };
           },
         }),
