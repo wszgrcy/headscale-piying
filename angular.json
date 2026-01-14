@@ -39,7 +39,8 @@
             "outputPath": {
               "browser": "",
               "base": "./dist"
-            }
+            },
+            "baseHref": "/dashboard/"
           },
           "configurations": {
             "production": {

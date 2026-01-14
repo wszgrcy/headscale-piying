@@ -20,21 +20,13 @@ import { localStorageGuard } from './guard/activate-check.guard';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/web/user',
-    pathMatch: 'full',
-  },
-  {
-    path: 'register/:key',
-    redirectTo: '/web/register/:key',
-  },
-  {
-    path: 'web',
     data: {
       schema: () => MainPage,
     },
     canActivateChild: [localStorageGuard],
     component: SchemaViewRC,
     children: [
+      { path: '', redirectTo: '/user', pathMatch: 'full' },
       {
         path: 'login',
         component: SchemaViewRC,
