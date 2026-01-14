@@ -1,59 +1,54 @@
+
 # HeadscalePiying
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
+- This project is a web UI for [headscale](https://github.com/juanfont/headscale).
+- Currently supports version `0.27.1`.
 
-## Development server
+## Project Features
 
-To start a local development server, run:
+- Uses the official API definition file [gen/openapiv2/headscale/v1/headscale.swagger.json](https://github.com/juanfont/headscale/blob/main/gen/openapiv2/headscale/v1/headscale.swagger.json) for easy maintenance.
+- Implements a visual ACL configuration interface with auto-suggestion support.
 
-```bash
-ng serve
-```
+![](./docs/image/acl-select-1.png)
+![](./docs/image/acl-select-2.png)
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Supports deployment via [Traefik](./docs/server-config/readme.md) and temporary hosting on [GitHub Pages](https://wszgrcy.github.io/headscale-piying).
 
-## Code scaffolding
+### Traefik Deployment
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- [Traefik deployment guide](./docs/server-config/readme.md)
+- Enables automatic redirection for Tailscale links:
 
 ```bash
-ng generate --help
+root@ubuntu:~# sudo tailscale up --login-server=your.web.site
+
+To authenticate, visit:
+
+        https://your.web.site/register/xxxxxx-yyyyyyyyyyyyyyyy
 ```
 
-## Building
+![](./docs/image/register.png)
 
-To build the project run:
+### Temporary GitHub Pages Hosting
 
-```bash
-ng build
+- [GitHub Pages](https://wszgrcy.github.io/headscale-piying)
+- If your server allows CORS, you can host the web UI remotely without local deployment. The only limitation is that link redirection won't work — manual registration is required.
+
+- In Traefik, configure a CORS middleware as follows:
+
+```yaml
+cors:
+  headers:
+    accessControlAllowMethods:
+      - GET
+      - OPTIONS
+      - PUT
+      - POST
+      - PATCH
+      - DELETE
+    accessControlAllowHeaders: '*'
+    accessControlAllowOriginList:
+      - https://wszgrcy.github.io
+    accessControlMaxAge: 100
+    addVaryHeader: true
 ```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
