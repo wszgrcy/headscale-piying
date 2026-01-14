@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:gh": "ng build --configuration github-gh",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:headscale-piying": "node dist/headscale-piying/server/server.mjs",
