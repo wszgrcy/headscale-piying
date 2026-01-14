@@ -36,7 +36,7 @@ import { deepEqual } from 'fast-equals';
 const RenameDefine = v.pipe(
   v.object({
     name: v.pipe(v.string(), v.title('newName')),
-  })
+  }),
 );
 const CreateUserDefine = v.pipe(
   v.object({
@@ -44,7 +44,7 @@ const CreateUserDefine = v.pipe(
     displayName: v.pipe(v.optional(v.string()), v.title('displayName')),
     email: v.pipe(v.optional(v.pipe(v.string(), v.email())), v.title('email')),
     pictureUrl: v.pipe(v.optional(v.pipe(v.string(), v.url())), v.title('pictureUrl')),
-  })
+  }),
 );
 const FilterCondition = v.pipe(
   v.object({
@@ -56,16 +56,13 @@ const FilterCondition = v.pipe(
       formConfig({ updateOn: 'submit' }),
       actions.wrappers.set(['div']),
       actions.class.top('flex gap-4'),
-      setAlias('filterParams')
+      setAlias('filterParams'),
     ),
     __flex: v.pipe(NFCSchema, setComponent('div'), actions.class.top('flex-1')),
     reset: v.pipe(
       NFCSchema,
-      setComponent('button'),
-      actions.inputs.patch({
-        content: 'Reset',
-        color: 'error',
-      }),
+      setComponent('input-button'),
+      actions.inputs.patch({ type: 'reset', color: 'error' }),
       actions.inputs.patchAsync({
         clicked: (field) => {
           return () => {
@@ -73,15 +70,12 @@ const FilterCondition = v.pipe(
             result.reset();
           };
         },
-      })
+      }),
     ),
     submit: v.pipe(
       NFCSchema,
-      setComponent('button'),
-      actions.inputs.patch({
-        content: 'Submit',
-        color: 'primary',
-      }),
+      setComponent('input-button'),
+      actions.inputs.patch({ type: 'submit', color: 'primary' }),
       actions.inputs.patchAsync({
         clicked: (field) => {
           return () => {
@@ -89,11 +83,11 @@ const FilterCondition = v.pipe(
             result.emitSubmit();
           };
         },
-      })
+      }),
     ),
   }),
   actions.wrappers.set(['div']),
-  actions.class.top('flex gap-2')
+  actions.class.top('flex gap-2'),
 );
 export const UserPageDefine = v.pipe(
   v.object({
@@ -150,7 +144,7 @@ export const UserPageDefine = v.pipe(
                 body: v.pipe(
                   NFCSchema,
                   setComponent('table-expand-cell'),
-                  actions.wrappers.set(['td'])
+                  actions.wrappers.set(['td']),
                 ),
               },
               id: {
@@ -174,7 +168,7 @@ export const UserPageDefine = v.pipe(
                   actions.props.patch({
                     key: 'createdAt',
                     direction: -1,
-                  })
+                  }),
                 ),
                 body: (data: User) => {
                   return formatDatetimeToStr(data.createdAt);
@@ -241,7 +235,7 @@ export const UserPageDefine = v.pipe(
                             // let result = await firstValueFrom(ref.closed);
                           };
                         },
-                      })
+                      }),
                     ),
                     delete: v.pipe(
                       NFCSchema,
@@ -262,11 +256,11 @@ export const UserPageDefine = v.pipe(
                             status.needUpdate();
                           };
                         },
-                      })
+                      }),
                     ),
                   }),
                   actions.wrappers.set(['td']),
-                  actions.class.top('flex gap-2')
+                  actions.class.top('flex gap-2'),
                 ),
               },
 
@@ -304,10 +298,10 @@ export const UserPageDefine = v.pipe(
                         map(([item, sm]) => {
                           return !sm.isSelected(item);
                         }),
-                        startWith(true)
+                        startWith(true),
                       );
                     },
-                  })
+                  }),
                 ),
               },
             },
@@ -323,8 +317,8 @@ export const UserPageDefine = v.pipe(
               api.ListUsers().pipe(
                 map((item) => {
                   return item.users ?? [];
-                })
-              )
+                }),
+              ),
             );
           });
         },
@@ -369,7 +363,7 @@ export const UserPageDefine = v.pipe(
             },
           };
         };
-      })
+      }),
     ),
 
     bottom: v.pipe(
@@ -395,7 +389,7 @@ export const UserPageDefine = v.pipe(
                 });
               };
             },
-          })
+          }),
         ),
         page: v.pipe(
           NFCSchema,
@@ -414,13 +408,13 @@ export const UserPageDefine = v.pipe(
                 return tableField.props()['count$$']();
               });
             },
-          })
+          }),
         ),
       }),
       actions.wrappers.set(['div']),
-      actions.class.top('flex justify-between items-center')
+      actions.class.top('flex justify-between items-center'),
     ),
   }),
   setAlias('table-block'),
-  actions.wrappers.set([{ type: 'loading-wrapper' }])
+  actions.wrappers.set([{ type: 'loading-wrapper' }]),
 );

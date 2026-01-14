@@ -73,11 +73,8 @@ const FilterCondition = v.pipe(
     __flex: v.pipe(NFCSchema, setComponent('div'), actions.class.top('flex-1')),
     reset: v.pipe(
       NFCSchema,
-      setComponent('button'),
-      actions.inputs.patch({
-        content: 'Reset',
-        color: 'error',
-      }),
+      setComponent('input-button'),
+      actions.inputs.patch({ type: 'reset', color: 'error' }),
       actions.inputs.patchAsync({
         clicked: (field) => {
           return () => {
@@ -89,11 +86,8 @@ const FilterCondition = v.pipe(
     ),
     submit: v.pipe(
       NFCSchema,
-      setComponent('button'),
-      actions.inputs.patch({
-        content: 'Submit',
-        color: 'primary',
-      }),
+      setComponent('input-button'),
+      actions.inputs.patch({ type: 'submit', color: 'primary' }),
       actions.inputs.patchAsync({
         clicked: (field) => {
           return () => {
