@@ -1,7 +1,9 @@
 name: docker build
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - 'master'
 
 jobs:
   main:
@@ -20,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Install dependencies
         run: npm ci --prefer-offline
@@ -52,5 +54,3 @@ jobs:
           tags: ghcr.io/${{github.actor}}/headscale-piying:0.27.1-${{ env.CCOUNT }}
           labels: ${{ steps.meta.outputs.labels }}
           target: builder
-    
-
