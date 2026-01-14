@@ -47,6 +47,8 @@ export const MainPage = v.pipe(
               { title: 'acl', router: { routerLink: './acl' } },
 
               { type: 'divider' },
+              { title: 'register', router: { routerLink: './register/length24string' } },
+              { type: 'divider' },
               { title: 'status', router: { routerLink: './status' } },
             ],
           }),
