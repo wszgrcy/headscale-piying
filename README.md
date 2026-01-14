@@ -52,3 +52,7 @@ cors:
     accessControlMaxAge: 100
     addVaryHeader: true
 ```
+
+- type `server_url`
+
+![](./docs/image/gh-login.png)

@@ -14,7 +14,7 @@ export const StatusDefine = v.pipe(
           return ls.prefix$$;
         },
       }),
-      v.title('prefix'),
+      v.title('server_url'),
       actions.wrappers.set(['label-wrapper', 'div']),
       actions.props.patch({ labelPosition: 'left' }),
 

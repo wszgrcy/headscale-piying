@@ -5,7 +5,7 @@ export const LoginDefine = v.pipe(
   v.object({
     prefix: v.pipe(
       v.optional(v.string()),
-      v.title('prefix'),
+      v.title('server_url'),
       actions.class.top('w-full *:last:w-full'),
       actions.class.component('w-full'),
     ),
