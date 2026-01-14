@@ -24,6 +24,7 @@ import { EditableBadgeFCC } from './component/edit-badge';
 import { EditableSelectFCC } from './component/select/component';
 import { EditGroupFGC } from './component/edit-group/component';
 import { ValidateTooltipbWC } from './component/wrapper/validate-tooltip/component';
+import { ThemeControllerNFCC } from './component/theme-controller/component';
 const selectorPrefix = 'app-';
 
 const list = [
@@ -184,6 +185,9 @@ export const FieldGlobalConfig: PiViewConfig = {
     },
     'source-input': {
       actions: [setComponent(SourceInputFCC)],
+    },
+    'theme-controller': {
+      actions: [setComponent(ThemeControllerNFCC)],
     },
   },
   wrappers: {
