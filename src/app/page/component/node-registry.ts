@@ -69,7 +69,7 @@ export const NodeRegistryDefine = v.pipe(
                 const api: ApiService = field.context['api'];
                 await firstValueFrom(api.RegisterNode(tableField.form.control!.value));
                 const router: Router = field.context['router'];
-                return router.navigateByUrl('/web/node');
+                return router.navigateByUrl('/node');
               };
             },
             disabled: (field) => {

@@ -19,7 +19,7 @@ export class AccountService {
     }
     return firstValueFrom(this.api.Health())
       .then(() => {
-        return this.router.navigateByUrl('/web/user');
+        return this.router.navigateByUrl('/user');
       })
       .catch(() => {
         this.apiKey.clearKey();
@@ -27,6 +27,6 @@ export class AccountService {
   }
   logout() {
     this.apiKey.clearKey();
-    return this.router.navigateByUrl('/web/login');
+    return this.router.navigateByUrl('/login');
   }
 }
