@@ -1,6 +1,6 @@
 import { computed, Injectable, linkedSignal } from '@angular/core';
-const KEY = 'apikey';
-const Prefix = 'prefix';
+const KEY = '__apikey';
+const Prefix = '__prefix';
 @Injectable({
   providedIn: 'root',
 })
@@ -15,7 +15,9 @@ export class LocalSaveService {
   #prefix$ = linkedSignal(
     computed(() => {
       let saved =
-        typeof localStorage !== 'undefined' ? (localStorage.getItem(Prefix) ?? undefined) : undefined;
+        typeof localStorage !== 'undefined'
+          ? (localStorage.getItem(Prefix) ?? undefined)
+          : undefined;
       return saved;
     }),
   );

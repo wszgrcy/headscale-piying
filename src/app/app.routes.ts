@@ -18,6 +18,7 @@ import { CopyService } from './service/copy.service';
 import { ACLPageDefine } from './page/component/acl';
 import { AclSourceService } from './service/acl-source.service';
 import { NodeRegistryDefine } from './page/component/node-registry';
+import { LocalSaveService } from './service/local-save.service';
 export const routes: Routes = [
   {
     path: '',
@@ -43,6 +44,15 @@ export const routes: Routes = [
           context: () => {
             return {
               account: inject(AccountService),
+            };
+          },
+          model: () => {
+            let ls = inject(LocalSaveService);
+            return {
+              __login: {
+                prefix: ls.prefix$$(),
+                apiKey: ls.key$$(),
+              },
             };
           },
         },
