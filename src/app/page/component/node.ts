@@ -56,6 +56,17 @@ const ROSTRLabelWrapper = metadataList<any>([
     labelPosition: 'left',
   }),
 ]);
+const registerMethodList = [
+  'REGISTER_METHOD_UNSPECIFIED',
+  'REGISTER_METHOD_AUTH_KEY',
+  'REGISTER_METHOD_CLI',
+  'REGISTER_METHOD_OIDC',
+].map((item) => {
+  return {
+    label: item.slice('REGISTER_METHOD_'.length),
+    value: item,
+  };
+});
 const FilterCondition = v.pipe(
   v.object({
     params: v.pipe(
@@ -64,6 +75,16 @@ const FilterCondition = v.pipe(
         ip: v.pipe(v.optional(v.string()), v.title('ip'), LeftTitleAction),
         createdAt: v.pipe(v.optional(PickerTimeRangeDefine), v.title('createdAt'), LeftTitleAction),
         lastSeen: v.pipe(v.optional(PickerTimeRangeDefine), v.title('lastSeen'), LeftTitleAction),
+        registerMethod: v.pipe(
+          v.optional(v.string()),
+          setComponent('select'),
+          actions.class.component('min-w-20'),
+          actions.inputs.patch({
+            options: registerMethodList,
+          }),
+          v.title('lastSeen'),
+          LeftTitleAction,
+        ),
       }),
       formConfig({ updateOn: 'submit' }),
       actions.wrappers.set(['div']),
@@ -516,6 +537,12 @@ export const NodeItemPageDefine = v.pipe(
               if (queryParams.ip && item.ipAddresses) {
                 let ip = queryParams.ip.toLowerCase();
                 result = item.ipAddresses.some((item) => item.toLowerCase().includes(ip));
+                if (!result) {
+                  return result;
+                }
+              }
+              if (queryParams.registerMethod) {
+                result = item.registerMethod===queryParams.registerMethod
                 if (!result) {
                   return result;
                 }
