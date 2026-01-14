@@ -1,0 +1,20 @@
+<ng-template #templateRef let-attr="attributes">
+  <div class="flex items-center">
+    @if (isEdit$()) {
+      <input type="text" class="input input-xs" [(ngModel)]="editContent$" />
+      <button class="btn btn-circle btn-success btn-xs btn-ghost" (click)="valueChange2()">
+        <mat-icon class="micon-4">check</mat-icon>
+      </button>
+      <button class="btn btn-circle btn-error btn-xs btn-ghost" (click)="isEdit$.set(false)">
+        <mat-icon class="micon-4">close</mat-icon>
+      </button>
+    } @else {
+      @if (value$()) {
+        {{ value$() }}
+      }
+      <button class="btn btn-circle btn-accent btn-xs btn-ghost" (click)="isEdit$.set(true)">
+        <mat-icon class="micon-4">edit</mat-icon>
+      </button>
+    }
+  </div>
+</ng-template>

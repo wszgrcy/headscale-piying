@@ -1,13 +1,9 @@
-import { Routes } from '@angular/router';
+import { ActivatedRoute, Router, Routes } from '@angular/router';
 import { SchemaViewRC } from './schema-view/component';
 import { MainPage } from './page/main';
-import { LoginDefine } from './page/component/login';
 import { LoginPageDefine } from './page/login';
 import { inject } from '@angular/core';
 
-import { range } from 'es-toolkit';
-
-import { FieldGlobalConfig } from './define';
 import { AccountService } from './service/account.service';
 import { UserPageDefine } from './page/component/user';
 import { ApiService } from './service/api.service';
@@ -16,7 +12,11 @@ import { ApiKeyPageDefine } from './page/component/apikey';
 import { NodeItemPageDefine } from './page/component/node';
 import { CopyService } from './service/copy.service';
 import { ACLPageDefine } from './page/component/acl';
-
+import { AclSourceService } from './service/acl-source.service';
+import { NodeRegistryDefine } from './page/component/node-registry';
+import { LocalSaveService } from './service/local-save.service';
+import { StatusDefine } from './page/component/status';
+import { localStorageGuard } from './guard/activate-check.guard';
 export const routes: Routes = [
   {
     path: '',
@@ -24,10 +24,15 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
+    path: 'register/:key',
+    redirectTo: '/web/register/:key',
+  },
+  {
     path: 'web',
     data: {
       schema: () => MainPage,
     },
+    canActivateChild: [localStorageGuard],
     component: SchemaViewRC,
     children: [
       {
@@ -38,6 +43,29 @@ export const routes: Routes = [
           context: () => {
             return {
               account: inject(AccountService),
+            };
+          },
+          model: () => {
+            const ls = inject(LocalSaveService);
+            return {
+              __login: {
+                prefix: ls.prefix$$(),
+                apiKey: ls.key$$(),
+              },
+            };
+          },
+        },
+      },
+      {
+        path: 'register/:key',
+        component: SchemaViewRC,
+        data: {
+          schema: () => NodeRegistryDefine,
+          context: () => {
+            return {
+              api: inject(ApiService),
+              activatedRoute: inject(ActivatedRoute),
+              router: inject(Router),
             };
           },
         },
@@ -91,6 +119,21 @@ export const routes: Routes = [
             return {
               api: inject(ApiService),
               dialog: inject(DialogService),
+              aclSource: inject(AclSourceService),
+            };
+          },
+        },
+      },
+      {
+        path: 'status',
+        component: SchemaViewRC,
+        data: {
+          schema: () => StatusDefine,
+          context: () => {
+            return {
+              api: inject(ApiService),
+              localSave: inject(LocalSaveService),
+              account: inject(AccountService),
             };
           },
         },

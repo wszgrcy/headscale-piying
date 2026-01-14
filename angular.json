@@ -18,7 +18,9 @@
           "options": {
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
-            "polyfills": ["./src/polyfill"],
+            "polyfills": [
+              "./src/polyfill"
+            ],
             "assets": [
               {
                 "glob": "**/*",
@@ -30,7 +32,14 @@
                 "output": "lib/monaco-editor"
               }
             ],
-            "styles": ["src/styles.css", "material-icons/iconfont/filled.css"]
+            "styles": [
+              "src/styles.css",
+              "material-icons/iconfont/filled.css"
+            ],
+            "outputPath": {
+              "browser": "",
+              "base": "./dist"
+            }
           },
           "configurations": {
             "production": {

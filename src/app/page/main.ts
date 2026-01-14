@@ -18,17 +18,20 @@ export const MainPage = v.pipe(
               }),
               actions.attributes.patch({
                 for: 'drawer-0',
-              })
+              }),
             ),
+          }),
+          end: v.object({
+            theme: v.pipe(NFCSchema, setComponent('theme-controller')),
           }),
         }),
         setComponent('navbar'),
-        actions.class.top('sticky top-0 bg-base-100 z-9')
+        actions.class.top('sticky top-0 bg-base-100 z-9'),
       ),
       router: v.pipe(
         NFCSchema,
         setComponent('div'),
-        actions.directives.patch([{ type: RouterOutlet }])
+        actions.directives.patch([{ type: RouterOutlet }]),
       ),
     }),
     side: v.pipe(
@@ -44,16 +47,19 @@ export const MainPage = v.pipe(
               { title: 'acl', router: { routerLink: './acl' } },
 
               { type: 'divider' },
+              { title: 'status', router: { routerLink: './status' } },
             ],
           }),
-          actions.class.top('min-w-[250px]')
+          actions.class.top('min-w-[250px]'),
         ),
       }),
       actions.wrappers.set([{ type: 'div' }]),
-      actions.class.top('bg-base-100 h-full z-9')
+      actions.class.top('bg-base-100 h-full z-9'),
     ),
   }),
   setComponent('drawer'),
-
-  actions.class.top('lg:drawer-open')
+  actions.inputs.patch({
+    contentClass: 'flex flex-col *:last:flex-1',
+  }),
+  actions.class.top('lg:drawer-open'),
 );

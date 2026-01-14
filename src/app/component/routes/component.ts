@@ -1,13 +1,5 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, viewChild } from '@angular/core';
 
-import { NgTemplateOutlet } from '@angular/common';
 import { PI_VIEW_FIELD_TOKEN } from '@piying/view-angular';
 import { NodeItem } from '../../../api/item.type';
 import { PurePipe } from '@cyia/ngx-common/pipe';
@@ -47,17 +39,17 @@ export class NodeRouterNFCC {
     return list.includes(item);
   };
   async approvedToggle(item: string, enable: boolean) {
-    let list = this.#item$$().approvedRoutes ?? [];
+    const list = this.#item$$().approvedRoutes ?? [];
     if (enable) {
       list.push(item);
     } else {
-      let index = list.findIndex((item2) => item2 === item);
+      const index = list.findIndex((item2) => item2 === item);
       list.splice(index, 1);
     }
     await firstValueFrom(
       (this.field$$().context['api'] as ApiService).SetApprovedRoutes(this.#item$$().id!, {
         routes: list,
-      })
+      }),
     );
     (this.field$$().context['status'] as TableStatusService).needUpdate();
   }

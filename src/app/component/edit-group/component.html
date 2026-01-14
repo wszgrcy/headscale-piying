@@ -1,0 +1,45 @@
+<ng-template #templateRef let-attr="attributes" let-events="events">
+  @for (field of children$$(); track field.id || $index) {
+    <div class="flex items-center gap-2">
+      @let key = field.key!;
+      {{ key }}
+      <div class="flex-1">
+        <ng-container
+          *ngTemplateOutlet="fieldTemplateRef(); context: { $implicit: field }"
+        ></ng-container>
+      </div>
+      <button class="btn btn-circle btn-error" (click)="removeItem(key)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  }
+  <div class="flex items-center gap-2">
+    <ng-container
+      [selectlessOutlet]="PiyingView"
+      [selectlessOutletInputs]="
+        schemaOptions$$ | pure: field$$().form.control!.config$().groupKeySchema
+      "
+      [selectlessOutletOutputs]="modelOutput | pure: newKey$"
+      #newKey="selectlessOutlet"
+    ></ng-container>
+    <ng-container
+      [selectlessOutlet]="PiyingView"
+      [selectlessOutletInputs]="
+        schemaOptions$$ | pure: field$$().form.control!.config$().groupValueSchema
+      "
+      [selectlessOutletOutputs]="modelOutput | pure: newValue$"
+      #newValue="selectlessOutlet"
+    ></ng-container>
+
+    <button
+      class="btn btn-circle"
+      (click)="addNew(newKey, newValue)"
+      color="primary"
+      [disabled]="
+        !(newKey.componentInstance?.form$$()?.valid && newValue.componentInstance?.form$$()?.valid)
+      "
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+</ng-template>

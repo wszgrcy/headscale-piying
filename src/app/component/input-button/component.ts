@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, input, signal, viewChild } from '@angular/core';
 import { ThemeService } from '@piying-lib/angular-daisyui/service';
 import { EventsDirective, AttributesDirective } from '@piying/view-angular';
 import { MergeClassPipe } from '@piying-lib/angular-daisyui/pipe';
@@ -40,7 +40,7 @@ export class InputButtonNFCC {
       this.#theme.setSize('btn', this.size()),
       this.style() ? this.#theme.addPrefix(`btn-${this.style()}`) : undefined,
       this.shape() ? this.#theme.addPrefix(`btn-${this.shape()}`) : undefined,
-      this.active() ? this.#theme.addPrefix(`btn-active`) : undefined
+      this.active() ? this.#theme.addPrefix(`btn-active`) : undefined,
     );
   });
 }

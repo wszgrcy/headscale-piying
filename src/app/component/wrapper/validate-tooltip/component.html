@@ -1,0 +1,14 @@
+<ng-template #templateRef let-attr="attributes">
+  <div
+    [attributes]="attr()"
+    [excludes]="['class']"
+    [class]="wrapperClass$$() | mergeClass: attr()?.class"
+  >
+    @if (showError$$()) {
+      <div class="tooltip-content">
+        <div class="text-error">{{ errorStr$$() }}</div>
+      </div>
+    }
+    <ng-container insertField></ng-container>
+  </div>
+</ng-template>

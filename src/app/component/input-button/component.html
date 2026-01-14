@@ -4,7 +4,7 @@
     [events]="events()"
     [attributes]="attr()"
     [excludes]="['class']"
-    [class]="'btn' | mergeClass : wrapperClass$$()"
+    [class]="'btn' | mergeClass: wrapperClass$$() : attr()?.class"
     (click)="onClick($event)"
     [disabled]="isLoading$() || disabled()"
   />

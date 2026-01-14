@@ -1,0 +1,56 @@
+name: docker build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Compute commit count (git)
+        id: compute-count
+        run: |
+          COUNT=$(git rev-list --count HEAD)
+          echo "CCOUNT=$COUNT"
+          echo "CCOUNT=$COUNT" >> "$GITHUB_ENV"
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Run build
+        run: npm run build
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ github.actor }}/headscale-piying
+
+      - name: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./dockerfile
+          push: true
+          tags: ghcr.io/${{github.actor}}/headscale-piying:0.27.1-${{ env.CCOUNT }}
+          labels: ${{ steps.meta.outputs.labels }}
+          target: builder
+    
+

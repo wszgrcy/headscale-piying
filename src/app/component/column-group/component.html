@@ -1,0 +1,16 @@
+<ng-template #templateRef let-attr="attributes" let-events="events">
+  <div class="flex gap-2">
+    @for (field of children$$(); track field.id || $index) {
+      <ng-container
+        *ngTemplateOutlet="fieldTemplateRef(); context: { $implicit: field }"
+      ></ng-container>
+    }
+
+    <ng-container
+      [selectlessOutlet]="PiyingView"
+      [selectlessOutletInputs]="schemaOptions$$()"
+      [selectlessOutletOutputs]="modelOutput | pure: newItem"
+      #newItem="selectlessOutlet"
+    ></ng-container>
+  </div>
+</ng-template>

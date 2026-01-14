@@ -1,43 +1,59 @@
 import * as v from 'valibot';
 import {
   _PiResolvedCommonViewFieldConfig,
-  formConfig,
-  hideWhen,
+  FieldLogicGroup,
   NFCSchema,
   setAlias,
   setComponent,
 } from '@piying/view-angular-core';
-import { computed } from '@angular/core';
 import { actions } from '@piying/view-angular';
-import { firstValueFrom, map, startWith, Subject } from 'rxjs';
-import { ExpandRowDirective, TableStatusService } from '@piying-lib/angular-daisyui/extension';
+import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../service/api.service';
-import { ListUsersRes } from '../../../api/type';
-import { ApiKey } from '../../../api/item.type';
-import { DialogService } from '../../service/dialog.service';
-import { requestLoading } from '../../util/request-loading';
-import { formatDatetimeToStr } from '../../util/time-to-str';
+import { ACLSchema } from '../../define/acl';
 async function requestACL(field: _PiResolvedCommonViewFieldConfig) {
-  let api = field.context['api'] as ApiService;
+  const api = field.context['api'] as ApiService;
 
-  let value = await firstValueFrom(api.GetPolicy());
+  const value = await firstValueFrom(api.GetPolicy());
 
-  let editorField = field.get(['@editor'])!;
+  const editorField = field.get(['@editor'])!;
   editorField.form.control!.updateValue(JSON.parse(value.policy ?? '{}'));
 }
 export const ACLPageDefine = v.object({
-  editor: v.pipe(
-    v.any(),
-    setComponent('acl-text-editor'),
-    setAlias('editor'),
-
-    actions.class.component('h-100'),
-    actions.hooks.merge({
-      allFieldsResolved: async (field) => {
-        requestACL(field);
+  acl: v.pipe(
+    v.union([
+      v.pipe(
+        ACLSchema,
+        v.title('View'),
+        actions.wrappers.patchAsync('div', [actions.class.component('*:w-full')]),
+      ),
+      v.pipe(
+        v.any(),
+        setComponent('acl-text-editor'),
+        setAlias('editor'),
+        actions.class.component('h-100'),
+        actions.hooks.merge({
+          allFieldsResolved: async (field) => {
+            requestACL(field);
+          },
+        }),
+        v.title('Editor'),
+      ),
+    ]),
+    actions.inputs.patch({
+      isUnion: true,
+    }),
+    actions.inputs.patchAsync({
+      beforeChange: (field) => {
+        return (index: number) => {
+          const control = (field.form.control as FieldLogicGroup).fixedControls$()[index];
+          control.updateValue(field.form.control!.value$$());
+        };
       },
-    })
+    }),
+    setAlias('aclContent'),
+    setComponent('tabs'),
   ),
+
   bottom: v.pipe(
     v.object({
       reset: v.pipe(
@@ -50,7 +66,7 @@ export const ACLPageDefine = v.object({
               return requestACL(field);
             };
           },
-        })
+        }),
       ),
       submit: v.pipe(
         NFCSchema,
@@ -59,16 +75,18 @@ export const ACLPageDefine = v.object({
         actions.inputs.patchAsync({
           clicked: (field) => {
             return async () => {
-              let api = field.context['api'] as ApiService;
-              let editorField = field.get(['@editor'])!;
-              let content = editorField.form.control!.value;
-              await firstValueFrom(api.SetPolicy({ policy: JSON.stringify(content) }));
+              const api = field.context['api'] as ApiService;
+              const editorField = field.get(['@aclContent'])!;
+              const content = editorField.form.control!.value;
+              console.log(content);
+
+              // await firstValueFrom(api.SetPolicy({ policy: JSON.stringify(content) }));
             };
           },
-        })
+        }),
       ),
     }),
     actions.wrappers.set(['div']),
-    actions.class.top('flex gap-2 justify-end')
+    actions.class.top('flex gap-2 justify-end'),
   ),
 });

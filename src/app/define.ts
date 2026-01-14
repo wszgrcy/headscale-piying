@@ -16,6 +16,16 @@ import { UlGroup } from './component/ul/component';
 import { NodeRouterNFCC } from './component/routes/component';
 import { ACLTxtEditorFCC } from './component/acl-text-editor/component';
 import { InputButtonNFCC } from './component/input-button/component';
+import { RowGroupFGC } from './component/row-group/component';
+import { ArrayGroupFGC } from './component/column-group/component';
+import { SourceListFCC } from './component/source-list';
+import { SourceInputFCC } from './component/source-input';
+import { EditableBadgeFCC } from './component/edit-badge';
+import { EditableSelectFCC } from './component/select/component';
+import { EditGroupFGC } from './component/edit-group/component';
+import { ValidateTooltipbWC } from './component/wrapper/validate-tooltip/component';
+import { ThemeControllerNFCC } from './component/theme-controller/component';
+import { PasswordInputFCC } from './component/password';
 const selectorPrefix = 'app-';
 
 const list = [
@@ -25,20 +35,23 @@ const list = [
   ...Object.values(ExtComponentGroup),
 ] as Type<any>[];
 
-const types = list.reduce((obj, item) => {
-  const result = reflectComponentType(item);
-  if (!result) {
+const types = list.reduce(
+  (obj, item) => {
+    const result = reflectComponentType(item);
+    if (!result) {
+      return obj;
+    }
+    obj[
+      result.selector.startsWith(selectorPrefix)
+        ? result.selector.slice(selectorPrefix.length)
+        : result.selector
+    ] = {
+      type: item,
+    };
     return obj;
-  }
-  obj[
-    result.selector.startsWith(selectorPrefix)
-      ? result.selector.slice(selectorPrefix.length)
-      : result.selector
-  ] = {
-    type: item,
-  };
-  return obj;
-}, {} as Record<string, any>);
+  },
+  {} as Record<string, any>,
+);
 const defaultWrapper = [...Object.values(WrapperGroup), ...Object.values(ExtWrapperGroup)].reduce(
   (obj, item) => {
     const result = reflectComponentType(item as any);
@@ -54,11 +67,26 @@ const defaultWrapper = [...Object.values(WrapperGroup), ...Object.values(ExtWrap
     };
     return obj;
   },
-  {} as Record<string, any>
+  {} as Record<string, any>,
 );
 export const FormDefine = {
   string: {
-    actions: [setComponent(InputFCC), actions.wrappers.set(['label-wrapper'])],
+    actions: [
+      setComponent(InputFCC),
+      actions.wrappers.set(['label-wrapper', 'validate-tooltip-wrapper']),
+      actions.props.patch({
+        labelPosition: 'left',
+      }),
+    ],
+  },
+  password: {
+    actions: [
+      setComponent(PasswordInputFCC),
+      actions.wrappers.set(['label-wrapper', 'validate-tooltip-wrapper']),
+      actions.props.patch({
+        labelPosition: 'left',
+      }),
+    ],
   },
   number: {
     actions: [
@@ -98,11 +126,38 @@ export const FormDefine = {
   select: {
     actions: [setComponent(FCCGroup.SelectFCC), actions.wrappers.set(['label-wrapper'])],
   },
+  picklist: {
+    actions: [setComponent(FCCGroup.SelectFCC), actions.wrappers.set(['label-wrapper'])],
+  },
   radio: {
     actions: [setComponent(FCCGroup.RadioFCC), actions.wrappers.set(['label-wrapper'])],
   },
   textarea: {
     actions: [setComponent(FCCGroup.TextareaFCC), actions.wrappers.set(['label-wrapper'])],
+  },
+  array: {
+    actions: [setComponent(PiyingViewGroup)],
+  },
+  record: {
+    actions: [setComponent(PiyingViewGroup)],
+  },
+  tuple: {
+    actions: [setComponent(PiyingViewGroup)],
+  },
+  'row-group': {
+    actions: [setComponent(RowGroupFGC)],
+  },
+  'column-group': {
+    actions: [setComponent(ArrayGroupFGC)],
+  },
+  'editable-badge': {
+    actions: [setComponent(EditableBadgeFCC)],
+  },
+  'editable-select': {
+    actions: [setComponent(EditableSelectFCC)],
+  },
+  'edit-group': {
+    actions: [setComponent(EditGroupFGC)],
   },
 } as PiViewConfig['types'];
 
@@ -112,6 +167,7 @@ export const FieldGlobalConfig: PiViewConfig = {
     ...FormDefine,
     'router-outlet': { type: RouterOutlet },
     object: { type: PiyingViewGroup },
+    loose_object: { type: PiyingViewGroup },
     div: {
       type: DivNFCC,
     },
@@ -134,11 +190,23 @@ export const FieldGlobalConfig: PiViewConfig = {
     'input-button': {
       type: InputButtonNFCC,
     },
+    'source-list': {
+      type: SourceListFCC,
+    },
+    'source-input': {
+      actions: [setComponent(SourceInputFCC)],
+    },
+    'theme-controller': {
+      actions: [setComponent(ThemeControllerNFCC)],
+    },
   },
   wrappers: {
     ...defaultWrapper,
     div: {
       type: DivWC,
+    },
+    'validate-tooltip-wrapper': {
+      type: ValidateTooltipbWC,
     },
   },
 };

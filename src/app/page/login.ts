@@ -15,5 +15,5 @@ export const LoginPageDefine = v.pipe(
     __login: v.pipe(LoginDefine, actions.class.top('max-w-[50vw] w-full')),
   }),
   actions.wrappers.set(['div']),
-  actions.class.top('flex items-center justify-center h-[100vh] flex-col'),
+  actions.class.top('flex items-center justify-center h-full flex-col'),
 );

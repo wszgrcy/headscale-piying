@@ -1,4 +1,4 @@
-import { Component, effect, forwardRef, input, signal } from '@angular/core';
+import { Component, forwardRef, signal } from '@angular/core';
 import { BaseControl } from '@piying/view-angular';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -14,8 +14,8 @@ export class NodeTagFCC extends BaseControl {
   isAddEdit$ = signal(false);
   editContent = signal('');
   addNew() {
-    let list: string[] = this.value$() ?? [];
-    let item = `tag:${this.editContent()}`;
+    const list: string[] = this.value$() ?? [];
+    const item = `tag:${this.editContent()}`;
     if (!list.includes(item)) {
       list.push(item);
       this.valueAndTouchedChange(list);
@@ -24,7 +24,7 @@ export class NodeTagFCC extends BaseControl {
     this.isAddEdit$.set(false);
   }
   removeItem(index: number) {
-    let list: string[] = this.value$();
+    const list: string[] = this.value$();
     list.splice(index, 1);
     this.valueAndTouchedChange(list);
   }

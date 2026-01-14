@@ -9,19 +9,9 @@ import {
 } from '@piying/view-angular-core';
 import { computed, effect, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
-import {
-  combineLatest,
-  filter,
-  firstValueFrom,
-  map,
-  Observable,
-  skip,
-  startWith,
-  Subject,
-} from 'rxjs';
-import { ExpandRowDirective, TableStatusService } from '@piying-lib/angular-daisyui/extension';
+import { combineLatest, filter, firstValueFrom, map, Observable, skip, startWith } from 'rxjs';
+import { TableStatusService } from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
-import { ListUsersRes } from '../../../api/type';
 import { NodeItem } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -32,7 +22,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { LeftTitleAction } from '../../define/left-title';
 import { PickerTimeRangeDefine } from '../../define/picker-time-range';
 import { timeInRange } from '../../util/time-in-range';
-let newDate = new Date();
+const newDate = new Date();
 const ExpireNodeDefine = v.pipe(
   v.object({
     expiry: v.pipe(
@@ -40,14 +30,14 @@ const ExpireNodeDefine = v.pipe(
       v.title('expiration'),
       v.transform((input) => {
         return input.toISOString();
-      })
+      }),
     ),
-  })
+  }),
 );
 const RenameNodeDefine = v.pipe(
   v.object({
     name: v.pipe(v.string(), v.title('name')),
-  })
+  }),
 );
 const ROSTRLabelWrapper = metadataList<any>([
   actions.class.top('[&_label]:w-30'),
@@ -56,6 +46,17 @@ const ROSTRLabelWrapper = metadataList<any>([
     labelPosition: 'left',
   }),
 ]);
+const registerMethodList = [
+  'REGISTER_METHOD_UNSPECIFIED',
+  'REGISTER_METHOD_AUTH_KEY',
+  'REGISTER_METHOD_CLI',
+  'REGISTER_METHOD_OIDC',
+].map((item) => {
+  return {
+    label: item.slice('REGISTER_METHOD_'.length),
+    value: item,
+  };
+});
 const FilterCondition = v.pipe(
   v.object({
     params: v.pipe(
@@ -64,20 +65,27 @@ const FilterCondition = v.pipe(
         ip: v.pipe(v.optional(v.string()), v.title('ip'), LeftTitleAction),
         createdAt: v.pipe(v.optional(PickerTimeRangeDefine), v.title('createdAt'), LeftTitleAction),
         lastSeen: v.pipe(v.optional(PickerTimeRangeDefine), v.title('lastSeen'), LeftTitleAction),
+        registerMethod: v.pipe(
+          v.optional(v.string()),
+          setComponent('select'),
+          actions.class.component('min-w-20'),
+          actions.inputs.patch({
+            options: registerMethodList,
+          }),
+          v.title('lastSeen'),
+          LeftTitleAction,
+        ),
       }),
       formConfig({ updateOn: 'submit' }),
       actions.wrappers.set(['div']),
       actions.class.top('flex gap-4'),
-      setAlias('filterParams')
+      setAlias('filterParams'),
     ),
     __flex: v.pipe(NFCSchema, setComponent('div'), actions.class.top('flex-1')),
     reset: v.pipe(
       NFCSchema,
-      setComponent('button'),
-      actions.inputs.patch({
-        content: 'Reset',
-        color: 'error',
-      }),
+      setComponent('input-button'),
+      actions.inputs.patch({ type: 'reset', color: 'error' }),
       actions.inputs.patchAsync({
         clicked: (field) => {
           return () => {
@@ -85,15 +93,12 @@ const FilterCondition = v.pipe(
             result.reset();
           };
         },
-      })
+      }),
     ),
     submit: v.pipe(
       NFCSchema,
-      setComponent('button'),
-      actions.inputs.patch({
-        content: 'Submit',
-        color: 'primary',
-      }),
+      setComponent('input-button'),
+      actions.inputs.patch({ type: 'submit', color: 'primary' }),
       actions.inputs.patchAsync({
         clicked: (field) => {
           return () => {
@@ -101,11 +106,11 @@ const FilterCondition = v.pipe(
             result.emitSubmit();
           };
         },
-      })
+      }),
     ),
   }),
   actions.wrappers.set(['div']),
-  actions.class.top('flex gap-2')
+  actions.class.top('flex gap-2'),
 );
 // todo dynamic
 const ROStrItemDefine = v.pipe(NFCSchema, setComponent('common-data'), ROSTRLabelWrapper);
@@ -160,7 +165,7 @@ export const NodeItemPageDefine = v.pipe(
                 body: v.pipe(
                   NFCSchema,
                   setComponent('table-expand-cell'),
-                  actions.wrappers.set(['td'])
+                  actions.wrappers.set(['td']),
                 ),
               },
               id: {
@@ -171,7 +176,7 @@ export const NodeItemPageDefine = v.pipe(
                   actions.wrappers.set(['td', 'sort-header']),
                   actions.props.patch({
                     key: 'id',
-                  })
+                  }),
                 ),
                 body: (data: NodeItem) => {
                   return data.id;
@@ -185,7 +190,7 @@ export const NodeItemPageDefine = v.pipe(
                   actions.wrappers.set(['td', 'sort-header']),
                   actions.props.patch({
                     key: 'givenName',
-                  })
+                  }),
                 ),
                 body: (data: NodeItem) => {
                   return data.givenName;
@@ -200,7 +205,7 @@ export const NodeItemPageDefine = v.pipe(
                   actions.props.patch({
                     key: 'createdAt',
                     direction: -1,
-                  })
+                  }),
                 ),
                 body: (data: NodeItem) => {
                   return formatDatetimeToStr(data.createdAt);
@@ -214,7 +219,7 @@ export const NodeItemPageDefine = v.pipe(
                   actions.wrappers.set(['td', 'sort-header']),
                   actions.props.patch({
                     key: 'lastSeen',
-                  })
+                  }),
                 ),
                 body: (data: NodeItem) => {
                   return formatDatetimeToStr(data.lastSeen);
@@ -230,10 +235,10 @@ export const NodeItemPageDefine = v.pipe(
                   actions.inputs.patchAsync({
                     color: ({ context }) => {
                       return computed(() =>
-                        (context.item$() as NodeItem).online ? 'success' : 'error'
+                        (context.item$() as NodeItem).online ? 'success' : 'error',
                       );
                     },
-                  })
+                  }),
                 ),
               },
               registerMethod: {
@@ -248,7 +253,7 @@ export const NodeItemPageDefine = v.pipe(
                   actions.inputs.patchAsync({
                     content: ({ context }) => {
                       return computed(() => {
-                        let method = (context.item$() as NodeItem).registerMethod;
+                        const method = (context.item$() as NodeItem).registerMethod;
                         if (!method) {
                           return 'NONE';
                         } else {
@@ -257,7 +262,7 @@ export const NodeItemPageDefine = v.pipe(
                         }
                       });
                     },
-                  })
+                  }),
                 ),
               },
 
@@ -276,21 +281,21 @@ export const NodeItemPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
-                            let dialog: DialogService = field.context['dialog'];
-                            let item = field.context['item$']() as NodeItem;
+                            const dialog: DialogService = field.context['dialog'];
+                            const item = field.context['item$']() as NodeItem;
                             dialog.openDialog({
                               title: 'change givenName',
                               schema: RenameNodeDefine,
                               applyValue: async (value) => {
-                                let api: ApiService = field.context['api'];
+                                const api: ApiService = field.context['api'];
                                 await firstValueFrom(api.RenameNode(item.id!, value.name));
-                                let status: TableStatusService = field.context['status'];
+                                const status: TableStatusService = field.context['status'];
                                 status.needUpdate();
                               },
                             });
                           };
                         },
-                      })
+                      }),
                     ),
                     expire: v.pipe(
                       NFCSchema,
@@ -304,21 +309,21 @@ export const NodeItemPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
-                            let dialog: DialogService = field.context['dialog'];
-                            let item = field.context['item$']() as NodeItem;
+                            const dialog: DialogService = field.context['dialog'];
+                            const item = field.context['item$']() as NodeItem;
                             dialog.openDialog({
                               title: 'new',
                               schema: v.pipe(ExpireNodeDefine),
                               applyValue: async (value) => {
-                                let api: ApiService = field.context['api'];
+                                const api: ApiService = field.context['api'];
                                 await firstValueFrom(api.ExpireNode(item.id!, value));
-                                let status: TableStatusService = field.context['status'];
+                                const status: TableStatusService = field.context['status'];
                                 status.needUpdate();
                               },
                             });
                           };
                         },
-                      })
+                      }),
                     ),
 
                     delete: v.pipe(
@@ -333,17 +338,20 @@ export const NodeItemPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
-                            let api: ApiService = field.context['api'];
-                            let item = field.context['item$']() as NodeItem;
+                            const api: ApiService = field.context['api'];
+                            const item = field.context['item$']() as NodeItem;
                             await firstValueFrom(api.DeleteNode(item.id!));
-                            let status: TableStatusService = field.context['status'];
+                            const status: TableStatusService = field.context['status'];
                             status.needUpdate();
                           };
                         },
-                      })
+                      }),
                     ),
                   }),
-                  actions.wrappers.set(['td', { type: 'div', attributes: { class: 'flex gap-2' } }])
+                  actions.wrappers.set([
+                    'td',
+                    { type: 'div', attributes: { class: 'flex gap-2' } },
+                  ]),
                 ),
               },
 
@@ -359,7 +367,7 @@ export const NodeItemPageDefine = v.pipe(
                       actions.wrappers.set(['label-wrapper']),
                       actions.props.patch({
                         labelPosition: 'left',
-                      })
+                      }),
                     ),
                     machineKey: v.pipe(
                       ROStrItemDefine,
@@ -368,7 +376,7 @@ export const NodeItemPageDefine = v.pipe(
                         content: (field) => {
                           return computed(() => field.context['item$']().machineKey);
                         },
-                      })
+                      }),
                     ),
                     discoKey: v.pipe(
                       ROStrItemDefine,
@@ -377,7 +385,7 @@ export const NodeItemPageDefine = v.pipe(
                         content: (field) => {
                           return computed(() => field.context['item$']().discoKey);
                         },
-                      })
+                      }),
                     ),
                     name: v.pipe(
                       ROStrItemDefine,
@@ -386,19 +394,19 @@ export const NodeItemPageDefine = v.pipe(
                         content: (field) => {
                           return computed(() => field.context['item$']().name);
                         },
-                      })
+                      }),
                     ),
                     ipAddresses: v.pipe(
                       v.array(v.pipe(v.string(), setComponent('common-data'))),
                       setComponent('ul'),
                       v.title('ipAddresses'),
-                      ROSTRLabelWrapper
+                      ROSTRLabelWrapper,
                     ),
                     routes: v.pipe(
                       NFCSchema,
                       setComponent('node-router'),
                       v.title('routes'),
-                      ROSTRLabelWrapper
+                      ROSTRLabelWrapper,
                     ),
                     user: v.pipe(
                       ROStrItemDefine,
@@ -406,11 +414,11 @@ export const NodeItemPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         content: (field) => {
                           return computed(() => {
-                            let item = field.context['item$']() as NodeItem;
+                            const item = field.context['item$']() as NodeItem;
                             return (item.user?.displayName || item.user?.name) ?? '';
                           });
                         },
-                      })
+                      }),
                     ),
                   }),
 
@@ -418,15 +426,15 @@ export const NodeItemPageDefine = v.pipe(
                     allFieldsResolved: (field) => {
                       effect(
                         (fn) => {
-                          let item = field.context!['item$']() as NodeItem;
+                          const item = field.context!['item$']() as NodeItem;
 
                           field.form.control!.updateValue({
                             nodeTag: item.forcedTags,
                             ipAddresses: item.ipAddresses,
                           });
-                          let api: ApiService = field.context['api'];
+                          const api: ApiService = field.context['api'];
                           untracked(() => {
-                            let ref = field
+                            const ref = field
                               .get(['nodeTag'])!
                               .form.control!.valueChanges.pipe(skip(1), filter(Boolean))
                               .subscribe(async (value) => {
@@ -437,7 +445,7 @@ export const NodeItemPageDefine = v.pipe(
                             });
                           });
                         },
-                        { injector: field.injector }
+                        { injector: field.injector },
                       );
                     },
                   }),
@@ -452,7 +460,7 @@ export const NodeItemPageDefine = v.pipe(
                   ]),
                   hideWhen({
                     listen(fn, field) {
-                      let sm = field.context.status['selectionModel$$'] as Observable<
+                      const sm = field.context.status['selectionModel$$'] as Observable<
                         SelectionModel<unknown>
                       >;
                       return combineLatest([
@@ -464,10 +472,10 @@ export const NodeItemPageDefine = v.pipe(
                         map(([item, sm]) => {
                           return !sm.isSelected(item);
                         }),
-                        startWith(true)
+                        startWith(true),
                       );
                     },
-                  })
+                  }),
                 ),
               },
             },
@@ -477,14 +485,14 @@ export const NodeItemPageDefine = v.pipe(
       actions.props.patch({ sortList: ['createdAt', 'lastSeen', 'givenName', 'id'] }),
       actions.props.patchAsync({
         data: (field) => {
-          let api = field.context['api'] as ApiService;
+          const api = field.context['api'] as ApiService;
           return requestLoading(field, ['@table-block'], () => {
             return firstValueFrom(
               api.ListNodes().pipe(
                 map((item) => {
                   return item.nodes ?? [];
-                })
-              )
+                }),
+              ),
             );
           });
         },
@@ -492,10 +500,8 @@ export const NodeItemPageDefine = v.pipe(
           return {
             filterFn: (
               item: NodeItem,
-              queryParams?: v.InferOutput<typeof FilterCondition>['params']
+              queryParams?: v.InferOutput<typeof FilterCondition>['params'],
             ) => {
-              console.log(queryParams);
-              
               if (!queryParams) {
                 return true;
               }
@@ -519,8 +525,14 @@ export const NodeItemPageDefine = v.pipe(
                 }
               }
               if (queryParams.ip && item.ipAddresses) {
-                let ip = queryParams.ip.toLowerCase();
+                const ip = queryParams.ip.toLowerCase();
                 result = item.ipAddresses.some((item) => item.toLowerCase().includes(ip));
+                if (!result) {
+                  return result;
+                }
+              }
+              if (queryParams.registerMethod) {
+                result = item.registerMethod === queryParams.registerMethod;
                 if (!result) {
                   return result;
                 }
@@ -547,34 +559,12 @@ export const NodeItemPageDefine = v.pipe(
             },
           };
         };
-      })
+      }),
     ),
 
     bottom: v.pipe(
       v.object({
-        add: v.pipe(
-          NFCSchema,
-          setComponent('button'),
-          actions.inputs.patch({ content: { icon: { fontIcon: 'add' }, title: 'add' } }),
-          actions.inputs.patchAsync({
-            clicked: (field) => {
-              let tableField = field.get(['@table'])!;
-              return () => {
-                const dialog: DialogService = field.context['dialog'];
-                // dialog.openDialog({
-                //   title: 'new',
-                //   schema: v.pipe(CreateNodeItemDefine),
-                //   applyValue: async (value) => {
-                //     let api: ApiService = field.context['api'];
-                //     await firstValueFrom(api.CreateNodeItem(value));
-                //     let status: TableStatusService = tableField.props()['status'];
-                //     status.needUpdate();
-                //   },
-                // });
-              };
-            },
-          })
-        ),
+        _: v.pipe(NFCSchema, setComponent('div')),
         page: v.pipe(
           NFCSchema,
           setComponent('pagination'),
@@ -592,13 +582,13 @@ export const NodeItemPageDefine = v.pipe(
                 return tableField.props()['count$$']();
               });
             },
-          })
+          }),
         ),
       }),
       actions.wrappers.set(['div']),
-      actions.class.top('flex justify-between items-center')
+      actions.class.top('flex justify-between items-center'),
     ),
   }),
   actions.wrappers.set([{ type: 'loading-wrapper' }]),
-  setAlias('table-block')
+  setAlias('table-block'),
 );

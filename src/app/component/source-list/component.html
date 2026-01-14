@@ -1,0 +1,63 @@
+<ng-template #templateRef let-attr="attributes">
+  @if (usePort()) {
+    <div class="flex gap-2 items-start">
+      <ng-container
+        *ngTemplateOutlet="menuTemplate; context: listContenxt | pure: options()"
+      ></ng-container>
+
+      <label class="input input-xs m-2">
+        ports
+        <input type="text" class="grow" ngModel #port="ngModel" />
+        <button
+          class="btn btn-circle btn-ghost btn-xs btn-success"
+          (click)="submitPort(port.value)"
+          [disabled]="port.invalid"
+        >
+          <mat-icon class="micon-4">check</mat-icon>
+        </button>
+      </label>
+    </div>
+  } @else {
+    <ng-container
+      *ngTemplateOutlet="menuTemplate; context: listContenxt | pure: options()"
+    ></ng-container>
+  }
+</ng-template>
+
+<ng-template #menuTemplate let-list="list" let-parent="parent">
+  <div class="menu max-h-100 overflow-auto flex-nowrap" cdkMenu>
+    <ng-template #itemTemplate let-option>
+      @if (option.value) {
+        <li (click)="selectOption(option)" cdkMenuItem>
+          <button [class]="activateClass | pure: option.value : hostValue$()">
+            {{ option.label ?? option.value }}
+          </button>
+        </li>
+      } @else if (option.children || option.children$$) {
+        @let children = option.children$$ ? (option.children$$() ?? []) : option.children;
+
+        <li
+          [cdkMenuTriggerFor]="menuTemplate"
+          [cdkMenuTriggerData]="listContenxt | pure: children : option"
+          cdkMenuItem
+        >
+          <button class="justify-between">
+            {{ option.label ?? option.value }}
+            <mat-icon> keyboard_arrow_right </mat-icon>
+          </button>
+        </li>
+      }
+    </ng-template>
+    @if (parent?.define) {
+      <ng-container
+        [selectlessOutlet]="PiyingView"
+        [selectlessOutletInputs]="getInput$$ | pure: parent.define"
+        [selectlessOutletOutputs]="modelOutput | pure: parent"
+      ></ng-container>
+    }
+
+    @for (option of list; track $index) {
+      <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: option }"></ng-container>
+    }
+  </div>
+</ng-template>
