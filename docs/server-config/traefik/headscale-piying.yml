@@ -1,0 +1,78 @@
+http:
+  routers:
+    headscale-piying:
+      entryPoints:
+        - 'web'
+        - 'websecure'
+      rule: 'Host(`your.web.site`) && (PathPrefix(`/dashboard`)||PathPrefix(`/register`))'
+      middlewares:
+        - gzip
+        - https
+        - rewritedevice
+        - stripprefix
+      tls:
+        certResolver: letsenc
+      service: headscale-piying
+    headscale-http:
+      entryPoints:
+        - 'web'
+      rule: 'Host(`your.web.site`)'
+      service: headscale
+      middlewares:
+        - https
+        - cors
+    headscale-https:
+      entryPoints:
+        - 'websecure'
+      rule: 'Host(`your.web.site`)'
+      tls:
+        certResolver: letsenc
+      service: headscale
+      middlewares:
+        - cors
+
+  services:
+    headscale:
+      loadBalancer:
+        servers:
+          - url: 'https://your.web.site:4443/'
+    headscale-piying:
+      loadBalancer:
+        servers:
+          - url: 'http://headscale-piying:80/'
+  middlewares:
+    gzip:
+      compress:
+        # minresponsebodybytes: 1
+        encodings:
+          - zstd
+          - br
+          - gzip
+    https:
+      redirectScheme:
+        scheme: https
+        permanent: true
+    cors:
+      headers:
+        # local test
+        accessControlAllowMethods:
+          - GET
+          - OPTIONS
+          - PUT
+          - POST
+          - PATCH
+          - DELETE
+        accessControlAllowHeaders: '*'
+        accessControlAllowOriginList:
+          - http://localhost:4200
+          - http://127.0.0.1:4200
+        accessControlMaxAge: 100
+        addVaryHeader: true
+    rewritedevice:
+      redirectRegex:
+        regex: "^/register/(.*)$"
+        replacement: "/dashboard/register/${1}"
+    stripprefix:
+      stripPrefix:
+        prefixes:
+          - "/dashboard"

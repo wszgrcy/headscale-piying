@@ -1,0 +1,12 @@
+services:
+  headscale-piying:
+    # https://github.com/users/wszgrcy/packages/container/package/headscale-piying
+    image: ghcr.io/wszgrcy/headscale-piying:0.27.1-26
+    restart: unless-stopped
+    container_name: headscale-piying
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true
