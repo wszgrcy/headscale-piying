@@ -1,27 +1,11 @@
-import { Component, computed, inject, input, OnInit, signal, viewChild } from '@angular/core';
-import { ThemeService } from '@piying-lib/angular-daisyui/service';
-import {
-  EventsDirective,
-  AttributesDirective,
-  PiyingViewGroupBase,
-  PiyingView,
-  PI_INPUT_OPTIONS_TOKEN,
-} from '@piying/view-angular';
-import { MergeClassPipe } from '@piying-lib/angular-daisyui/pipe';
+import { Component, input, viewChild } from '@angular/core';
+import { PiyingViewGroupBase, PiyingView } from '@piying/view-angular';
 import { MatIconModule } from '@angular/material/icon';
-import { SelectorlessOutlet } from '@cyia/ngx-common/directive';
 import { NgTemplateOutlet } from '@angular/common';
 @Component({
   selector: 'app-row-group',
   templateUrl: './component.html',
-  imports: [
-    EventsDirective,
-    AttributesDirective,
-    MergeClassPipe,
-    MatIconModule,
-    SelectorlessOutlet,
-    NgTemplateOutlet,
-  ],
+  imports: [MatIconModule, NgTemplateOutlet],
 })
 export class RowGroupFGC extends PiyingViewGroupBase {
   static __version = 2;

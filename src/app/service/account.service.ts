@@ -1,9 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { environment } from '../../environments/environment';
 import { ApiService } from './api.service';
-import { catchError, firstValueFrom, tap } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { LocalSaveService } from './local-save.service';
 @Injectable({
   providedIn: 'root',

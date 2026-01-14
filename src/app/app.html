@@ -1,16 +1,15 @@
 <router-outlet></router-outlet>
 <div class="toast toast-top toast-end z-10">
   @for (item of list$$(); track $index) {
-
-  <div class="alert alert-{{ item.type }} w-100 break-all gap-1">
-    <span>{{ item.message }}</span>
-    <button
-      class="btn btn-circle btn-ghost btn-xs tooltip"
-      [cdkCopyToClipboard]="item.message"
-      data-tip="copy"
-    >
-      <mat-icon class="micon-4">content_copy</mat-icon>
-    </button>
-  </div>
+    <div class="alert alert-{{ item.type }} w-100 break-all gap-1">
+      <span>{{ item.message }}</span>
+      <button
+        class="btn btn-circle btn-ghost btn-xs tooltip"
+        [cdkCopyToClipboard]="item.message"
+        data-tip="copy"
+      >
+        <mat-icon class="micon-4">content_copy</mat-icon>
+      </button>
+    </div>
   }
 </div>

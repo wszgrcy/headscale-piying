@@ -1,22 +1,5 @@
-import {
-  Component,
-  computed,
-  inject,
-  input,
-  OnInit,
-  signal,
-  viewChild,
-  WritableSignal,
-} from '@angular/core';
-import { ThemeService } from '@piying-lib/angular-daisyui/service';
-import {
-  EventsDirective,
-  AttributesDirective,
-  PiyingViewGroupBase,
-  PiyingView,
-  PI_INPUT_OPTIONS_TOKEN,
-} from '@piying/view-angular';
-import { MergeClassPipe } from '@piying-lib/angular-daisyui/pipe';
+import { Component, inject, input, signal, viewChild, WritableSignal } from '@angular/core';
+import { PiyingViewGroupBase, PiyingView, PI_INPUT_OPTIONS_TOKEN } from '@piying/view-angular';
 import { MatIconModule } from '@angular/material/icon';
 import { SelectorlessOutlet } from '@cyia/ngx-common/directive';
 import { NgTemplateOutlet } from '@angular/common';
@@ -25,16 +8,7 @@ import { PurePipe } from '@cyia/ngx-common/pipe';
 @Component({
   selector: 'app-row-group',
   templateUrl: './component.html',
-  imports: [
-    EventsDirective,
-    AttributesDirective,
-    MergeClassPipe,
-    MatIconModule,
-    SelectorlessOutlet,
-    NgTemplateOutlet,
-    FormsModule,
-    PurePipe,
-  ],
+  imports: [MatIconModule, SelectorlessOutlet, NgTemplateOutlet, FormsModule, PurePipe],
 })
 export class EditGroupFGC extends PiyingViewGroupBase {
   static __version = 2;

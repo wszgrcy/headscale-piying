@@ -14,7 +14,7 @@ export class LocalSaveService {
   );
   #prefix$ = linkedSignal(
     computed(() => {
-      let saved =
+      const saved =
         typeof localStorage !== 'undefined'
           ? (localStorage.getItem(Prefix) ?? undefined)
           : undefined;

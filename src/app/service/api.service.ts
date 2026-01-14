@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { inject, Injectable } from '@angular/core';
 import { LocalSaveService } from './local-save.service';
 import { paths } from '../../api/headscale.swagger';
 //l4BHYTP.nIhRafSJT4IXKDjNyEJ5lDDQhW_qp0Yv

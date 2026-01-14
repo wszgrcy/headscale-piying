@@ -2,7 +2,7 @@
   <label [class]="'input' | mergeClass: attr().class">
     <input
       [type]="type$$()"
-      [placeholder]="attr()?.placeholder??''"
+      [placeholder]="attr()?.placeholder ?? ''"
       [ngModel]="value$()"
       (ngModelChange)="valueChange($event)"
       (blur)="touchedChange()"

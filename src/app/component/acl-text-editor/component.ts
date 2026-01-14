@@ -1,4 +1,4 @@
-import { afterNextRender, Component, ElementRef, forwardRef, inject, signal } from '@angular/core';
+import { afterNextRender, Component, ElementRef, forwardRef, inject } from '@angular/core';
 import { BaseControl } from '@piying/view-angular';
 import { AmdInit$$ } from '../../monaco-editor/init';
 import type { editor } from 'monaco-editor';

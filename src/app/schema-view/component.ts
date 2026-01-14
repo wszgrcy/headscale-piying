@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PiyingView } from '@piying/view-angular';
-import { AsyncPipe } from '@angular/common';
 import { FieldGlobalConfig } from '../define';
 import { SelectorlessOutlet } from '@cyia/ngx-common/directive';
 const defaultValue = Promise.resolve(undefined);
@@ -27,9 +26,8 @@ export class SchemaViewRC {
   #injector = inject(Injector);
   model = resource({
     loader: () =>
-      runInInjectionContext(this.#injector, () =>
-        this.route.snapshot.data['model']?.(),
-      ) || defaultValue,
+      runInInjectionContext(this.#injector, () => this.route.snapshot.data['model']?.()) ||
+      defaultValue,
   });
   options = {
     context: this.context,

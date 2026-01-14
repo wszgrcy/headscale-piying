@@ -1,27 +1,10 @@
 import * as v from 'valibot';
-import {
-  asControl,
-  formConfig,
-  hideWhen,
-  NFCSchema,
-  setAlias,
-  setComponent,
-} from '@piying/view-angular-core';
-import { computed, untracked, WritableSignal } from '@angular/core';
+import { formConfig, hideWhen, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
+import { computed } from '@angular/core';
 import { actions } from '@piying/view-angular';
-import {
-  combineLatest,
-  combineLatestAll,
-  firstValueFrom,
-  map,
-  merge,
-  Observable,
-  startWith,
-  Subject,
-} from 'rxjs';
-import { ExpandRowDirective, TableStatusService } from '@piying-lib/angular-daisyui/extension';
+import { combineLatest, firstValueFrom, map, Observable, startWith } from 'rxjs';
+import { TableStatusService } from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
-import { ListUsersRes } from '../../../api/type';
 import { User } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -31,7 +14,7 @@ import { timeInRange } from '../../util/time-in-range';
 import { PickerTimeRangeDefine } from '../../define/picker-time-range';
 import { LeftTitleAction } from '../../define/left-title';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { datetimeToStr, formatDatetimeToStr } from '../../util/time-to-str';
+import { formatDatetimeToStr } from '../../util/time-to-str';
 import { deepEqual } from 'fast-equals';
 const RenameDefine = v.pipe(
   v.object({
@@ -220,14 +203,14 @@ export const UserPageDefine = v.pipe(
                         clicked: (field) => {
                           return async () => {
                             const dialog: DialogService = field.context['dialog'];
-                            let ref = dialog.openDialog({
+                            const ref = dialog.openDialog({
                               title: 'rename',
                               schema: RenameDefine,
                               async applyValue(value) {
-                                let api: ApiService = field.context['api'];
-                                let item = field.context['item$']();
+                                const api: ApiService = field.context['api'];
+                                const item = field.context['item$']();
                                 await firstValueFrom(api.RenameUser(item.id, value.name));
-                                let status: TableStatusService = field.context['status'];
+                                const status: TableStatusService = field.context['status'];
                                 status.needUpdate();
                                 return true;
                               },
@@ -249,10 +232,10 @@ export const UserPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
-                            let api: ApiService = field.context['api'];
-                            let item = field.context['item$']();
+                            const api: ApiService = field.context['api'];
+                            const item = field.context['item$']();
                             await firstValueFrom(api.DeleteUser(item.id));
-                            let status: TableStatusService = field.context['status'];
+                            const status: TableStatusService = field.context['status'];
                             status.needUpdate();
                           };
                         },
@@ -286,7 +269,7 @@ export const UserPageDefine = v.pipe(
                   v.title('Preauthkey'),
                   hideWhen({
                     listen(fn, field) {
-                      let sm = field.context.status['selectionModel$$'] as Observable<
+                      const sm = field.context.status['selectionModel$$'] as Observable<
                         SelectionModel<unknown>
                       >;
                       return combineLatest([
@@ -311,7 +294,7 @@ export const UserPageDefine = v.pipe(
       actions.props.patch({ sortList: ['createdAt'] }),
       actions.props.patchAsync({
         data: (field) => {
-          let api = field.context['api'] as ApiService;
+          const api = field.context['api'] as ApiService;
           return requestLoading(field, ['@table-block'], () => {
             return firstValueFrom(
               api.ListUsers().pipe(
@@ -374,16 +357,16 @@ export const UserPageDefine = v.pipe(
           actions.inputs.patch({ content: { icon: { fontIcon: 'add' }, title: 'add' } }),
           actions.inputs.patchAsync({
             clicked: (field) => {
-              let tableField = field.get(['@table'])!;
+              const tableField = field.get(['@table'])!;
               return () => {
                 const dialog: DialogService = field.context['dialog'];
                 dialog.openDialog({
                   title: 'new',
                   schema: v.pipe(CreateUserDefine),
                   applyValue: async (value) => {
-                    let api: ApiService = field.context['api'];
+                    const api: ApiService = field.context['api'];
                     await firstValueFrom(api.CreateUser(value));
-                    let status: TableStatusService = tableField.props()['status'];
+                    const status: TableStatusService = tableField.props()['status'];
                     status.needUpdate();
                   },
                 });

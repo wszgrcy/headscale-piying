@@ -1,18 +1,17 @@
 import * as v from 'valibot';
-import { hideWhen, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
+import { NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
 import { computed } from '@angular/core';
 import { actions } from '@piying/view-angular';
-import { firstValueFrom, map, startWith, Subject } from 'rxjs';
-import { ExpandRowDirective, TableStatusService } from '@piying-lib/angular-daisyui/extension';
+import { firstValueFrom, map } from 'rxjs';
+import { TableStatusService } from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
-import { ListUsersRes } from '../../../api/type';
 import { ApiKey } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { requestLoading } from '../../util/request-loading';
 import { formatDatetimeToStr } from '../../util/time-to-str';
 import { timeCompare } from '../../util/time';
 // todo dynamic
-let newDate = new Date();
+const newDate = new Date();
 newDate.setDate(newDate.getDate() + 90);
 const CreateApiKeyDefine = v.pipe(
   v.object({
@@ -90,7 +89,7 @@ export const ApiKeyPageDefine = v.pipe(
               expiration: {
                 head: 'expiration',
                 body: (data: ApiKey) => {
-                  let icon = timeCompare(data.expiration!) ? '✔️' : '❌';
+                  const icon = timeCompare(data.expiration!) ? '✔️' : '❌';
                   return `${icon}${formatDatetimeToStr(data.expiration)}`;
                 },
               },
@@ -122,10 +121,10 @@ export const ApiKeyPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
-                            let api: ApiService = field.context['api'];
-                            let item = field.context['item$']() as ApiKey;
+                            const api: ApiService = field.context['api'];
+                            const item = field.context['item$']() as ApiKey;
                             await firstValueFrom(api.ExpireApiKey({ prefix: item.prefix }));
-                            let status: TableStatusService = field.context['status'];
+                            const status: TableStatusService = field.context['status'];
                             status.needUpdate();
                           };
                         },
@@ -143,10 +142,10 @@ export const ApiKeyPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
-                            let api: ApiService = field.context['api'];
-                            let item = field.context['item$']() as ApiKey;
+                            const api: ApiService = field.context['api'];
+                            const item = field.context['item$']() as ApiKey;
                             await firstValueFrom(api.DeleteApiKey(item.prefix!));
-                            let status: TableStatusService = field.context['status'];
+                            const status: TableStatusService = field.context['status'];
                             status.needUpdate();
                           };
                         },
@@ -180,7 +179,7 @@ export const ApiKeyPageDefine = v.pipe(
       actions.props.patch({ sortList: ['title1', 'badge1'] }),
       actions.props.patchAsync({
         data: (field) => {
-          let api = field.context['api'] as ApiService;
+          const api = field.context['api'] as ApiService;
           return requestLoading(field, ['@table-block'], () => {
             return firstValueFrom(
               api.ListApiKeys().pipe(
@@ -216,16 +215,16 @@ export const ApiKeyPageDefine = v.pipe(
           actions.inputs.patch({ content: { icon: { fontIcon: 'add' }, title: 'add' } }),
           actions.inputs.patchAsync({
             clicked: (field) => {
-              let tableField = field.get(['@table'])!;
+              const tableField = field.get(['@table'])!;
               return () => {
                 const dialog: DialogService = field.context['dialog'];
                 dialog.openDialog({
                   title: 'new',
                   schema: v.pipe(CreateApiKeyDefine),
                   applyValue: async (value) => {
-                    let api: ApiService = field.context['api'];
+                    const api: ApiService = field.context['api'];
                     await firstValueFrom(api.CreateApiKey(value));
-                    let status: TableStatusService = tableField.props()['status'];
+                    const status: TableStatusService = tableField.props()['status'];
                     status.needUpdate();
                   },
                 });

@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:headscale-piying": "node dist/headscale-piying/server/server.mjs"
+    "serve:ssr:headscale-piying": "node dist/headscale-piying/server/server.mjs",
+    "lint": "eslint --fix ./src  && prettier ./src --write  "
   },
   "private": true,
   "packageManager": "npm@10.9.2",
@@ -44,15 +45,19 @@
     "@angular/build": "^21.0.4",
     "@angular/cli": "^21.0.4",
     "@angular/compiler-cli": "^21.0.0",
+    "@eslint/js": "^9.39.2",
     "@tailwindcss/postcss": "^4.1.12",
     "@types/express": "^5.0.1",
     "@types/ms": "^2.1.0",
     "@types/node": "^20.17.19",
+    "eslint-plugin-unused-imports": "^4.3.0",
+    "globals": "^17.0.0",
     "jsdom": "^27.1.0",
     "postcss": "^8.5.3",
     "prettier": "^3.7.4",
     "tailwindcss": "^4.1.12",
     "typescript": "~5.9.2",
+    "typescript-eslint": "^8.53.0",
     "vitest": "^4.0.8"
   }
 }

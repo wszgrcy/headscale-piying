@@ -1,4 +1,4 @@
-import { Injectable, signal, effect, inject } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 export interface AlertItem {
   id: number;

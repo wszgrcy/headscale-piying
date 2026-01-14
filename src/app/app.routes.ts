@@ -1,13 +1,9 @@
 import { ActivatedRoute, Router, Routes } from '@angular/router';
 import { SchemaViewRC } from './schema-view/component';
 import { MainPage } from './page/main';
-import { LoginDefine } from './page/component/login';
 import { LoginPageDefine } from './page/login';
 import { inject } from '@angular/core';
 
-import { range } from 'es-toolkit';
-
-import { FieldGlobalConfig } from './define';
 import { AccountService } from './service/account.service';
 import { UserPageDefine } from './page/component/user';
 import { ApiService } from './service/api.service';
@@ -48,7 +44,7 @@ export const routes: Routes = [
             };
           },
           model: () => {
-            let ls = inject(LocalSaveService);
+            const ls = inject(LocalSaveService);
             return {
               __login: {
                 prefix: ls.prefix$$(),

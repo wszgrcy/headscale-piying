@@ -1,9 +1,5 @@
-import { Component, computed, inject, viewChild } from '@angular/core';
-import {
-  AttributesDirective,
-  InsertFieldDirective,
-  PI_VIEW_FIELD_TOKEN,
-} from '@piying/view-angular';
+import { Component, inject, viewChild } from '@angular/core';
+import { InsertFieldDirective, PI_VIEW_FIELD_TOKEN } from '@piying/view-angular';
 
 import { AclService } from './service';
 @Component({

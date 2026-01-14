@@ -1,14 +1,13 @@
-import { Component, computed, forwardRef, inject, input, signal, viewChild } from '@angular/core';
+import { Component, computed, forwardRef, inject, signal, viewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BaseControl, PI_VIEW_FIELD_TOKEN } from '@piying/view-angular';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MergeClassPipe } from '@piying-lib/angular-daisyui/pipe';
-import { NgClass } from '@angular/common';
 @Component({
   selector: 'app-password-input',
   templateUrl: './component.html',
-  imports: [FormsModule, MatIconModule, MergeClassPipe, MatIconModule, NgClass],
+  imports: [FormsModule, MatIconModule, MergeClassPipe, MatIconModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

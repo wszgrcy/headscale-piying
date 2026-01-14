@@ -9,7 +9,7 @@ export class AclService {
   #aclSource = inject(AclSourceService);
 
   groups$$ = computed(() => {
-    let value = this.#field$$().get(['groups'])!.form.control!.value$$();
+    const value = this.#field$$().get(['groups'])!.form.control!.value$$();
     return Object.keys(value ?? {}).map((value) => {
       return {
         label: value.slice('group:'.length),
@@ -18,7 +18,7 @@ export class AclService {
     });
   });
   hosts$$ = computed(() => {
-    let value = this.#field$$().get(['hosts'])!.form.control!.value$$();
+    const value = this.#field$$().get(['hosts'])!.form.control!.value$$();
     return Object.keys(value ?? {}).map((value) => {
       return {
         label: value,
@@ -38,8 +38,8 @@ export class AclService {
     });
   });
   tagList$$ = computed(() => {
-    let list = this.#aclSource.getNodeList$.value();
-    let tagSet = new Set<string>();
+    const list = this.#aclSource.getNodeList$.value();
+    const tagSet = new Set<string>();
     list.forEach((item) => {
       item.validTags?.forEach((tag) => {
         if (tag.startsWith('tag:')) {
@@ -65,7 +65,7 @@ export class AclService {
     });
   });
   ipList$$ = computed(() => {
-    let list = this.#aclSource.getNodeList$.value();
+    const list = this.#aclSource.getNodeList$.value();
     return list
       .flatMap((item) => {
         return item.ipAddresses ?? [];
@@ -79,8 +79,8 @@ export class AclService {
       });
   });
   routes$$ = computed(() => {
-    let list = this.#aclSource.getNodeList$.value();
-    let tagSet = new Set<string>();
+    const list = this.#aclSource.getNodeList$.value();
+    const tagSet = new Set<string>();
     list.forEach((item) => {
       item.subnetRoutes?.forEach((item) => {
         tagSet.add(item);

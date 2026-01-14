@@ -1,3 +1,9 @@
 <ng-template #templateRef let-attr="attributes">
-  <input type="checkbox" value="dark" class="toggle theme-controller" (input)="valueChange($event)" [checked]="value$()"/>
+  <input
+    type="checkbox"
+    value="dark"
+    class="toggle theme-controller"
+    (input)="valueChange($event)"
+    [checked]="value$()"
+  />
 </ng-template>

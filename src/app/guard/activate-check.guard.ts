@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { LocalSaveService } from '../service/local-save.service';
 
 export const localStorageGuard: CanActivateFn = () => {
-  let apiKey = inject(LocalSaveService);
+  const apiKey = inject(LocalSaveService);
   const router = inject(Router);
   if (apiKey.key$$()) {
     return true;

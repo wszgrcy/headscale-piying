@@ -15,27 +15,13 @@ import {
   PI_VIEW_FIELD_TOKEN,
   PiyingView,
 } from '@piying/view-angular';
-import {
-  DefaultOptionConvert,
-  OptionConvert,
-  ResolvedOption,
-  SelectOption,
-  transformOption,
-} from '@piying-lib/angular-core';
-import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
+
+import { NgTemplateOutlet } from '@angular/common';
 import { StrOrTemplateComponent } from '@piying-lib/angular-core';
 import { SelectorlessOutlet } from '@cyia/ngx-common/directive';
 import { PurePipe } from '@cyia/ngx-common/pipe';
 import { SourceOption } from './type';
-import {
-  CdkMenu,
-  CdkMenuBar,
-  CdkMenuGroup,
-  CdkMenuItem,
-  CdkMenuItemCheckbox,
-  CdkMenuItemRadio,
-  CdkMenuTrigger,
-} from '@angular/cdk/menu';
+import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { ConnectedPosition } from '@angular/cdk/overlay';
 import { MatIconModule } from '@angular/material/icon';
 import * as v from 'valibot';
@@ -49,7 +35,6 @@ type a = ConnectedPosition;
     NgTemplateOutlet,
     SelectorlessOutlet,
     PurePipe,
-    AsyncPipe,
     CdkMenu,
     CdkMenuTrigger,
     CdkMenuItem,
@@ -94,9 +79,9 @@ export class SourceListFCC extends BaseControl {
   constructor() {
     super();
     effect(() => {
-      let value = this.hostValue$();
+      const value = this.hostValue$();
       if (this.usePort()) {
-        let portValue = this.#portValue$();
+        const portValue = this.#portValue$();
         if (value && portValue) {
           this.valueAndTouchedChange(`${value}:${portValue}`);
         }
@@ -131,7 +116,7 @@ export class SourceListFCC extends BaseControl {
   modelOutput = (option: SourceOption) => {
     return {
       modelChange: ([value]: any) => {
-        let emitValue = option.prefix ? `${option.prefix}${value}` : value;
+        const emitValue = option.prefix ? `${option.prefix}${value}` : value;
         this.hostValue$.set(emitValue);
       },
     };

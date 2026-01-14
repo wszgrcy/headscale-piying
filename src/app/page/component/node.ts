@@ -9,19 +9,9 @@ import {
 } from '@piying/view-angular-core';
 import { computed, effect, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
-import {
-  combineLatest,
-  filter,
-  firstValueFrom,
-  map,
-  Observable,
-  skip,
-  startWith,
-  Subject,
-} from 'rxjs';
-import { ExpandRowDirective, TableStatusService } from '@piying-lib/angular-daisyui/extension';
+import { combineLatest, filter, firstValueFrom, map, Observable, skip, startWith } from 'rxjs';
+import { TableStatusService } from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
-import { ListUsersRes } from '../../../api/type';
 import { NodeItem } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -32,7 +22,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { LeftTitleAction } from '../../define/left-title';
 import { PickerTimeRangeDefine } from '../../define/picker-time-range';
 import { timeInRange } from '../../util/time-in-range';
-let newDate = new Date();
+const newDate = new Date();
 const ExpireNodeDefine = v.pipe(
   v.object({
     expiry: v.pipe(
@@ -263,7 +253,7 @@ export const NodeItemPageDefine = v.pipe(
                   actions.inputs.patchAsync({
                     content: ({ context }) => {
                       return computed(() => {
-                        let method = (context.item$() as NodeItem).registerMethod;
+                        const method = (context.item$() as NodeItem).registerMethod;
                         if (!method) {
                           return 'NONE';
                         } else {
@@ -291,15 +281,15 @@ export const NodeItemPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
-                            let dialog: DialogService = field.context['dialog'];
-                            let item = field.context['item$']() as NodeItem;
+                            const dialog: DialogService = field.context['dialog'];
+                            const item = field.context['item$']() as NodeItem;
                             dialog.openDialog({
                               title: 'change givenName',
                               schema: RenameNodeDefine,
                               applyValue: async (value) => {
-                                let api: ApiService = field.context['api'];
+                                const api: ApiService = field.context['api'];
                                 await firstValueFrom(api.RenameNode(item.id!, value.name));
-                                let status: TableStatusService = field.context['status'];
+                                const status: TableStatusService = field.context['status'];
                                 status.needUpdate();
                               },
                             });
@@ -319,15 +309,15 @@ export const NodeItemPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
-                            let dialog: DialogService = field.context['dialog'];
-                            let item = field.context['item$']() as NodeItem;
+                            const dialog: DialogService = field.context['dialog'];
+                            const item = field.context['item$']() as NodeItem;
                             dialog.openDialog({
                               title: 'new',
                               schema: v.pipe(ExpireNodeDefine),
                               applyValue: async (value) => {
-                                let api: ApiService = field.context['api'];
+                                const api: ApiService = field.context['api'];
                                 await firstValueFrom(api.ExpireNode(item.id!, value));
-                                let status: TableStatusService = field.context['status'];
+                                const status: TableStatusService = field.context['status'];
                                 status.needUpdate();
                               },
                             });
@@ -348,10 +338,10 @@ export const NodeItemPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
-                            let api: ApiService = field.context['api'];
-                            let item = field.context['item$']() as NodeItem;
+                            const api: ApiService = field.context['api'];
+                            const item = field.context['item$']() as NodeItem;
                             await firstValueFrom(api.DeleteNode(item.id!));
-                            let status: TableStatusService = field.context['status'];
+                            const status: TableStatusService = field.context['status'];
                             status.needUpdate();
                           };
                         },
@@ -424,7 +414,7 @@ export const NodeItemPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         content: (field) => {
                           return computed(() => {
-                            let item = field.context['item$']() as NodeItem;
+                            const item = field.context['item$']() as NodeItem;
                             return (item.user?.displayName || item.user?.name) ?? '';
                           });
                         },
@@ -436,15 +426,15 @@ export const NodeItemPageDefine = v.pipe(
                     allFieldsResolved: (field) => {
                       effect(
                         (fn) => {
-                          let item = field.context!['item$']() as NodeItem;
+                          const item = field.context!['item$']() as NodeItem;
 
                           field.form.control!.updateValue({
                             nodeTag: item.forcedTags,
                             ipAddresses: item.ipAddresses,
                           });
-                          let api: ApiService = field.context['api'];
+                          const api: ApiService = field.context['api'];
                           untracked(() => {
-                            let ref = field
+                            const ref = field
                               .get(['nodeTag'])!
                               .form.control!.valueChanges.pipe(skip(1), filter(Boolean))
                               .subscribe(async (value) => {
@@ -470,7 +460,7 @@ export const NodeItemPageDefine = v.pipe(
                   ]),
                   hideWhen({
                     listen(fn, field) {
-                      let sm = field.context.status['selectionModel$$'] as Observable<
+                      const sm = field.context.status['selectionModel$$'] as Observable<
                         SelectionModel<unknown>
                       >;
                       return combineLatest([
@@ -495,7 +485,7 @@ export const NodeItemPageDefine = v.pipe(
       actions.props.patch({ sortList: ['createdAt', 'lastSeen', 'givenName', 'id'] }),
       actions.props.patchAsync({
         data: (field) => {
-          let api = field.context['api'] as ApiService;
+          const api = field.context['api'] as ApiService;
           return requestLoading(field, ['@table-block'], () => {
             return firstValueFrom(
               api.ListNodes().pipe(
@@ -535,14 +525,14 @@ export const NodeItemPageDefine = v.pipe(
                 }
               }
               if (queryParams.ip && item.ipAddresses) {
-                let ip = queryParams.ip.toLowerCase();
+                const ip = queryParams.ip.toLowerCase();
                 result = item.ipAddresses.some((item) => item.toLowerCase().includes(ip));
                 if (!result) {
                   return result;
                 }
               }
               if (queryParams.registerMethod) {
-                result = item.registerMethod===queryParams.registerMethod
+                result = item.registerMethod === queryParams.registerMethod;
                 if (!result) {
                   return result;
                 }

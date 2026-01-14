@@ -1,20 +1,18 @@
 import * as v from 'valibot';
-import { asControl, hideWhen, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
+import { asControl, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
 import { computed, effect, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
-import { firstValueFrom, map, startWith, Subject } from 'rxjs';
-import { ExpandRowDirective, TableStatusService } from '@piying-lib/angular-daisyui/extension';
+import { firstValueFrom, map } from 'rxjs';
+import { TableStatusService } from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
-import { ListUsersRes } from '../../../api/type';
 import { PreAuthKeys, User } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { CopyService } from '../../service/copy.service';
 import { requestLoading } from '../../util/request-loading';
 import { formatDatetimeToStr } from '../../util/time-to-str';
-import { deepEqual } from 'fast-equals';
 import { timeCompare } from '../../util/time';
 // todo dynamic
-let newDate = new Date();
+const newDate = new Date();
 newDate.setDate(newDate.getDate() + 90);
 const CreateDefine = v.pipe(
   v.object({
@@ -111,9 +109,9 @@ export const PreAuthkeyPageDefine = v.pipe(
                   }),
                   actions.events.patchAsync({
                     click: (field) => {
-                      let copy = field.context['copy'] as CopyService;
+                      const copy = field.context['copy'] as CopyService;
                       return () => {
-                        let key = (field.context['item$']() as PreAuthKeys).key!;
+                        const key = (field.context['item$']() as PreAuthKeys).key!;
                         copy.copy(key);
                       };
                     },
@@ -147,7 +145,7 @@ export const PreAuthkeyPageDefine = v.pipe(
               expiration: {
                 head: 'expiration',
                 body: (data: PreAuthKeys) => {
-                  let icon = timeCompare(data.expiration!) ? '✔️' : '❌';
+                  const icon = timeCompare(data.expiration!) ? '✔️' : '❌';
                   return `${icon}${formatDatetimeToStr(data.expiration)}`;
                 },
               },
@@ -174,12 +172,12 @@ export const PreAuthkeyPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
-                            let api: ApiService = field.context['api'];
-                            let item = field.context['item$']() as PreAuthKeys;
+                            const api: ApiService = field.context['api'];
+                            const item = field.context['item$']() as PreAuthKeys;
                             await firstValueFrom(
                               api.ExpirePreAuthKey({ user: item.user!.id!, key: item.key! }),
                             );
-                            let status: TableStatusService = field.context['status'];
+                            const status: TableStatusService = field.context['status'];
                             status.needUpdate();
                           };
                         },
@@ -197,12 +195,12 @@ export const PreAuthkeyPageDefine = v.pipe(
                       actions.inputs.patchAsync({
                         clicked: (field) => {
                           return async () => {
-                            let api: ApiService = field.context['api'];
-                            let item = field.context['item$']() as PreAuthKeys;
+                            const api: ApiService = field.context['api'];
+                            const item = field.context['item$']() as PreAuthKeys;
                             await firstValueFrom(
                               api.DeletePreAuthKey({ user: item.user!.id!, key: item.key }),
                             );
-                            let status: TableStatusService = field.context['status'];
+                            const status: TableStatusService = field.context['status'];
                             status.needUpdate();
                           };
                         },
@@ -220,15 +218,15 @@ export const PreAuthkeyPageDefine = v.pipe(
       actions.props.patch({ sortList: ['title1', 'badge1'] }),
       actions.hooks.merge({
         allFieldsResolved: (field) => {
-          let defineField = field.get(['@preauthkey'])!;
-          let status$ = computed(() => {
+          const defineField = field.get(['@preauthkey'])!;
+          const status$ = computed(() => {
             return field.props()['status'];
           });
-          let user$$ = computed(() => (defineField.props()['user$$']() as User).id);
+          const user$$ = computed(() => (defineField.props()['user$$']() as User).id);
           let init = false;
           effect(
             () => {
-              let status = status$() as TableStatusService;
+              const status = status$() as TableStatusService;
               if (!status) {
                 return;
               }
@@ -245,10 +243,10 @@ export const PreAuthkeyPageDefine = v.pipe(
       }),
       actions.props.patchAsync({
         data: (field) => {
-          let api = field.context['api'] as ApiService;
-          let defineField = field.get(['@preauthkey'])!;
+          const api = field.context['api'] as ApiService;
+          const defineField = field.get(['@preauthkey'])!;
           return requestLoading(field, ['@preauthkey'], () => {
-            let defineProps = untracked(() => defineField.props()['user$$']());
+            const defineProps = untracked(() => defineField.props()['user$$']());
             return firstValueFrom(
               api.ListPreAuthKeys({ user: defineProps.id }).pipe(
                 map((item) => {
@@ -283,18 +281,18 @@ export const PreAuthkeyPageDefine = v.pipe(
           actions.inputs.patch({ content: { icon: { fontIcon: 'add' }, title: 'add' } }),
           actions.inputs.patchAsync({
             clicked: (field) => {
-              let tableField = field.get(['@preauthkey-table'])!;
-              let defineField = field.get(['@preauthkey'])!;
+              const tableField = field.get(['@preauthkey-table'])!;
+              const defineField = field.get(['@preauthkey'])!;
               return () => {
                 const dialog: DialogService = field.context['dialog'];
                 dialog.openDialog({
                   title: 'new',
                   schema: v.pipe(CreateDefine),
                   applyValue: async (value) => {
-                    let defineProps = defineField?.props()['user$$']() as User;
-                    let api: ApiService = field.context['api'];
+                    const defineProps = defineField?.props()['user$$']() as User;
+                    const api: ApiService = field.context['api'];
                     await firstValueFrom(api.CreatePreAuthKey({ ...value, user: defineProps.id! }));
-                    let status: TableStatusService = tableField.props()['status'];
+                    const status: TableStatusService = tableField.props()['status'];
                     status.needUpdate();
                   },
                 });

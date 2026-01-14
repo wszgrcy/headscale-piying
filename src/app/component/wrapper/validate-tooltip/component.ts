@@ -33,12 +33,12 @@ export class ValidateTooltipbWC {
 
   classStatus$$ = computed(() => fieldControlStatusClass(this.#field$$().form.control));
   showError$$ = computed(() => {
-    let control = this.#field$$().form.control!;
+    const control = this.#field$$().form.control!;
 
     return control.invalid && control.dirty$$();
   });
   wrapperClass$$ = computed(() => {
-    let tooltipClass = this.showError$$() ? 'tooltip' : '';
+    const tooltipClass = this.showError$$() ? 'tooltip' : '';
     return clsx(this.classStatus$$(), tooltipClass);
   });
 }

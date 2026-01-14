@@ -1,5 +1,4 @@
-import { ResourceRef, Signal } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Signal } from '@angular/core';
 import * as v from 'valibot';
 export enum SourceType {
   any,

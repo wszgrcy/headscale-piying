@@ -19,13 +19,13 @@ export const PickerTimeRangeDefine = v.pipe(
             return pickerValue ? `${timeRangeToStr(pickerValue)}` : '[empty]';
           });
         },
-      })
+      }),
     ),
     content: v.pipe(
       v.tuple([v.date(), v.date()]),
       asControl(),
       setComponent('calendar'),
-      actions.inputs.patch({ type: 'range' })
+      actions.inputs.patch({ type: 'range' }),
     ),
-  })
+  }),
 );

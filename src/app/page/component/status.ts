@@ -10,7 +10,7 @@ export const StatusDefine = v.pipe(
       setComponent('common-data'),
       actions.inputs.patchAsync({
         content: (field) => {
-          let ls: LocalSaveService = field.context['localSave'];
+          const ls: LocalSaveService = field.context['localSave'];
           return ls.prefix$$;
         },
       }),
@@ -26,7 +26,7 @@ export const StatusDefine = v.pipe(
       setComponent('common-data'),
       actions.inputs.patchAsync({
         content: (field) => {
-          let ls: LocalSaveService = field.context['localSave'];
+          const ls: LocalSaveService = field.context['localSave'];
           return ls.key$$();
         },
       }),
@@ -51,7 +51,7 @@ export const StatusDefine = v.pipe(
       }),
       actions.hooks.merge({
         allFieldsResolved: (field) => {
-          let api: ApiService = field.context['api'];
+          const api: ApiService = field.context['api'];
           api.Health().subscribe((result) => {
             field.get(['databaseConnectivity'])!.inputs.update((value) => {
               return {

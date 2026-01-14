@@ -1,15 +1,9 @@
-import {
-  _PiResolvedCommonViewFieldConfig,
-  KeyPath,
-  PiResolvedCommonViewFieldConfig,
-} from '@piying/view-angular-core';
-import { ApiService } from '../service/api.service';
+import { _PiResolvedCommonViewFieldConfig, KeyPath } from '@piying/view-angular-core';
 import { untracked } from '@angular/core';
-import { firstValueFrom, map } from 'rxjs';
 export function requestLoading(
   field: _PiResolvedCommonViewFieldConfig,
   keyPath: KeyPath,
-  request: () => Promise<any>
+  request: () => Promise<any>,
 ) {
   const defineField = field.get(keyPath)!;
   return async () => {
@@ -20,7 +14,7 @@ export function requestLoading(
         return { ...value, isLoading: true };
       });
     });
-    let result = await request();
+    const result = await request();
     untracked(() => {
       props.update((value) => {
         return { ...value, isLoading: false };

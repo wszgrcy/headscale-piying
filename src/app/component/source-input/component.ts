@@ -1,13 +1,7 @@
-import { Component, computed, forwardRef, inject, input, signal, viewChild } from '@angular/core';
+import { Component, computed, forwardRef, inject, signal, viewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import {
-  AttributesDirective,
-  BaseControl,
-  PI_VIEW_FIELD_TOKEN,
-  PiyingView,
-} from '@piying/view-angular';
+import { BaseControl, PI_VIEW_FIELD_TOKEN } from '@piying/view-angular';
 
-import { StrOrTemplateComponent } from '@piying-lib/angular-core';
 import { fieldControlStatusClass } from '@piying/view-angular-core';
 import { summarize } from 'valibot';
 import { MatIconModule } from '@angular/material/icon';
@@ -47,7 +41,7 @@ export class SourceInputFCC extends BaseControl {
   }
   classStatus$$ = computed(() => fieldControlStatusClass(this.#field$$().form.control));
   isError$$ = computed(() => {
-    let control = this.#field$$().form.control!;
+    const control = this.#field$$().form.control!;
     return control.invalid;
   });
 }

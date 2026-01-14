@@ -1,13 +1,5 @@
-import { Component, computed, inject, input, OnInit, signal, viewChild } from '@angular/core';
-import { ThemeService } from '@piying-lib/angular-daisyui/service';
-import {
-  EventsDirective,
-  AttributesDirective,
-  PiyingViewGroupBase,
-  PiyingView,
-  PI_INPUT_OPTIONS_TOKEN,
-} from '@piying/view-angular';
-import { MergeClassPipe } from '@piying-lib/angular-daisyui/pipe';
+import { Component, computed, inject, input, viewChild } from '@angular/core';
+import { PiyingViewGroupBase, PiyingView, PI_INPUT_OPTIONS_TOKEN } from '@piying/view-angular';
 import { MatIconModule } from '@angular/material/icon';
 import { SelectorlessOutlet } from '@cyia/ngx-common/directive';
 import { NgTemplateOutlet } from '@angular/common';
@@ -15,15 +7,7 @@ import { PurePipe } from '@cyia/ngx-common/pipe';
 @Component({
   selector: 'app-column-group',
   templateUrl: './component.html',
-  imports: [
-    EventsDirective,
-    AttributesDirective,
-    MergeClassPipe,
-    MatIconModule,
-    SelectorlessOutlet,
-    NgTemplateOutlet,
-    PurePipe,
-  ],
+  imports: [MatIconModule, SelectorlessOutlet, NgTemplateOutlet, PurePipe],
 })
 export class ArrayGroupFGC extends PiyingViewGroupBase {
   static __version = 2;

@@ -1,10 +1,10 @@
 import { inject } from '@angular/core';
-import { HttpHandler, HttpInterceptor, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
+import { HttpInterceptorFn } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { LocalSaveService } from '../service/local-save.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  let apikey = inject(LocalSaveService);
+  const apikey = inject(LocalSaveService);
   const url = req.url;
 
   if (url.startsWith(environment.prefix)) {

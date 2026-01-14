@@ -1,13 +1,5 @@
 import * as v from 'valibot';
-import {
-  asControl,
-  formConfig,
-  hideWhen,
-  NFCSchema,
-  setAlias,
-  setComponent,
-} from '@piying/view-angular-core';
-import { computed, effect, untracked } from '@angular/core';
+import { NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
 import { actions } from '@piying/view-angular';
 import { ApiService } from '../../service/api.service';
 import { firstValueFrom, map } from 'rxjs';
@@ -25,10 +17,10 @@ export const NodeRegistryDefine = v.pipe(
           }),
           actions.inputs.patchAsync({
             options: (field) => {
-              let api: ApiService = field.context['api'];
+              const api: ApiService = field.context['api'];
               return api.ListUsers().pipe(
                 map((item) => {
-                  let list = item.users ?? [];
+                  const list = item.users ?? [];
                   return list.map((item) => {
                     return {
                       label: item.displayName || item.name,
@@ -49,7 +41,7 @@ export const NodeRegistryDefine = v.pipe(
           v.string(),
           actions.hooks.merge({
             allFieldsResolved: (field) => {
-              let activatedRoute: ActivatedRoute = field.context['activatedRoute'];
+              const activatedRoute: ActivatedRoute = field.context['activatedRoute'];
               field.form.control!.updateValue(activatedRoute.snapshot.params['key']);
             },
           }),
@@ -71,7 +63,7 @@ export const NodeRegistryDefine = v.pipe(
           actions.inputs.patch({ type: 'submit', color: 'primary' }),
           actions.inputs.patchAsync({
             clicked: (field) => {
-              let tableField = field.get(['@form'])!;
+              const tableField = field.get(['@form'])!;
 
               return async () => {
                 const api: ApiService = field.context['api'];
@@ -81,7 +73,7 @@ export const NodeRegistryDefine = v.pipe(
               };
             },
             disabled: (field) => {
-              let tableField = field.get(['@form'])!;
+              const tableField = field.get(['@form'])!;
               return tableField.form.control!.statusChanges.pipe(
                 map(() => {
                   return tableField.form.control!.invalid;
