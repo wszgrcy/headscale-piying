@@ -17,6 +17,7 @@ import { NodeRegistryDefine } from './page/component/node-registry';
 import { LocalSaveService } from './service/local-save.service';
 import { StatusDefine } from './page/component/status';
 import { localStorageGuard } from './guard/activate-check.guard';
+import { ToastService } from './service/toast.service';
 export const routes: Routes = [
   {
     path: '',
@@ -112,6 +113,7 @@ export const routes: Routes = [
               api: inject(ApiService),
               dialog: inject(DialogService),
               aclSource: inject(AclSourceService),
+              toast: inject(ToastService),
             };
           },
         },

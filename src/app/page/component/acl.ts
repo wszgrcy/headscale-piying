@@ -10,12 +10,13 @@ import { actions } from '@piying/view-angular';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../service/api.service';
 import { ACLSchema } from '../../define/acl';
+import { ToastService } from '../../service/toast.service';
 async function requestACL(field: _PiResolvedCommonViewFieldConfig) {
   const api = field.context['api'] as ApiService;
 
   const value = await firstValueFrom(api.GetPolicy());
 
-  const editorField = field.get(['@editor'])!;
+  const editorField = field.get(['@aclContent'])!;
   editorField.form.control!.updateValue(JSON.parse(value.policy ?? '{}'));
 }
 export const ACLPageDefine = v.object({
@@ -80,6 +81,8 @@ export const ACLPageDefine = v.object({
               const content = editorField.form.control!.value;
 
               await firstValueFrom(api.SetPolicy({ policy: JSON.stringify(content) }));
+              const dialog = field.context['toast'] as ToastService;
+              dialog.add('update ACL success', { type: 'success' });
             };
           },
         }),

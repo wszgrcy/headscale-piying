@@ -25,7 +25,7 @@ export class ToastService {
       id,
       message,
       type: options.type || 'info',
-      duration: options.duration ?? 3000,
+      duration: options.duration ?? 5000,
     };
     if (!delay) {
       this.#addToList(item);
