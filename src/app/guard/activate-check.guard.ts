@@ -1,14 +1,17 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateChildFn, CanActivateFn, Router } from '@angular/router';
 import { LocalSaveService } from '../service/local-save.service';
 
-export const localStorageGuard: CanActivateFn = () => {
+export const localStorageGuard: CanActivateFn | CanActivateChildFn = (route, state) => {
   const apiKey = inject(LocalSaveService);
   const router = inject(Router);
+  if (state.url === '/web/login') {
+    return true;
+  }
+
   if (apiKey.key$$()) {
     return true;
   } else {
-    // router.navigate(['/login']);
-    return false;
+    return router.createUrlTree(['/web/login']);
   }
 };
