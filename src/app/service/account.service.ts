@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { ApiService } from './api.service';
-import { catchError, tap } from 'rxjs';
+import { catchError, firstValueFrom, tap } from 'rxjs';
 import { LocalSaveService } from './local-save.service';
 @Injectable({
   providedIn: 'root',
@@ -18,13 +18,16 @@ export class AccountService {
     if (data.prefix) {
       this.apiKey.setPrefix(data.prefix);
     }
-    return this.api.Health().subscribe({
-      next: () => {
+    return firstValueFrom(this.api.Health())
+      .then(() => {
         return this.router.navigateByUrl('/web/user');
-      },
-      error: () => {
+      })
+      .catch(() => {
         this.apiKey.clearKey();
-      },
-    });
+      });
+  }
+  logout() {
+    this.apiKey.clearKey();
+    return this.router.navigateByUrl('/web/login');
   }
 }

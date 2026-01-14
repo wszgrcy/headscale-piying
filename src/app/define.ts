@@ -25,6 +25,7 @@ import { EditableSelectFCC } from './component/select/component';
 import { EditGroupFGC } from './component/edit-group/component';
 import { ValidateTooltipbWC } from './component/wrapper/validate-tooltip/component';
 import { ThemeControllerNFCC } from './component/theme-controller/component';
+import { PasswordInputFCC } from './component/password';
 const selectorPrefix = 'app-';
 
 const list = [
@@ -72,6 +73,15 @@ export const FormDefine = {
   string: {
     actions: [
       setComponent(InputFCC),
+      actions.wrappers.set(['label-wrapper', 'validate-tooltip-wrapper']),
+      actions.props.patch({
+        labelPosition: 'left',
+      }),
+    ],
+  },
+  password: {
+    actions: [
+      setComponent(PasswordInputFCC),
       actions.wrappers.set(['label-wrapper', 'validate-tooltip-wrapper']),
       actions.props.patch({
         labelPosition: 'left',

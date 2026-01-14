@@ -11,6 +11,7 @@ export const LoginDefine = v.pipe(
     ),
     apiKey: v.pipe(
       v.string(),
+      setComponent('password'),
       v.title('apiKey'),
       actions.class.top('w-full *:last:w-full'),
       actions.class.component('w-full'),

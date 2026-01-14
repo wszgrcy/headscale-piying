@@ -1,0 +1,20 @@
+<ng-template #templateRef let-attr="attributes">
+  <label [class]="'input' | mergeClass: attr().class">
+    <input
+      [type]="type$$()"
+      [placeholder]="attr()?.placeholder??''"
+      [ngModel]="value$()"
+      (ngModelChange)="valueChange($event)"
+      (blur)="touchedChange()"
+      class="w-full"
+    />
+    <button class="btn btn-circle btn-ghost btn-sm" (click)="toggleSee()">
+      @if (see$()) {
+        <mat-icon>remove_red_eye</mat-icon>
+        <mat-icon class="absolute">not_interested</mat-icon>
+      } @else {
+        <mat-icon>remove_red_eye</mat-icon>
+      }
+    </button>
+  </label>
+</ng-template>

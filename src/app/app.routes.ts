@@ -19,6 +19,7 @@ import { ACLPageDefine } from './page/component/acl';
 import { AclSourceService } from './service/acl-source.service';
 import { NodeRegistryDefine } from './page/component/node-registry';
 import { LocalSaveService } from './service/local-save.service';
+import { StatusDefine } from './page/component/status';
 export const routes: Routes = [
   {
     path: '',
@@ -121,6 +122,20 @@ export const routes: Routes = [
               api: inject(ApiService),
               dialog: inject(DialogService),
               aclSource: inject(AclSourceService),
+            };
+          },
+        },
+      },
+      {
+        path: 'status',
+        component: SchemaViewRC,
+        data: {
+          schema: () => StatusDefine,
+          context: () => {
+            return {
+              api: inject(ApiService),
+              localSave: inject(LocalSaveService),
+              account: inject(AccountService),
             };
           },
         },

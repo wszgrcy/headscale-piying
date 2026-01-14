@@ -47,6 +47,7 @@ export const MainPage = v.pipe(
               { title: 'acl', router: { routerLink: './acl' } },
 
               { type: 'divider' },
+              { title: 'status', router: { routerLink: './status' } },
             ],
           }),
           actions.class.top('min-w-[250px]'),
