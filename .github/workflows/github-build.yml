@@ -29,6 +29,8 @@ jobs:
         run: npm i
       - name: Build
         run: npm run build:gh
+      - name: add 404
+        run: cp ./dist/index.html ./dist/404.html
       - name: Upload artifact
         id: deployment
         uses: actions/upload-pages-artifact@v3
