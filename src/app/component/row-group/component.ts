@@ -17,4 +17,7 @@ export class RowGroupFGC extends PiyingViewGroupBase {
     const index = this.children$$().length;
     this.field$$().action.set(this.defaultValue()?.(index), index);
   }
+  removeItem(key: number) {
+    this.field$$().action.remove(key);
+  }
 }

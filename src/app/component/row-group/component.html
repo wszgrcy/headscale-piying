@@ -1,8 +1,15 @@
 <ng-template #templateRef let-attr="attributes" let-events="events">
   @for (field of children$$(); track field.id || $index) {
-    <ng-container
-      *ngTemplateOutlet="fieldTemplateRef(); context: { $implicit: field }"
-    ></ng-container>
+    <div class="flex items-center gap-2">
+      <div class="flex-1">
+        <ng-container
+          *ngTemplateOutlet="fieldTemplateRef(); context: { $implicit: field }"
+        ></ng-container>
+      </div>
+      <button class="btn btn-circle btn-error" (click)="removeItem($index)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
   }
   <button class="btn btn-circle" (click)="addNew()" color="primary">
     <mat-icon>add</mat-icon>
