@@ -10,7 +10,6 @@ import {
 } from '@piying/view-angular-core';
 import { SourceOption } from '../component/source-list/type';
 import ms from 'ms';
-import { AclServiceWC } from '../component/wrapper/acl-service/component';
 import { AclService } from '../component/wrapper/acl-service/service';
 import { computed } from '@angular/core';
 export const IP_CIDR_REGEX: RegExp =
@@ -93,9 +92,7 @@ function getTagSource(service: AclService) {
   };
 }
 const SrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
-  const topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
-  const rootField = topField.get(['#', '@aclView'])!;
-  const service: AclService = rootField.props()['service'];
+  const service = field.injector.get(AclService);
 
   return [
     { value: '*', label: 'Any' },
@@ -116,9 +113,7 @@ const SrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
   ];
 };
 const TagOwnerList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
-  const topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
-  const rootField = topField.get(['#', '@aclView'])!;
-  const service: AclService = rootField.props()['service'];
+  const service = field.injector.get(AclService);
 
   return [
     { label: 'User', children$$: service.users$$ },
@@ -130,9 +125,7 @@ const TagOwnerList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] 
 
 // todo dst是host:port,所以之间选择不行
 const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
-  const topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
-  const rootField = topField.get(['#', '@aclView'])!;
-  const service: AclService = rootField.props()['service'];
+  const service = field.injector.get(AclService);
 
   return [
     { value: '*', label: 'Any' },
@@ -169,9 +162,7 @@ const DstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (fi
 };
 
 const SSHSrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
-  const topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
-  const rootField = topField.get(['#', '@aclView'])!;
-  const service: AclService = rootField.props()['service'];
+  const service = field.injector.get(AclService);
   return [
     { label: 'User', children$$: service.users$$ },
     getTagSource(service),
@@ -182,9 +173,7 @@ const SSHSrcList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = 
   ];
 };
 const SSHDstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
-  const topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
-  const rootField = topField.get(['#', '@aclView'])!;
-  const service: AclService = rootField.props()['service'];
+  const service = field.injector.get(AclService);
   return [
     { label: 'User', children$$: service.users$$ },
     getTagSource(service),
@@ -195,9 +184,7 @@ const SSHDstList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = 
   ];
 };
 const SSHUsersList: (field: _PiResolvedCommonViewFieldConfig) => SourceOption[] = (field) => {
-  const topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
-  const rootField = topField.get(['#', '@aclView'])!;
-  const service: AclService = rootField.props()['service'];
+  const service = field.injector.get(AclService);
   return [
     { value: '*', label: 'Any' },
     {
@@ -237,9 +224,7 @@ export const ACLSchema = v.pipe(
               setComponent('editable-select'),
               actions.inputs.patchAsync({
                 options: (field) => {
-                  const topField: _PiResolvedCommonViewFieldConfig = field.context['root'] ?? field;
-                  const rootField = topField.get(['#', '@aclView'])!;
-                  const service: AclService = rootField.props()['service'];
+                  const service = field.injector.get(AclService);
                   return computed(() => {
                     return [...service.ipList$$(), ...service.routes$$()];
                   });
@@ -285,11 +270,7 @@ export const ACLSchema = v.pipe(
                   actions.inputs.patch({ filterEnable: true, emptyContent: '[User]' }),
                   actions.inputs.patchAsync({
                     options: (field) => {
-                      const topField = field.context['root'] ?? field;
-                      const aclSource: AclService = topField.get(['#', '@aclView'])?.props()[
-                        'service'
-                      ];
-                      return aclSource.users$$;
+                      return field.injector.get(AclService).users$$;
                     },
                   }),
                 ),
@@ -565,5 +546,5 @@ export const ACLSchema = v.pipe(
     ),
   }),
   setAlias('aclView'),
-  actions.wrappers.set([{ type: AclServiceWC }]),
+  actions.providers.patch([AclService]),
 );

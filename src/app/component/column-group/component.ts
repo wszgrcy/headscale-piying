@@ -22,10 +22,6 @@ export class ArrayGroupFGC extends PiyingViewGroupBase {
         ...this.parentPyOptions!(),
         context: {
           ...this.parentPyOptions!().context,
-          parent: this.field$$(),
-          parentCtx: this.parentPyOptions!().context,
-          root: this.parentPyOptions!().context?.['root'] ?? this.field$$(),
-          rootCtx: this.parentPyOptions!().context?.['rootCtx'] ?? this.parentPyOptions!().context,
         },
       },
       selectorless: true,

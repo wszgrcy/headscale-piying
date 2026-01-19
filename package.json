@@ -26,7 +26,7 @@
     "@cyia/ngx-common": "^20.0.3",
     "@piying-lib/angular-core": "^1.0.19",
     "@piying-lib/angular-daisyui": "^1.0.19",
-    "@piying/view-angular": "^2.2.2",
+    "@piying/view-angular": "^2.3.1",
     "cally": "^0.9.0",
     "clsx": "^2.1.1",
     "core-js": "^3.47.0",
