@@ -30,7 +30,7 @@ export const ApiKeyPageDefine = v.pipe(
       NFCSchema,
       setAlias('table'),
       setComponent('table'),
-      actions.wrappers.set(['table-status', 'sort-table', 'table-resource', 'checkbox-table']),
+      actions.wrappers.set(['sort-table', 'table-resource']),
 
       actions.inputs.patchAsync({
         define: (field) => {
@@ -258,4 +258,5 @@ export const ApiKeyPageDefine = v.pipe(
   }),
   actions.wrappers.set([{ type: 'loading-wrapper' }]),
   setAlias('table-block'),
+  actions.providers.patch([TableStatusService]),
 );

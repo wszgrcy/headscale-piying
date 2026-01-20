@@ -10,7 +10,7 @@ import {
 import { computed, effect, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
 import { combineLatest, filter, firstValueFrom, map, Observable, skip, startWith } from 'rxjs';
-import { TableStatusService } from '@piying-lib/angular-daisyui/extension';
+import { CheckboxService, TableStatusService } from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
 import { NodeItem } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
@@ -22,14 +22,23 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { LeftTitleAction } from '../../define/left-title';
 import { PickerTimeRangeDefine } from '../../define/picker-time-range';
 import { timeInRange } from '../../util/time-in-range';
+import { union } from 'es-toolkit';
+import { timeCompare } from '../../util/time';
+import { ConfirmService } from '../../service/confirm.service';
+import { deepEqual } from 'fast-equals';
 const newDate = new Date();
 const ExpireNodeDefine = v.pipe(
   v.object({
     expiry: v.pipe(
-      v.optional(v.date(), newDate),
+      v.optional(v.string(), newDate.toISOString()),
+      setComponent('date'),
       v.title('expiration'),
-      v.transform((input) => {
-        return input.toISOString();
+      formConfig({
+        transfomer: {
+          toModel(value, control) {
+            return value.toISOString();
+          },
+        },
       }),
     ),
   }),
@@ -114,6 +123,21 @@ const FilterCondition = v.pipe(
 );
 // todo dynamic
 const ROStrItemDefine = v.pipe(NFCSchema, setComponent('common-data'), ROSTRLabelWrapper);
+const BatchAddDefine = v.pipe(
+  v.object({
+    nodeTag: v.pipe(
+      v.array(v.string()),
+      setComponent('node-tag'),
+      asControl(),
+      actions.class.top('[&_label]:w-30'),
+      v.title('forcedTags'),
+      actions.wrappers.set(['label-wrapper']),
+      actions.props.patch({
+        labelPosition: 'left',
+      }),
+    ),
+  }),
+);
 export const NodeItemPageDefine = v.pipe(
   v.object({
     query: FilterCondition,
@@ -121,7 +145,7 @@ export const NodeItemPageDefine = v.pipe(
       NFCSchema,
       setAlias('table'),
       setComponent('table'),
-      actions.wrappers.set(['table-status', 'sort-table', 'table-resource', 'checkbox-table']),
+      actions.wrappers.set(['sort-table', 'table-resource']),
 
       actions.inputs.patchAsync({
         define: (field) => {
@@ -132,10 +156,12 @@ export const NodeItemPageDefine = v.pipe(
                 {
                   columns: [
                     'expand',
+                    'checkbox',
                     'online',
                     'id',
                     'givenName',
                     'registerMethod',
+                    'expiry',
                     'lastSeen',
                     'createdAt',
                     'actions',
@@ -147,10 +173,12 @@ export const NodeItemPageDefine = v.pipe(
                   define: v.pipe(v.tuple([]), setComponent('tr')),
                   columns: [
                     'expand',
+                    'checkbox',
                     'online',
                     'id',
                     'givenName',
                     'registerMethod',
+                    'expiry',
                     'lastSeen',
                     'createdAt',
                     'actions',
@@ -160,6 +188,18 @@ export const NodeItemPageDefine = v.pipe(
               ],
             },
             columns: {
+              checkbox: {
+                head: v.pipe(
+                  v.boolean(),
+                  setComponent('checkbox'),
+                  actions.wrappers.set(['td', 'table-checkbox-all']),
+                ),
+                body: v.pipe(
+                  v.boolean(),
+                  setComponent('checkbox'),
+                  actions.wrappers.set(['td', 'table-checkbox-body']),
+                ),
+              },
               expand: {
                 head: ' ',
                 body: v.pipe(
@@ -223,6 +263,16 @@ export const NodeItemPageDefine = v.pipe(
                 ),
                 body: (data: NodeItem) => {
                   return formatDatetimeToStr(data.lastSeen);
+                },
+              },
+              expiry: {
+                head: 'expiry',
+                body: (data: NodeItem) => {
+                  if (!data.expiry) {
+                    return '✔️';
+                  }
+                  const icon = timeCompare(data.expiry!) ? '✔️' : '❌';
+                  return `${icon}${formatDatetimeToStr(data.expiry)}`;
                 },
               },
               online: {
@@ -312,7 +362,7 @@ export const NodeItemPageDefine = v.pipe(
                             const dialog: DialogService = field.context['dialog'];
                             const item = field.context['item$']() as NodeItem;
                             dialog.openDialog({
-                              title: 'new',
+                              title: 'ExpireNode',
                               schema: v.pipe(ExpireNodeDefine),
                               applyValue: async (value) => {
                                 const api: ApiService = field.context['api'];
@@ -460,9 +510,7 @@ export const NodeItemPageDefine = v.pipe(
                   ]),
                   hideWhen({
                     listen(fn, field) {
-                      const sm = field.context.status['selectionModel$$'] as Observable<
-                        SelectionModel<unknown>
-                      >;
+                      const sm = field.injector.get(TableStatusService).selectionModel$$;
                       return combineLatest([
                         toObservable(field.context['item$'], {
                           injector: field.injector,
@@ -564,7 +612,123 @@ export const NodeItemPageDefine = v.pipe(
 
     bottom: v.pipe(
       v.object({
-        _: v.pipe(NFCSchema, setComponent('div')),
+        batch: v.pipe(
+          v.tuple([
+            v.pipe(
+              NFCSchema,
+              setComponent('button'),
+              actions.inputs.patch({ content: { title: 'addTag', icon: { fontIcon: 'add' } } }),
+              actions.inputs.patchAsync({
+                clicked: (field) => {
+                  return () => {
+                    let list = field.injector.get(CheckboxService).getSelected();
+                    if (!list.length) {
+                      return;
+                    }
+                    const dialog = field.injector.get(DialogService);
+                    const api = field.injector.get(ApiService);
+                    dialog.openDialog({
+                      title: `Batch Add Tag`,
+                      schema: BatchAddDefine,
+                      applyValue: async (value) => {
+                        for (const item of list) {
+                          await firstValueFrom(
+                            api.SetTags(item.id!, {
+                              tags: union(item.forcedTags ?? [], value.nodeTag),
+                            }),
+                          );
+                        }
+                        const status = field.injector.get(TableStatusService);
+                        status.needUpdate();
+                      },
+                    });
+                  };
+                },
+              }),
+            ),
+            v.pipe(
+              NFCSchema,
+              setComponent('button'),
+              actions.inputs.patch({
+                content: { icon: { fontIcon: 'update_disabled' } },
+                shape: 'circle',
+                size: 'sm',
+              }),
+              actions.class.top('text-error'),
+              actions.inputs.patchAsync({
+                clicked: (field) => {
+                  return async () => {
+                    let list = field.injector.get(CheckboxService).getSelected();
+                    if (!list.length) {
+                      return;
+                    }
+                    const dialog = field.injector.get(DialogService);
+                    let ref = dialog.openDialog({
+                      title: 'expire',
+                      schema: v.pipe(ExpireNodeDefine),
+                      applyValue: async (value) => {
+                        const api: ApiService = field.context['api'];
+                        for (const item of list) {
+                          await firstValueFrom(api.ExpireNode(item.id!, value));
+                        }
+                        const status = field.injector.get(TableStatusService);
+                        status.needUpdate();
+                      },
+                    });
+                  };
+                },
+              }),
+            ),
+            v.pipe(
+              NFCSchema,
+              setComponent('button'),
+              actions.inputs.patch({
+                content: { icon: { fontIcon: 'delete' } },
+                shape: 'circle',
+                size: 'sm',
+              }),
+              actions.class.top('text-error'),
+              actions.inputs.patchAsync({
+                clicked: (field) => {
+                  return async () => {
+                    let list = field.injector.get(CheckboxService<NodeItem>).getSelected();
+                    if (!list.length) {
+                      return;
+                    }
+                    let confirm = field.injector.get(ConfirmService);
+                    let result = await confirm.open({ title: 'confirm', message: 'Batch Remove' });
+                    if (!result) {
+                      return;
+                    }
+                    const api: ApiService = field.context['api'];
+                    let tableBlock = field.get(['@table-block']);
+                    tableBlock!.props.update((a) => {
+                      return {
+                        ...a,
+                        isLoading: true,
+                      };
+                    });
+
+                    for (const item of list) {
+                      await firstValueFrom(api.DeleteNode(item.id!));
+                    }
+                    tableBlock!.props.update((a) => {
+                      return {
+                        ...a,
+                        isLoading: false,
+                      };
+                    });
+                    const status = field.injector.get(TableStatusService);
+                    status.needUpdate();
+                  };
+                },
+              }),
+            ),
+          ]),
+          actions.wrappers.patch(['div']),
+          actions.class.top('flex gap-2 items-center'),
+        ),
+        // _: v.pipe(NFCSchema, setComponent('div')),
         page: v.pipe(
           NFCSchema,
           setComponent('pagination'),
@@ -591,4 +755,11 @@ export const NodeItemPageDefine = v.pipe(
   }),
   actions.wrappers.set([{ type: 'loading-wrapper' }]),
   setAlias('table-block'),
+  actions.providers.patch([CheckboxService, TableStatusService]),
+  actions.props.patch({ expandSelectModel: { _multiple: true, compareWith: deepEqual } }),
+  actions.hooks.merge({
+    allFieldsResolved: (field) => {
+      field.injector.get(CheckboxService).init();
+    },
+  }),
 );

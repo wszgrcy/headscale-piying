@@ -1,5 +1,12 @@
 import * as v from 'valibot';
-import { formConfig, hideWhen, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
+import {
+  _PiResolvedCommonViewFieldConfig,
+  formConfig,
+  hideWhen,
+  NFCSchema,
+  setAlias,
+  setComponent,
+} from '@piying/view-angular-core';
 import { computed } from '@angular/core';
 import { actions } from '@piying/view-angular';
 import { combineLatest, firstValueFrom, map, Observable, startWith } from 'rxjs';
@@ -77,10 +84,9 @@ export const UserPageDefine = v.pipe(
     query: FilterCondition,
     table: v.pipe(
       NFCSchema,
-      setAlias('table'),
+      setAlias('userTable'),
       setComponent('table'),
-      actions.wrappers.set(['table-status', 'sort-table', 'table-resource', 'checkbox-table']),
-      actions.props.patch({ expandSelectModel: { _multiple: true, compareWith: deepEqual } }),
+      actions.wrappers.set(['sort-table', 'table-resource']),
       actions.inputs.patchAsync({
         define: (field) => {
           const pageFiled = field.get(['..', 'page']);
@@ -269,9 +275,10 @@ export const UserPageDefine = v.pipe(
                   v.title('Preauthkey'),
                   hideWhen({
                     listen(fn, field) {
-                      const sm = field.context.status['selectionModel$$'] as Observable<
-                        SelectionModel<unknown>
-                      >;
+                      let userTableField = field.context[
+                        'parentField'
+                      ]() as _PiResolvedCommonViewFieldConfig;
+                      const sm = userTableField.injector.get(TableStatusService).selectionModel$$;
                       return combineLatest([
                         toObservable(field.context['item$'], {
                           injector: field.injector,
@@ -357,7 +364,7 @@ export const UserPageDefine = v.pipe(
           actions.inputs.patch({ content: { icon: { fontIcon: 'add' }, title: 'add' } }),
           actions.inputs.patchAsync({
             clicked: (field) => {
-              const tableField = field.get(['@table'])!;
+              const tableField = field.get(['@userTable'])!;
               return () => {
                 const dialog: DialogService = field.context['dialog'];
                 dialog.openDialog({
@@ -400,4 +407,6 @@ export const UserPageDefine = v.pipe(
   }),
   setAlias('table-block'),
   actions.wrappers.set([{ type: 'loading-wrapper' }]),
+  actions.providers.patch([TableStatusService]),
+  actions.props.patch({ expandSelectModel: { _multiple: true, compareWith: deepEqual } }),
 );

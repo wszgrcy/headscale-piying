@@ -41,7 +41,7 @@ export const PreAuthkeyPageDefine = v.pipe(
       setAlias('preauthkey-table'),
       setComponent('table'),
       actions.class.component('bg-base-200 rounded-box'),
-      actions.wrappers.set(['table-status', 'sort-table', 'table-resource', 'checkbox-table']),
+      actions.wrappers.set(['sort-table', 'table-resource']),
 
       actions.inputs.patchAsync({
         define: (field) => {
@@ -325,4 +325,5 @@ export const PreAuthkeyPageDefine = v.pipe(
     ),
   }),
   setAlias('preauthkey'),
+  actions.providers.patch([TableStatusService]),
 );
