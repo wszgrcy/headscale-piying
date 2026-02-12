@@ -9,14 +9,19 @@ import {
 } from '@piying/view-angular-core';
 import { computed, effect, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
-import { combineLatest, filter, firstValueFrom, map, Observable, skip, startWith } from 'rxjs';
-import { CheckboxService, TableStatusService } from '@piying-lib/angular-daisyui/extension';
+import { combineLatest, filter, firstValueFrom, map, Observable, skip, startWith, tap } from 'rxjs';
+import {
+  CheckboxService,
+  SortService,
+  TableExpandService,
+  TableResourceService,
+} from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
 import { NodeItem } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { metadataList } from '@piying/valibot-visit';
-import { requestLoading } from '../../util/request-loading';
+import { localRequest } from '../../util/local-request';
 import { formatDatetimeToStr } from '../../util/time-to-str';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { LeftTitleAction } from '../../define/left-title';
@@ -113,6 +118,7 @@ const FilterCondition = v.pipe(
           return () => {
             const result = field.get(['..', 'params'])!.form.control!;
             result.emitSubmit();
+            field.injector.get(TableResourceService).setParams('query', result.value);
           };
         },
       }),
@@ -145,11 +151,9 @@ export const NodeItemPageDefine = v.pipe(
       NFCSchema,
       setAlias('table'),
       setComponent('table'),
-      actions.wrappers.set(['sort-table', 'table-resource']),
 
       actions.inputs.patchAsync({
         define: (field) => {
-          const pageFiled = field.get(['..', 'page']);
           return {
             row: {
               head: [
@@ -244,7 +248,6 @@ export const NodeItemPageDefine = v.pipe(
                   actions.wrappers.set(['td', 'sort-header']),
                   actions.props.patch({
                     key: 'createdAt',
-                    direction: -1,
                   }),
                 ),
                 body: (data: NodeItem) => {
@@ -339,8 +342,7 @@ export const NodeItemPageDefine = v.pipe(
                               applyValue: async (value) => {
                                 const api: ApiService = field.context['api'];
                                 await firstValueFrom(api.RenameNode(item.id!, value.name));
-                                const status: TableStatusService = field.context['status'];
-                                status.needUpdate();
+                                field.injector.get(TableResourceService).needUpdate();
                               },
                             });
                           };
@@ -367,8 +369,7 @@ export const NodeItemPageDefine = v.pipe(
                               applyValue: async (value) => {
                                 const api: ApiService = field.context['api'];
                                 await firstValueFrom(api.ExpireNode(item.id!, value));
-                                const status: TableStatusService = field.context['status'];
-                                status.needUpdate();
+                                field.injector.get(TableResourceService).needUpdate();
                               },
                             });
                           };
@@ -391,8 +392,7 @@ export const NodeItemPageDefine = v.pipe(
                             const api: ApiService = field.context['api'];
                             const item = field.context['item$']() as NodeItem;
                             await firstValueFrom(api.DeleteNode(item.id!));
-                            const status: TableStatusService = field.context['status'];
-                            status.needUpdate();
+                            field.injector.get(TableResourceService).needUpdate();
                           };
                         },
                       }),
@@ -482,11 +482,18 @@ export const NodeItemPageDefine = v.pipe(
                             nodeTag: item.tags,
                             ipAddresses: item.ipAddresses,
                           });
+                          field.form.control?.markAllAsUntouched();
                           const api: ApiService = field.context['api'];
                           untracked(() => {
-                            const ref = field
-                              .get(['nodeTag'])!
-                              .form.control!.valueChanges.pipe(skip(1), filter(Boolean))
+                            let nodeTagField = field.get(['nodeTag'])!;
+                            const ref = nodeTagField.form
+                              .control!.valueChanges.pipe(
+                                filter(
+                                  () =>
+                                    nodeTagField.form.control!.touched &&
+                                    nodeTagField.form.control!.valid,
+                                ),
+                              )
                               .subscribe(async (value) => {
                                 await firstValueFrom(api.SetTags(item.id!, { tags: value }));
                               });
@@ -510,7 +517,7 @@ export const NodeItemPageDefine = v.pipe(
                   ]),
                   hideWhen({
                     listen(fn, field) {
-                      const sm = field.injector.get(TableStatusService).selectionModel$$;
+                      const sm = field.injector.get(TableExpandService).selectionModel$$;
                       return combineLatest([
                         toObservable(field.context['item$'], {
                           injector: field.injector,
@@ -529,84 +536,9 @@ export const NodeItemPageDefine = v.pipe(
             },
           };
         },
-      }),
-      actions.props.patch({ sortList: ['createdAt', 'lastSeen', 'givenName', 'id'] }),
-      actions.props.patchAsync({
         data: (field) => {
-          const api = field.context['api'] as ApiService;
-          return requestLoading(field, ['@table-block'], () => {
-            return firstValueFrom(
-              api.ListNodes().pipe(
-                map((item) => {
-                  return item.nodes ?? [];
-                }),
-              ),
-            );
-          });
+          return field.injector.get(TableResourceService).list$$;
         },
-        localSearchOptions: (field) => {
-          return {
-            filterFn: (
-              item: NodeItem,
-              queryParams?: v.InferOutput<typeof FilterCondition>['params'],
-            ) => {
-              if (!queryParams) {
-                return true;
-              }
-              let result = true;
-              if (queryParams.givenName && item.givenName) {
-                result = item.givenName.toLowerCase().includes(queryParams.givenName);
-                if (!result) {
-                  return result;
-                }
-              }
-              if (queryParams.createdAt && item.createdAt) {
-                result = timeInRange(item.createdAt, queryParams.createdAt);
-                if (!result) {
-                  return result;
-                }
-              }
-              if (queryParams.lastSeen && item.lastSeen) {
-                result = timeInRange(item.lastSeen, queryParams.lastSeen);
-                if (!result) {
-                  return result;
-                }
-              }
-              if (queryParams.ip && item.ipAddresses) {
-                const ip = queryParams.ip.toLowerCase();
-                result = item.ipAddresses.some((item) => item.toLowerCase().includes(ip));
-                if (!result) {
-                  return result;
-                }
-              }
-              if (queryParams.registerMethod) {
-                result = item.registerMethod === queryParams.registerMethod;
-                if (!result) {
-                  return result;
-                }
-              }
-              return result;
-            },
-          };
-        },
-        filterParams: (field) => {
-          return field.get(['@filterParams'])!.form.control!.valueChanges;
-        },
-      }),
-      actions.props.mapAsync((field) => {
-        const pageProps = field.get(['..', 'bottom', 'page'])!.props;
-        return (value) => {
-          return {
-            ...value,
-            queryParams: {
-              // page field
-              page: pageProps?.()['pageQueryParams'],
-              // sort-table
-              direction: value['sortQueryParams'],
-              filter: value['filterParams'],
-            },
-          };
-        };
       }),
     ),
 
@@ -638,7 +570,7 @@ export const NodeItemPageDefine = v.pipe(
                             }),
                           );
                         }
-                        const status = field.injector.get(TableStatusService);
+                        const status = field.injector.get(TableResourceService);
                         status.needUpdate();
                       },
                     });
@@ -671,7 +603,7 @@ export const NodeItemPageDefine = v.pipe(
                         for (const item of list) {
                           await firstValueFrom(api.ExpireNode(item.id!, value));
                         }
-                        const status = field.injector.get(TableStatusService);
+                        const status = field.injector.get(TableResourceService);
                         status.needUpdate();
                       },
                     });
@@ -718,7 +650,7 @@ export const NodeItemPageDefine = v.pipe(
                         isLoading: false,
                       };
                     });
-                    const status = field.injector.get(TableStatusService);
+                    const status = field.injector.get(TableResourceService);
                     status.needUpdate();
                   };
                 },
@@ -741,10 +673,14 @@ export const NodeItemPageDefine = v.pipe(
           }),
           actions.inputs.patchAsync({
             count: (field) => {
-              const tableField = field.get(['..', '..', 'table'])!;
-              return computed(() => {
-                return tableField.props()['count$$']();
-              });
+              return field.injector.get(TableResourceService).count$$;
+            },
+          }),
+          actions.outputs.patchAsync({
+            valueChange: (field) => {
+              return (data) => {
+                field.injector.get(TableResourceService).setParams('page', data);
+              };
             },
           }),
         ),
@@ -754,12 +690,78 @@ export const NodeItemPageDefine = v.pipe(
     ),
   }),
   actions.wrappers.set([{ type: 'loading-wrapper' }]),
+  actions.props.patchAsync({
+    isLoading: (field) => field.injector.get(TableResourceService).isLoading$$,
+  }),
   setAlias('table-block'),
-  actions.providers.patch([CheckboxService, TableStatusService]),
-  actions.props.patch({ expandSelectModel: { _multiple: true, compareWith: deepEqual } }),
+  actions.providers.patch([CheckboxService, TableResourceService, SortService, TableExpandService]),
   actions.hooks.merge({
     allFieldsResolved: (field) => {
+      field.injector.get(TableExpandService).init({ _multiple: true, compareWith: deepEqual });
+      let sort = field.injector.get(SortService);
+      sort.sortList.set(['createdAt', 'lastSeen', 'givenName', 'id']);
+      sort.setInitValue({
+        createdAt: -1,
+      });
+      sort.value$$.subscribe((value) => {
+        field.injector.get(TableResourceService).setParams('sort', value);
+      });
       field.injector.get(CheckboxService).init();
+
+      let api = field.injector.get(ApiService);
+      field.injector.get(TableResourceService).setRequest(
+        localRequest(
+          () => {
+            return firstValueFrom(
+              api.ListNodes().pipe(
+                map((item) => {
+                  let list = item.nodes ?? [];
+                  return [list.length, list] as const;
+                }),
+              ),
+            );
+          },
+          (item, queryParams: v.InferOutput<typeof FilterCondition>['params']) => {
+            if (!queryParams) {
+              return true;
+            }
+
+            let result = true;
+            if (queryParams.givenName && item.givenName) {
+              result = item.givenName.toLowerCase().includes(queryParams.givenName);
+              if (!result) {
+                return result;
+              }
+            }
+            if (queryParams.createdAt && item.createdAt) {
+              result = timeInRange(item.createdAt, queryParams.createdAt);
+              if (!result) {
+                return result;
+              }
+            }
+            if (queryParams.lastSeen && item.lastSeen) {
+              result = timeInRange(item.lastSeen, queryParams.lastSeen);
+              if (!result) {
+                return result;
+              }
+            }
+            if (queryParams.ip && item.ipAddresses) {
+              const ip = queryParams.ip.toLowerCase();
+              result = item.ipAddresses.some((item) => item.toLowerCase().includes(ip));
+              if (!result) {
+                return result;
+              }
+            }
+            if (queryParams.registerMethod) {
+              result = item.registerMethod === queryParams.registerMethod;
+              if (!result) {
+                return result;
+              }
+            }
+            return result;
+          },
+        ),
+      );
     },
   }),
 );

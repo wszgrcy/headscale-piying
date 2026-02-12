@@ -6,7 +6,7 @@ import { PurePipe } from '@cyia/ngx-common/pipe';
 import { MatIconModule } from '@angular/material/icon';
 import { ApiService } from '../../service/api.service';
 import { firstValueFrom } from 'rxjs';
-import { TableStatusService } from '@piying-lib/angular-daisyui/extension';
+import { TableResourceService } from '@piying-lib/angular-daisyui/extension';
 @Component({
   selector: 'app-node-router',
   imports: [PurePipe, MatIconModule],
@@ -31,7 +31,7 @@ export class NodeRouterNFCC {
   subnetRoutes$$ = computed(() => {
     return this.#item$$().subnetRoutes ?? [];
   });
-
+  tableResource = inject(TableResourceService);
   isApprovedRoutes = (list: string[], item: string) => {
     return list.includes(item);
   };
@@ -51,6 +51,6 @@ export class NodeRouterNFCC {
         routes: list,
       }),
     );
-    (this.field$$().context['status'] as TableStatusService).needUpdate();
+    this.tableResource.needUpdate();
   }
 }

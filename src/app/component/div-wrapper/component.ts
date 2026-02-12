@@ -1,12 +1,12 @@
 import { Component, viewChild } from '@angular/core';
-import { AttributesDirective, InsertFieldDirective } from '@piying/view-angular';
+import { AttributesDirective, EventsDirective, InsertFieldDirective } from '@piying/view-angular';
 
 @Component({
   selector: 'app-div',
-  template: `<ng-template #templateRef let-attr="attributes">
-    <div [attributes]="attr()"><ng-container insertField></ng-container></div>
+  template: `<ng-template #templateRef let-attr="attributes" let-events="events">
+    <div [attributes]="attr()" [events]="events()"><ng-container insertField></ng-container></div>
   </ng-template>`,
-  imports: [AttributesDirective, InsertFieldDirective],
+  imports: [AttributesDirective, InsertFieldDirective, EventsDirective],
 })
 export class DivWC {
   static __version = 2;

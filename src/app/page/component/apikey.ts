@@ -3,13 +3,13 @@ import { NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
 import { computed } from '@angular/core';
 import { actions } from '@piying/view-angular';
 import { firstValueFrom, map } from 'rxjs';
-import { TableStatusService } from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
 import { ApiKey } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
-import { requestLoading } from '../../util/request-loading';
 import { formatDatetimeToStr } from '../../util/time-to-str';
 import { timeCompare } from '../../util/time';
+import { TableResourceService } from '@piying-lib/angular-daisyui/extension';
+import { localRequest } from '../../util/local-request';
 // todo dynamic
 const newDate = new Date();
 newDate.setDate(newDate.getDate() + 90);
@@ -30,11 +30,9 @@ export const ApiKeyPageDefine = v.pipe(
       NFCSchema,
       setAlias('table'),
       setComponent('table'),
-      actions.wrappers.set(['sort-table', 'table-resource']),
 
       actions.inputs.patchAsync({
         define: (field) => {
-          const pageFiled = field.get(['..', 'page']);
           return {
             row: {
               head: [
@@ -123,9 +121,8 @@ export const ApiKeyPageDefine = v.pipe(
                           return async () => {
                             const api: ApiService = field.context['api'];
                             const item = field.context['item$']() as ApiKey;
-                            await firstValueFrom(api.ExpireApiKey({ prefix: item.prefix }));
-                            const status: TableStatusService = field.context['status'];
-                            status.needUpdate();
+                            await firstValueFrom(api.ExpireApiKey({ id: item.id }));
+                            field.injector.get(TableResourceService).needUpdate();
                           };
                         },
                       }),
@@ -144,14 +141,14 @@ export const ApiKeyPageDefine = v.pipe(
                           return async () => {
                             const api: ApiService = field.context['api'];
                             const item = field.context['item$']() as ApiKey;
-                            await firstValueFrom(api.DeleteApiKey(item.prefix!));
-                            const status: TableStatusService = field.context['status'];
-                            status.needUpdate();
+                            await firstValueFrom(api.DeleteApiKey(item.prefix!.slice(0, -3)));
+                            field.injector.get(TableResourceService).needUpdate();
                           };
                         },
                       }),
                     ),
                   }),
+                  actions.wrappers.set(['td']),
                 ),
               },
 
@@ -175,35 +172,9 @@ export const ApiKeyPageDefine = v.pipe(
             },
           };
         },
-      }),
-      actions.props.patch({ sortList: ['title1', 'badge1'] }),
-      actions.props.patchAsync({
         data: (field) => {
-          const api = field.context['api'] as ApiService;
-          return requestLoading(field, ['@table-block'], () => {
-            return firstValueFrom(
-              api.ListApiKeys().pipe(
-                map((item) => {
-                  return item.apiKeys ?? [];
-                }),
-              ),
-            );
-          });
+          return field.injector.get(TableResourceService).list$$;
         },
-      }),
-      actions.props.mapAsync((field) => {
-        const pageProps = field.get(['..', 'bottom', 'page'])!.props;
-        return (value) => {
-          return {
-            ...value,
-            queryParams: {
-              // page field
-              page: pageProps?.()['pageQueryParams'],
-              // sort-table
-              direction: value['sortQueryParams'],
-            },
-          };
-        };
       }),
     ),
 
@@ -215,7 +186,6 @@ export const ApiKeyPageDefine = v.pipe(
           actions.inputs.patch({ content: { icon: { fontIcon: 'add' }, title: 'add' } }),
           actions.inputs.patchAsync({
             clicked: (field) => {
-              const tableField = field.get(['@table'])!;
               return () => {
                 const dialog: DialogService = field.context['dialog'];
                 dialog.openDialog({
@@ -224,8 +194,7 @@ export const ApiKeyPageDefine = v.pipe(
                   applyValue: async (value) => {
                     const api: ApiService = field.context['api'];
                     await firstValueFrom(api.CreateApiKey(value));
-                    const status: TableStatusService = tableField.props()['status'];
-                    status.needUpdate();
+                    field.injector.get(TableResourceService).needUpdate();
                   },
                 });
               };
@@ -244,10 +213,14 @@ export const ApiKeyPageDefine = v.pipe(
           }),
           actions.inputs.patchAsync({
             count: (field) => {
-              const tableField = field.get(['..', '..', 'table'])!;
-              return computed(() => {
-                return tableField.props()['count$$']();
-              });
+              return field.injector.get(TableResourceService).count$$;
+            },
+          }),
+          actions.outputs.patchAsync({
+            valueChange: (field) => {
+              return (data) => {
+                field.injector.get(TableResourceService).setParams('page', data);
+              };
             },
           }),
         ),
@@ -257,6 +230,26 @@ export const ApiKeyPageDefine = v.pipe(
     ),
   }),
   actions.wrappers.set([{ type: 'loading-wrapper' }]),
+  actions.props.patchAsync({
+    isLoading: (field) => field.injector.get(TableResourceService).isLoading$$,
+  }),
   setAlias('table-block'),
-  actions.providers.patch([TableStatusService]),
+  actions.providers.patch([TableResourceService]),
+  actions.hooks.merge({
+    allFieldsResolved: (field) => {
+      let api = field.injector.get(ApiService);
+      field.injector.get(TableResourceService).setRequest(
+        localRequest((input) => {
+          return firstValueFrom(
+            api.ListApiKeys().pipe(
+              map((item) => {
+                let list = item.apiKeys ?? [];
+                return [list.length, list];
+              }),
+            ),
+          );
+        }),
+      );
+    },
+  }),
 );

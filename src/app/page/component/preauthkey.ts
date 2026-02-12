@@ -3,14 +3,14 @@ import { asControl, NFCSchema, setAlias, setComponent } from '@piying/view-angul
 import { computed, effect, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
 import { firstValueFrom, map } from 'rxjs';
-import { TableStatusService } from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
 import { PreAuthKeys, User } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { CopyService } from '../../service/copy.service';
-import { requestLoading } from '../../util/request-loading';
+import { localRequest } from '../../util/local-request';
 import { formatDatetimeToStr } from '../../util/time-to-str';
 import { timeCompare } from '../../util/time';
+import { TableResourceService } from '@piying-lib/angular-daisyui/extension';
 // todo dynamic
 const newDate = new Date();
 newDate.setDate(newDate.getDate() + 90);
@@ -41,11 +41,8 @@ export const PreAuthkeyPageDefine = v.pipe(
       setAlias('preauthkey-table'),
       setComponent('table'),
       actions.class.component('bg-base-200 rounded-box'),
-      actions.wrappers.set(['sort-table', 'table-resource']),
-
       actions.inputs.patchAsync({
         define: (field) => {
-          const pageFiled = field.get(['..', 'page']);
           return {
             row: {
               head: [
@@ -175,8 +172,7 @@ export const PreAuthkeyPageDefine = v.pipe(
                             const api: ApiService = field.context['api'];
                             const item = field.context['item$']() as PreAuthKeys;
                             await firstValueFrom(api.ExpirePreAuthKey({ id: item.id }));
-                            const status: TableStatusService = field.context['status'];
-                            status.needUpdate();
+                            field.injector.get(TableResourceService).needUpdate();
                           };
                         },
                       }),
@@ -196,8 +192,7 @@ export const PreAuthkeyPageDefine = v.pipe(
                             const api: ApiService = field.context['api'];
                             const item = field.context['item$']() as PreAuthKeys;
                             await firstValueFrom(api.DeletePreAuthKey({ id: item.id }));
-                            const status: TableStatusService = field.context['status'];
-                            status.needUpdate();
+                            field.injector.get(TableResourceService).needUpdate();
                           };
                         },
                       }),
@@ -210,64 +205,25 @@ export const PreAuthkeyPageDefine = v.pipe(
             },
           };
         },
+        data: (field) => {
+          return field.injector.get(TableResourceService).list$$;
+        },
       }),
-      actions.props.patch({ sortList: ['title1', 'badge1'] }),
       actions.hooks.merge({
         allFieldsResolved: (field) => {
+          let tableResource = field.injector.get(TableResourceService);
           const defineField = field.get(['@preauthkey'])!;
-          const status$ = computed(() => {
-            return field.props()['status'];
-          });
+
           const user$$ = computed(() => (defineField.props()['user$$']() as User).id);
-          let init = false;
           effect(
             () => {
-              const status = status$() as TableStatusService;
-              if (!status) {
-                return;
-              }
               user$$();
-              if (!init) {
-                init = true;
-                return;
-              }
-              status.needUpdate();
+
+              tableResource.needUpdate();
             },
             { injector: field.injector },
           );
         },
-      }),
-      actions.props.patchAsync({
-        data: (field) => {
-          const api = field.context['api'] as ApiService;
-          const defineField = field.get(['@preauthkey'])!;
-          return requestLoading(field, ['@preauthkey'], () => {
-            const defineProps = untracked(() => defineField.props()['user$$']());
-            return firstValueFrom(
-              api.ListPreAuthKeys().pipe(
-                map((item) => {
-                  return (item.preAuthKeys ?? []).filter(
-                    (item) => item.user?.id === defineProps.id,
-                  );
-                }),
-              ),
-            );
-          });
-        },
-      }),
-      actions.props.mapAsync((field) => {
-        const pageProps = field.get(['..', 'bottom', 'page'])!.props;
-        return (value) => {
-          return {
-            ...value,
-            queryParams: {
-              // page field
-              page: pageProps?.()['pageQueryParams'],
-              // sort-table
-              direction: value['sortQueryParams'],
-            },
-          };
-        };
       }),
     ),
 
@@ -290,8 +246,7 @@ export const PreAuthkeyPageDefine = v.pipe(
                     const defineProps = defineField?.props()['user$$']() as User;
                     const api: ApiService = field.context['api'];
                     await firstValueFrom(api.CreatePreAuthKey({ ...value, user: defineProps.id! }));
-                    const status: TableStatusService = tableField.props()['status'];
-                    status.needUpdate();
+                    field.injector.get(TableResourceService).needUpdate();
                   },
                 });
               };
@@ -310,10 +265,14 @@ export const PreAuthkeyPageDefine = v.pipe(
           }),
           actions.inputs.patchAsync({
             count: (field) => {
-              const tableField = field.get(['..', '..', 'table'])!;
-              return computed(() => {
-                return tableField.props()['count$$']();
-              });
+              return field.injector.get(TableResourceService).count$$;
+            },
+          }),
+          actions.outputs.patchAsync({
+            valueChange: (field) => {
+              return (data) => {
+                field.injector.get(TableResourceService).setParams('page', data);
+              };
             },
           }),
         ),
@@ -323,5 +282,33 @@ export const PreAuthkeyPageDefine = v.pipe(
     ),
   }),
   setAlias('preauthkey'),
-  actions.providers.patch([TableStatusService]),
+  actions.providers.patch([TableResourceService]),
+  actions.hooks.merge({
+    allFieldsResolved: (field) => {
+      const defineField = field.get(['@preauthkey'])!;
+
+      let api = field.injector.get(ApiService);
+      field.injector.get(TableResourceService).setRequest(
+        localRequest(
+          () => {
+            const defineProps = untracked(() => defineField.props()['user$$']());
+
+            return firstValueFrom(
+              api.ListPreAuthKeys().pipe(
+                map((item) => {
+                  let list = (item.preAuthKeys ?? []).filter(
+                    (item) => item.user?.id === defineProps.id,
+                  );
+                  return [list.length, list];
+                }),
+              ),
+            );
+          },
+          () => {
+            return true;
+          },
+        ),
+      );
+    },
+  }),
 );

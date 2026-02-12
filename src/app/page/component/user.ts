@@ -10,13 +10,17 @@ import {
 import { computed } from '@angular/core';
 import { actions } from '@piying/view-angular';
 import { combineLatest, firstValueFrom, map, Observable, startWith } from 'rxjs';
-import { TableStatusService } from '@piying-lib/angular-daisyui/extension';
+import {
+  SortService,
+  TableExpandService,
+  TableResourceService,
+} from '@piying-lib/angular-daisyui/extension';
 import { ApiService } from '../../service/api.service';
 import { User } from '../../../api/item.type';
 import { DialogService } from '../../service/dialog.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { PreAuthkeyPageDefine } from './preauthkey';
-import { requestLoading } from '../../util/request-loading';
+import { localRequest } from '../../util/local-request';
 import { timeInRange } from '../../util/time-in-range';
 import { PickerTimeRangeDefine } from '../../define/picker-time-range';
 import { LeftTitleAction } from '../../define/left-title';
@@ -71,6 +75,7 @@ const FilterCondition = v.pipe(
           return () => {
             const result = field.get(['..', 'params'])!.form.control!;
             result.emitSubmit();
+            field.injector.get(TableResourceService).setParams('query', result.value);
           };
         },
       }),
@@ -86,10 +91,8 @@ export const UserPageDefine = v.pipe(
       NFCSchema,
       setAlias('userTable'),
       setComponent('table'),
-      actions.wrappers.set(['sort-table', 'table-resource']),
       actions.inputs.patchAsync({
         define: (field) => {
-          const pageFiled = field.get(['..', 'page']);
           return {
             row: {
               head: [
@@ -156,7 +159,6 @@ export const UserPageDefine = v.pipe(
                   actions.wrappers.set(['td', 'sort-header']),
                   actions.props.patch({
                     key: 'createdAt',
-                    direction: -1,
                   }),
                 ),
                 body: (data: User) => {
@@ -216,8 +218,8 @@ export const UserPageDefine = v.pipe(
                                 const api: ApiService = field.context['api'];
                                 const item = field.context['item$']();
                                 await firstValueFrom(api.RenameUser(item.id, value.name));
-                                const status: TableStatusService = field.context['status'];
-                                status.needUpdate();
+
+                                field.injector.get(TableResourceService).needUpdate();
                                 return true;
                               },
                             });
@@ -241,8 +243,7 @@ export const UserPageDefine = v.pipe(
                             const api: ApiService = field.context['api'];
                             const item = field.context['item$']();
                             await firstValueFrom(api.DeleteUser(item.id));
-                            const status: TableStatusService = field.context['status'];
-                            status.needUpdate();
+                            field.injector.get(TableResourceService).needUpdate();
                           };
                         },
                       }),
@@ -278,7 +279,7 @@ export const UserPageDefine = v.pipe(
                       let userTableField = field.context[
                         'parentField'
                       ]() as _PiResolvedCommonViewFieldConfig;
-                      const sm = userTableField.injector.get(TableStatusService).selectionModel$$;
+                      const sm = userTableField.injector.get(TableExpandService).selectionModel$$;
                       return combineLatest([
                         toObservable(field.context['item$'], {
                           injector: field.injector,
@@ -297,62 +298,9 @@ export const UserPageDefine = v.pipe(
             },
           };
         },
-      }),
-      actions.props.patch({ sortList: ['createdAt'] }),
-      actions.props.patchAsync({
         data: (field) => {
-          const api = field.context['api'] as ApiService;
-          return requestLoading(field, ['@table-block'], () => {
-            return firstValueFrom(
-              api.ListUsers().pipe(
-                map((item) => {
-                  return item.users ?? [];
-                }),
-              ),
-            );
-          });
+          return field.injector.get(TableResourceService).list$$;
         },
-        localSearchOptions: (field) => {
-          return {
-            filterFn: (item: User, queryParams?: Record<string, any>) => {
-              if (!queryParams) {
-                return true;
-              }
-              let result = true;
-              if (queryParams['name'] && item.name) {
-                result = item.name.toLowerCase().includes(queryParams['name']);
-                if (!result) {
-                  return result;
-                }
-              }
-              if (queryParams['createdAt'] && item.createdAt) {
-                result = timeInRange(item.createdAt, queryParams['createdAt']);
-                if (!result) {
-                  return result;
-                }
-              }
-              return result;
-            },
-          };
-        },
-        filterParams: (field) => {
-          return field.get(['@filterParams'])!.form.control!.valueChanges;
-        },
-      }),
-      actions.props.mapAsync((field) => {
-        const pageProps = field.get(['..', 'bottom', 'page'])!.props;
-        return (value) => {
-          return {
-            ...value,
-            queryParams: {
-              // page field
-              page: pageProps?.()['pageQueryParams'],
-              // sort-table
-              direction: value['sortQueryParams'],
-              filter: value['filterParams'],
-            },
-          };
-        };
       }),
     ),
 
@@ -373,7 +321,7 @@ export const UserPageDefine = v.pipe(
                   applyValue: async (value) => {
                     const api: ApiService = field.context['api'];
                     await firstValueFrom(api.CreateUser(value));
-                    const status: TableStatusService = tableField.props()['status'];
+                    const status: TableResourceService = tableField.props()['status'];
                     status.needUpdate();
                   },
                 });
@@ -393,10 +341,14 @@ export const UserPageDefine = v.pipe(
           }),
           actions.inputs.patchAsync({
             count: (field) => {
-              const tableField = field.get(['..', '..', 'table'])!;
-              return computed(() => {
-                return tableField.props()['count$$']();
-              });
+              return field.injector.get(TableResourceService).count$$;
+            },
+          }),
+          actions.outputs.patchAsync({
+            valueChange: (field) => {
+              return (data) => {
+                field.injector.get(TableResourceService).setParams('page', data);
+              };
             },
           }),
         ),
@@ -407,6 +359,55 @@ export const UserPageDefine = v.pipe(
   }),
   setAlias('table-block'),
   actions.wrappers.set([{ type: 'loading-wrapper' }]),
-  actions.providers.patch([TableStatusService]),
-  actions.props.patch({ expandSelectModel: { _multiple: true, compareWith: deepEqual } }),
+  actions.props.patchAsync({
+    isLoading: (field) => field.injector.get(TableResourceService).isLoading$$,
+  }),
+  actions.providers.patch([TableResourceService, TableExpandService, SortService]),
+  actions.hooks.merge({
+    allFieldsResolved: (field) => {
+      let sort = field.injector.get(SortService);
+      sort.sortList.set(['createdAt']);
+      sort.setInitValue({
+        createdAt: -1,
+      });
+      sort.value$$.subscribe((value) => {
+        field.injector.get(TableResourceService).setParams('sort', value);
+      });
+      field.injector.get(TableExpandService).init({ _multiple: true, compareWith: deepEqual });
+      let api = field.injector.get(ApiService);
+      field.injector.get(TableResourceService).setRequest(
+        localRequest(
+          (input) => {
+            return firstValueFrom(
+              api.ListUsers().pipe(
+                map((item) => {
+                  let list = item.users ?? [];
+                  return [list.length, list];
+                }),
+              ),
+            );
+          },
+          (item, queryParams?: Record<string, any>) => {
+            if (!queryParams) {
+              return true;
+            }
+            let result = true;
+            if (queryParams['name'] && item.name) {
+              result = item.name.toLowerCase().includes(queryParams['name']);
+              if (!result) {
+                return result;
+              }
+            }
+            if (queryParams['createdAt'] && item.createdAt) {
+              result = timeInRange(item.createdAt, queryParams['createdAt']);
+              if (!result) {
+                return result;
+              }
+            }
+            return result;
+          },
+        ),
+      );
+    },
+  }),
 );
