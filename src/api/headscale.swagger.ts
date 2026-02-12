@@ -4,68 +4,68 @@
  */
 
 export interface paths {
-  "/api/v1/apikey": {
-    get: operations["HeadscaleService_ListApiKeys"];
-    post: operations["HeadscaleService_CreateApiKey"];
+  '/api/v1/apikey': {
+    get: operations['HeadscaleService_ListApiKeys'];
+    post: operations['HeadscaleService_CreateApiKey'];
   };
-  "/api/v1/apikey/expire": {
-    post: operations["HeadscaleService_ExpireApiKey"];
+  '/api/v1/apikey/expire': {
+    post: operations['HeadscaleService_ExpireApiKey'];
   };
-  "/api/v1/apikey/{prefix}": {
-    delete: operations["HeadscaleService_DeleteApiKey"];
+  '/api/v1/apikey/{prefix}': {
+    delete: operations['HeadscaleService_DeleteApiKey'];
   };
-  "/api/v1/debug/node": {
-    post: operations["HeadscaleService_DebugCreateNode"];
+  '/api/v1/debug/node': {
+    post: operations['HeadscaleService_DebugCreateNode'];
   };
-  "/api/v1/health": {
-    get: operations["HeadscaleService_Health"];
+  '/api/v1/health': {
+    get: operations['HeadscaleService_Health'];
   };
-  "/api/v1/node": {
-    get: operations["HeadscaleService_ListNodes"];
+  '/api/v1/node': {
+    get: operations['HeadscaleService_ListNodes'];
   };
-  "/api/v1/node/backfillips": {
-    post: operations["HeadscaleService_BackfillNodeIPs"];
+  '/api/v1/node/backfillips': {
+    post: operations['HeadscaleService_BackfillNodeIPs'];
   };
-  "/api/v1/node/register": {
-    post: operations["HeadscaleService_RegisterNode"];
+  '/api/v1/node/register': {
+    post: operations['HeadscaleService_RegisterNode'];
   };
-  "/api/v1/node/{nodeId}": {
-    get: operations["HeadscaleService_GetNode"];
-    delete: operations["HeadscaleService_DeleteNode"];
+  '/api/v1/node/{nodeId}': {
+    get: operations['HeadscaleService_GetNode'];
+    delete: operations['HeadscaleService_DeleteNode'];
   };
-  "/api/v1/node/{nodeId}/approve_routes": {
-    post: operations["HeadscaleService_SetApprovedRoutes"];
+  '/api/v1/node/{nodeId}/approve_routes': {
+    post: operations['HeadscaleService_SetApprovedRoutes'];
   };
-  "/api/v1/node/{nodeId}/expire": {
-    post: operations["HeadscaleService_ExpireNode"];
+  '/api/v1/node/{nodeId}/expire': {
+    post: operations['HeadscaleService_ExpireNode'];
   };
-  "/api/v1/node/{nodeId}/rename/{newName}": {
-    post: operations["HeadscaleService_RenameNode"];
+  '/api/v1/node/{nodeId}/rename/{newName}': {
+    post: operations['HeadscaleService_RenameNode'];
   };
-  "/api/v1/node/{nodeId}/tags": {
-    post: operations["HeadscaleService_SetTags"];
+  '/api/v1/node/{nodeId}/tags': {
+    post: operations['HeadscaleService_SetTags'];
   };
-  "/api/v1/policy": {
-    get: operations["HeadscaleService_GetPolicy"];
-    put: operations["HeadscaleService_SetPolicy"];
+  '/api/v1/policy': {
+    get: operations['HeadscaleService_GetPolicy'];
+    put: operations['HeadscaleService_SetPolicy'];
   };
-  "/api/v1/preauthkey": {
-    get: operations["HeadscaleService_ListPreAuthKeys"];
-    post: operations["HeadscaleService_CreatePreAuthKey"];
-    delete: operations["HeadscaleService_DeletePreAuthKey"];
+  '/api/v1/preauthkey': {
+    get: operations['HeadscaleService_ListPreAuthKeys'];
+    post: operations['HeadscaleService_CreatePreAuthKey'];
+    delete: operations['HeadscaleService_DeletePreAuthKey'];
   };
-  "/api/v1/preauthkey/expire": {
-    post: operations["HeadscaleService_ExpirePreAuthKey"];
+  '/api/v1/preauthkey/expire': {
+    post: operations['HeadscaleService_ExpirePreAuthKey'];
   };
-  "/api/v1/user": {
-    get: operations["HeadscaleService_ListUsers"];
-    post: operations["HeadscaleService_CreateUser"];
+  '/api/v1/user': {
+    get: operations['HeadscaleService_ListUsers'];
+    post: operations['HeadscaleService_CreateUser'];
   };
-  "/api/v1/user/{id}": {
-    delete: operations["HeadscaleService_DeleteUser"];
+  '/api/v1/user/{id}': {
+    delete: operations['HeadscaleService_DeleteUser'];
   };
-  "/api/v1/user/{oldId}/rename/{newName}": {
-    post: operations["HeadscaleService_RenameUser"];
+  '/api/v1/user/{oldId}/rename/{newName}': {
+    post: operations['HeadscaleService_RenameUser'];
   };
 }
 
@@ -77,13 +77,13 @@ export interface definitions {
     tags?: string[];
   };
   protobufAny: {
-    "@type"?: string;
+    '@type'?: string;
   } & { [key: string]: unknown };
   rpcStatus: {
     /** Format: int32 */
     code?: number;
     message?: string;
-    details?: definitions["protobufAny"][];
+    details?: definitions['protobufAny'][];
   };
   v1ApiKey: {
     /** Format: uint64 */
@@ -116,7 +116,7 @@ export interface definitions {
     aclTags?: string[];
   };
   v1CreatePreAuthKeyResponse: {
-    preAuthKey?: definitions["v1PreAuthKey"];
+    preAuthKey?: definitions['v1PreAuthKey'];
   };
   v1CreateUserRequest: {
     name?: string;
@@ -125,7 +125,7 @@ export interface definitions {
     pictureUrl?: string;
   };
   v1CreateUserResponse: {
-    user?: definitions["v1User"];
+    user?: definitions['v1User'];
   };
   v1DebugCreateNodeRequest: {
     user?: string;
@@ -134,7 +134,7 @@ export interface definitions {
     routes?: string[];
   };
   v1DebugCreateNodeResponse: {
-    node?: definitions["v1Node"];
+    node?: definitions['v1Node'];
   };
   v1DeleteApiKeyResponse: { [key: string]: unknown };
   v1DeleteNodeResponse: { [key: string]: unknown };
@@ -142,19 +142,20 @@ export interface definitions {
   v1DeleteUserResponse: { [key: string]: unknown };
   v1ExpireApiKeyRequest: {
     prefix?: string;
+    /** Format: uint64 */
+    id?: string;
   };
   v1ExpireApiKeyResponse: { [key: string]: unknown };
   v1ExpireNodeResponse: {
-    node?: definitions["v1Node"];
+    node?: definitions['v1Node'];
   };
   v1ExpirePreAuthKeyRequest: {
     /** Format: uint64 */
-    user?: string;
-    key?: string;
+    id?: string;
   };
   v1ExpirePreAuthKeyResponse: { [key: string]: unknown };
   v1GetNodeResponse: {
-    node?: definitions["v1Node"];
+    node?: definitions['v1Node'];
   };
   v1GetPolicyResponse: {
     policy?: string;
@@ -165,16 +166,16 @@ export interface definitions {
     databaseConnectivity?: boolean;
   };
   v1ListApiKeysResponse: {
-    apiKeys?: definitions["v1ApiKey"][];
+    apiKeys?: definitions['v1ApiKey'][];
   };
   v1ListNodesResponse: {
-    nodes?: definitions["v1Node"][];
+    nodes?: definitions['v1Node'][];
   };
   v1ListPreAuthKeysResponse: {
-    preAuthKeys?: definitions["v1PreAuthKey"][];
+    preAuthKeys?: definitions['v1PreAuthKey'][];
   };
   v1ListUsersResponse: {
-    users?: definitions["v1User"][];
+    users?: definitions['v1User'][];
   };
   v1Node: {
     /** Format: uint64 */
@@ -184,26 +185,30 @@ export interface definitions {
     discoKey?: string;
     ipAddresses?: string[];
     name?: string;
-    user?: definitions["v1User"];
+    user?: definitions['v1User'];
     /** Format: date-time */
     lastSeen?: string;
     /** Format: date-time */
     expiry?: string;
-    preAuthKey?: definitions["v1PreAuthKey"];
+    preAuthKey?: definitions['v1PreAuthKey'];
     /** Format: date-time */
     createdAt?: string;
-    registerMethod?: definitions["v1RegisterMethod"];
-    forcedTags?: string[];
-    invalidTags?: string[];
-    validTags?: string[];
+    registerMethod?: definitions['v1RegisterMethod'];
+    /**
+     * Deprecated
+     * repeated string forced_tags = 18;
+     * repeated string invalid_tags = 19;
+     * repeated string valid_tags = 20;
+     */
     givenName?: string;
     online?: boolean;
     approvedRoutes?: string[];
     availableRoutes?: string[];
     subnetRoutes?: string[];
+    tags?: string[];
   };
   v1PreAuthKey: {
-    user?: definitions["v1User"];
+    user?: definitions['v1User'];
     /** Format: uint64 */
     id?: string;
     key?: string;
@@ -221,21 +226,21 @@ export interface definitions {
    * @enum {string}
    */
   v1RegisterMethod:
-    | "REGISTER_METHOD_UNSPECIFIED"
-    | "REGISTER_METHOD_AUTH_KEY"
-    | "REGISTER_METHOD_CLI"
-    | "REGISTER_METHOD_OIDC";
+    | 'REGISTER_METHOD_UNSPECIFIED'
+    | 'REGISTER_METHOD_AUTH_KEY'
+    | 'REGISTER_METHOD_CLI'
+    | 'REGISTER_METHOD_OIDC';
   v1RegisterNodeResponse: {
-    node?: definitions["v1Node"];
+    node?: definitions['v1Node'];
   };
   v1RenameNodeResponse: {
-    node?: definitions["v1Node"];
+    node?: definitions['v1Node'];
   };
   v1RenameUserResponse: {
-    user?: definitions["v1User"];
+    user?: definitions['v1User'];
   };
   v1SetApprovedRoutesResponse: {
-    node?: definitions["v1Node"];
+    node?: definitions['v1Node'];
   };
   v1SetPolicyRequest: {
     policy?: string;
@@ -246,7 +251,7 @@ export interface definitions {
     updatedAt?: string;
   };
   v1SetTagsResponse: {
-    node?: definitions["v1Node"];
+    node?: definitions['v1Node'];
   };
   v1User: {
     /** Format: uint64 */
@@ -267,45 +272,45 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1ListApiKeysResponse"];
+        schema: definitions['v1ListApiKeysResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
   HeadscaleService_CreateApiKey: {
     parameters: {
       body: {
-        body: definitions["v1CreateApiKeyRequest"];
+        body: definitions['v1CreateApiKeyRequest'];
       };
     };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1CreateApiKeyResponse"];
+        schema: definitions['v1CreateApiKeyResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
   HeadscaleService_ExpireApiKey: {
     parameters: {
       body: {
-        body: definitions["v1ExpireApiKeyRequest"];
+        body: definitions['v1ExpireApiKeyRequest'];
       };
     };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1ExpireApiKeyResponse"];
+        schema: definitions['v1ExpireApiKeyResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -314,32 +319,35 @@ export interface operations {
       path: {
         prefix: string;
       };
+      query: {
+        id?: string;
+      };
     };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1DeleteApiKeyResponse"];
+        schema: definitions['v1DeleteApiKeyResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
   HeadscaleService_DebugCreateNode: {
     parameters: {
       body: {
-        body: definitions["v1DebugCreateNodeRequest"];
+        body: definitions['v1DebugCreateNodeRequest'];
       };
     };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1DebugCreateNodeResponse"];
+        schema: definitions['v1DebugCreateNodeResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -347,11 +355,11 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1HealthResponse"];
+        schema: definitions['v1HealthResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -364,11 +372,11 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1ListNodesResponse"];
+        schema: definitions['v1ListNodesResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -381,11 +389,11 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1BackfillNodeIPsResponse"];
+        schema: definitions['v1BackfillNodeIPsResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -399,11 +407,11 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1RegisterNodeResponse"];
+        schema: definitions['v1RegisterNodeResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -416,11 +424,11 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1GetNodeResponse"];
+        schema: definitions['v1GetNodeResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -433,11 +441,11 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1DeleteNodeResponse"];
+        schema: definitions['v1DeleteNodeResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -447,17 +455,17 @@ export interface operations {
         nodeId: string;
       };
       body: {
-        body: definitions["HeadscaleServiceSetApprovedRoutesBody"];
+        body: definitions['HeadscaleServiceSetApprovedRoutesBody'];
       };
     };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1SetApprovedRoutesResponse"];
+        schema: definitions['v1SetApprovedRoutesResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -473,11 +481,11 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1ExpireNodeResponse"];
+        schema: definitions['v1ExpireNodeResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -491,11 +499,11 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1RenameNodeResponse"];
+        schema: definitions['v1RenameNodeResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -505,17 +513,17 @@ export interface operations {
         nodeId: string;
       };
       body: {
-        body: definitions["HeadscaleServiceSetTagsBody"];
+        body: definitions['HeadscaleServiceSetTagsBody'];
       };
     };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1SetTagsResponse"];
+        schema: definitions['v1SetTagsResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -523,97 +531,91 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1GetPolicyResponse"];
+        schema: definitions['v1GetPolicyResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
   HeadscaleService_SetPolicy: {
     parameters: {
       body: {
-        body: definitions["v1SetPolicyRequest"];
+        body: definitions['v1SetPolicyRequest'];
       };
     };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1SetPolicyResponse"];
+        schema: definitions['v1SetPolicyResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
   HeadscaleService_ListPreAuthKeys: {
-    parameters: {
-      query: {
-        user?: string;
-      };
-    };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1ListPreAuthKeysResponse"];
+        schema: definitions['v1ListPreAuthKeysResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
   HeadscaleService_CreatePreAuthKey: {
     parameters: {
       body: {
-        body: definitions["v1CreatePreAuthKeyRequest"];
+        body: definitions['v1CreatePreAuthKeyRequest'];
       };
     };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1CreatePreAuthKeyResponse"];
+        schema: definitions['v1CreatePreAuthKeyResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
   HeadscaleService_DeletePreAuthKey: {
     parameters: {
       query: {
-        user?: string;
-        key?: string;
+        id?: string;
       };
     };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1DeletePreAuthKeyResponse"];
+        schema: definitions['v1DeletePreAuthKeyResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
   HeadscaleService_ExpirePreAuthKey: {
     parameters: {
       body: {
-        body: definitions["v1ExpirePreAuthKeyRequest"];
+        body: definitions['v1ExpirePreAuthKeyRequest'];
       };
     };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1ExpirePreAuthKeyResponse"];
+        schema: definitions['v1ExpirePreAuthKeyResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -628,28 +630,28 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1ListUsersResponse"];
+        schema: definitions['v1ListUsersResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
   HeadscaleService_CreateUser: {
     parameters: {
       body: {
-        body: definitions["v1CreateUserRequest"];
+        body: definitions['v1CreateUserRequest'];
       };
     };
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1CreateUserResponse"];
+        schema: definitions['v1CreateUserResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -662,11 +664,11 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1DeleteUserResponse"];
+        schema: definitions['v1DeleteUserResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };
@@ -680,11 +682,11 @@ export interface operations {
     responses: {
       /** A successful response. */
       200: {
-        schema: definitions["v1RenameUserResponse"];
+        schema: definitions['v1RenameUserResponse'];
       };
       /** An unexpected error response. */
       default: {
-        schema: definitions["rpcStatus"];
+        schema: definitions['rpcStatus'];
       };
     };
   };

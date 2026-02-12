@@ -41,17 +41,7 @@ export class AclService {
     const list = this.#aclSource.getNodeList$.value();
     const tagSet = new Set<string>();
     list.forEach((item) => {
-      item.validTags?.forEach((tag) => {
-        if (tag.startsWith('tag:')) {
-          tagSet.add(tag);
-        }
-      });
-      item.forcedTags?.forEach((tag) => {
-        if (tag.startsWith('tag:')) {
-          tagSet.add(tag);
-        }
-      });
-      item.invalidTags?.forEach((tag) => {
+      item.tags?.forEach((tag) => {
         if (tag.startsWith('tag:')) {
           tagSet.add(tag);
         }

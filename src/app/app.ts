@@ -15,7 +15,7 @@ import { ConfirmService } from './service/confirm.service';
 })
 export class App {
   #toast = inject(ToastService);
-  #confirm = inject(ConfirmService);
   readonly list$$ = this.#toast.list$$;
+  #confirm = inject(ConfirmService);
   readonly dialogList$$ = this.#confirm.list$$;
 }

@@ -130,7 +130,7 @@ const BatchAddDefine = v.pipe(
       setComponent('node-tag'),
       asControl(),
       actions.class.top('[&_label]:w-30'),
-      v.title('forcedTags'),
+      v.title('tags'),
       actions.wrappers.set(['label-wrapper']),
       actions.props.patch({
         labelPosition: 'left',
@@ -413,7 +413,7 @@ export const NodeItemPageDefine = v.pipe(
                       setComponent('node-tag'),
                       asControl(),
                       actions.class.top('[&_label]:w-30'),
-                      v.title('forcedTags'),
+                      v.title('tags'),
                       actions.wrappers.set(['label-wrapper']),
                       actions.props.patch({
                         labelPosition: 'left',
@@ -479,7 +479,7 @@ export const NodeItemPageDefine = v.pipe(
                           const item = field.context!['item$']() as NodeItem;
 
                           field.form.control!.updateValue({
-                            nodeTag: item.forcedTags,
+                            nodeTag: item.tags,
                             ipAddresses: item.ipAddresses,
                           });
                           const api: ApiService = field.context['api'];
@@ -634,7 +634,7 @@ export const NodeItemPageDefine = v.pipe(
                         for (const item of list) {
                           await firstValueFrom(
                             api.SetTags(item.id!, {
-                              tags: union(item.forcedTags ?? [], value.nodeTag),
+                              tags: union(item.tags ?? [], value.nodeTag),
                             }),
                           );
                         }

@@ -174,9 +174,7 @@ export const PreAuthkeyPageDefine = v.pipe(
                           return async () => {
                             const api: ApiService = field.context['api'];
                             const item = field.context['item$']() as PreAuthKeys;
-                            await firstValueFrom(
-                              api.ExpirePreAuthKey({ user: item.user!.id!, key: item.key! }),
-                            );
+                            await firstValueFrom(api.ExpirePreAuthKey({ id: item.id }));
                             const status: TableStatusService = field.context['status'];
                             status.needUpdate();
                           };
@@ -197,9 +195,7 @@ export const PreAuthkeyPageDefine = v.pipe(
                           return async () => {
                             const api: ApiService = field.context['api'];
                             const item = field.context['item$']() as PreAuthKeys;
-                            await firstValueFrom(
-                              api.DeletePreAuthKey({ user: item.user!.id!, key: item.key }),
-                            );
+                            await firstValueFrom(api.DeletePreAuthKey({ id: item.id }));
                             const status: TableStatusService = field.context['status'];
                             status.needUpdate();
                           };
@@ -248,9 +244,11 @@ export const PreAuthkeyPageDefine = v.pipe(
           return requestLoading(field, ['@preauthkey'], () => {
             const defineProps = untracked(() => defineField.props()['user$$']());
             return firstValueFrom(
-              api.ListPreAuthKeys({ user: defineProps.id }).pipe(
+              api.ListPreAuthKeys().pipe(
                 map((item) => {
-                  return item.preAuthKeys ?? [];
+                  return (item.preAuthKeys ?? []).filter(
+                    (item) => item.user?.id === defineProps.id,
+                  );
                 }),
               ),
             );

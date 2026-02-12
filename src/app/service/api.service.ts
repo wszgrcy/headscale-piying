@@ -130,10 +130,10 @@ export class ApiService {
     );
   }
 
-  ListPreAuthKeys(params: paths['/api/v1/preauthkey']['get']['parameters']['query'] = {}) {
+  ListPreAuthKeys() {
     return this.#http.get<paths['/api/v1/preauthkey']['get']['responses']['200']['schema']>(
       `${this.#ls.prefix$$()}/api/v1/preauthkey`,
-      { params },
+      {},
     );
   }
 
