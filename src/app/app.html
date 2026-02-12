@@ -12,20 +12,31 @@
       </button>
     </div>
   }
-  @for (item of dialogList$$(); track $index) {
-    <dialog class="modal" app-dialog>
-      <div class="modal-box">
-        <h3 class="text-lg font-bold">{{item.title}}</h3>
-        <p class="py-4">{{ item.message }}</p>
-        <form method="dialog" class="flex justify-end gap-2">
-          <button class="btn btn-error" (click)="item.close(false)">close</button>
-          <button class="btn btn-primary" (click)="item.close(true)">apply</button>
-        </form>
-      </div>
-
-      <form method="dialog" class="modal-backdrop">
-        <button (click)="item.close(false)">close</button>
-      </form>
-    </dialog>
-  }
 </div>
+@for (item of dialogList$$(); track $index) {
+  <dialog class="modal" open>
+    <div class="modal-box">
+      <h3 class="text-lg font-bold">{{ item.title }}</h3>
+      <p class="py-4 break-all">{{ item.message }}</p>
+      <form method="dialog" class="flex justify-end gap-2">
+        @for (button of item.buttons; track $index) {
+          <button
+            [class]="'btn' | mergeClass: button.class"
+            (click)="item.close($index)"
+            type="button"
+          >
+            <ng-template
+              [selectlessOutlet]="StrOrTemplateComponent"
+              [selectlessOutletInputs]="buttonContent | pure: button.label"
+            ></ng-template>
+          </button>
+        }
+      </form>
+    </div>
+    @if (!item.modal) {
+      <form method="dialog" class="modal-backdrop">
+        <button (click)="item.close(undefined)">close</button>
+      </form>
+    }
+  </dialog>
+}

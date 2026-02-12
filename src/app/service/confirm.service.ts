@@ -4,9 +4,15 @@ export interface AlertItem {
   id: number;
   title: string;
   message: string;
+  buttons: {
+    label: string;
+    class?: string;
+    close?: () => Promise<any>;
+  }[];
   close: (value: any) => Promise<any>;
+  modal?: boolean;
 }
-
+const Undefined$$ = Promise.resolve(undefined);
 @Injectable({
   providedIn: 'root',
 })
@@ -18,13 +24,20 @@ export class ConfirmService {
 
   open(options: Omit<AlertItem, 'id' | 'close'>) {
     const id = this.nextId++;
-    let p = Promise.withResolvers();
+    const p = Promise.withResolvers();
     this.#addToList({
       ...options,
       id,
-      close: async (value) => {
-        p.resolve(value);
-        this.remove(id);
+      close: async (index: number | undefined) => {
+        (index === undefined
+          ? Undefined$$
+          : options.buttons[index].close
+            ? options.buttons[index].close()
+            : Undefined$$
+        ).then((value) => {
+          p.resolve(value);
+          this.remove(id);
+        });
       },
     });
 

@@ -603,6 +603,7 @@ export const NodeItemPageDefine = v.pipe(
                         for (const item of list) {
                           await firstValueFrom(api.ExpireNode(item.id!, value));
                         }
+                        field.injector.get(CheckboxService<NodeItem>).clear();
                         const status = field.injector.get(TableResourceService);
                         status.needUpdate();
                       },
@@ -623,12 +624,21 @@ export const NodeItemPageDefine = v.pipe(
               actions.inputs.patchAsync({
                 clicked: (field) => {
                   return async () => {
-                    let list = field.injector.get(CheckboxService<NodeItem>).getSelected();
+                    let checkbox = field.injector.get(CheckboxService<NodeItem>);
+                    let list = checkbox.getSelected();
+
                     if (!list.length) {
                       return;
                     }
                     let confirm = field.injector.get(ConfirmService);
-                    let result = await confirm.open({ title: 'confirm', message: 'Batch Remove' });
+                    let result = await confirm.open({
+                      title: 'confirm',
+                      message: 'Batch Remove',
+                      buttons: [
+                        { label: 'close', close: async () => false, class: 'btn-error' },
+                        { label: 'apply', close: async () => true, class: 'btn-primary' },
+                      ],
+                    });
                     if (!result) {
                       return;
                     }
@@ -650,6 +660,7 @@ export const NodeItemPageDefine = v.pipe(
                         isLoading: false,
                       };
                     });
+                    checkbox.clear();
                     const status = field.injector.get(TableResourceService);
                     status.needUpdate();
                   };

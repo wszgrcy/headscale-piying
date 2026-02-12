@@ -10,6 +10,9 @@ import { formatDatetimeToStr } from '../../util/time-to-str';
 import { timeCompare } from '../../util/time';
 import { TableResourceService } from '@piying-lib/angular-daisyui/extension';
 import { localRequest } from '../../util/local-request';
+import { ConfirmService } from '../../service/confirm.service';
+import { Clipboard } from '@angular/cdk/clipboard';
+import { ToastService } from '../../service/toast.service';
 // todo dynamic
 const newDate = new Date();
 newDate.setDate(newDate.getDate() + 90);
@@ -193,7 +196,28 @@ export const ApiKeyPageDefine = v.pipe(
                   schema: v.pipe(CreateApiKeyDefine),
                   applyValue: async (value) => {
                     const api: ApiService = field.context['api'];
-                    await firstValueFrom(api.CreateApiKey(value));
+                    let result = await firstValueFrom(api.CreateApiKey(value));
+                    field.injector.get(ConfirmService).open({
+                      title: 'apikey',
+                      message: 'copy apikey',
+                      buttons: [
+                        {
+                          label: 'copy',
+                          close: async () => {
+                            let a = field.injector.get(Clipboard).copy(result.apiKey!);
+                            if (a) {
+                              field.injector
+                                .get(ToastService)
+                                .add('Copy Success', { type: 'success' });
+                            }
+                            await new Promise(() => {});
+                          },
+                          class: 'btn-primary',
+                        },
+                        { label: 'close', close: async () => false, class: 'btn-error' },
+                      ],
+                    });
+
                     field.injector.get(TableResourceService).needUpdate();
                   },
                 });
