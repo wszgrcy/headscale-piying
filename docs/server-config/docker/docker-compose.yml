@@ -1,7 +1,7 @@
 services:
   headscale-piying:
     # https://github.com/users/wszgrcy/packages/container/package/headscale-piying
-    image: ghcr.io/wszgrcy/headscale-piying:0.27.1-34
+    image: ghcr.io/wszgrcy/headscale-piying:0.28.0-44
     restart: unless-stopped
     container_name: headscale-piying
     networks:

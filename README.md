@@ -2,7 +2,7 @@
 # HeadscalePiying
 
 - This project is a web UI for [headscale](https://github.com/juanfont/headscale).
-- Currently supports version `0.27.1`.
+- Currently supports version `0.28.0`.
 
 ## Project Features
 

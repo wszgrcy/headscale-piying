@@ -51,6 +51,6 @@ jobs:
           context: .
           file: ./dockerfile
           push: true
-          tags: ghcr.io/${{github.actor}}/headscale-piying:0.27.1-${{ env.CCOUNT }}
+          tags: ghcr.io/${{github.actor}}/headscale-piying:0.28.0-${{ env.CCOUNT }}
           labels: ${{ steps.meta.outputs.labels }}
           target: builder
