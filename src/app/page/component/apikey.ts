@@ -199,7 +199,7 @@ export const ApiKeyPageDefine = v.pipe(
                     let result = await firstValueFrom(api.CreateApiKey(value));
                     field.injector.get(ConfirmService).open({
                       title: 'apikey',
-                      message: 'copy apikey',
+                      message: result.apiKey!,
                       buttons: [
                         {
                           label: 'copy',

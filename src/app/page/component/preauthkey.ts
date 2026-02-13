@@ -1,5 +1,11 @@
 import * as v from 'valibot';
-import { asControl, NFCSchema, setAlias, setComponent } from '@piying/view-angular-core';
+import {
+  asControl,
+  formConfig,
+  NFCSchema,
+  setAlias,
+  setComponent,
+} from '@piying/view-angular-core';
 import { computed, effect, untracked } from '@angular/core';
 import { actions } from '@piying/view-angular';
 import { firstValueFrom, map } from 'rxjs';
@@ -11,6 +17,10 @@ import { localRequest } from '../../util/local-request';
 import { formatDatetimeToStr } from '../../util/time-to-str';
 import { timeCompare } from '../../util/time';
 import { TableResourceService } from '@piying-lib/angular-daisyui/extension';
+import { Clipboard } from '@angular/cdk/clipboard';
+import { ConfirmService } from '../../service/confirm.service';
+import { ToastService } from '../../service/toast.service';
+
 // todo dynamic
 const newDate = new Date();
 newDate.setDate(newDate.getDate() + 90);
@@ -19,10 +29,18 @@ const CreateDefine = v.pipe(
     reusable: v.pipe(v.optional(v.boolean(), true), v.title('reusable')),
     ephemeral: v.pipe(v.optional(v.boolean(), false), v.title('ephemeral')),
     expiration: v.pipe(
-      v.optional(v.date(), newDate),
+      v.optional(v.string(), newDate.toISOString()),
+      setComponent('date'),
       v.title('expiration'),
-      v.transform((input) => {
-        return input.toISOString();
+      formConfig({
+        transfomer: {
+          toModel(value, control) {
+            return value ? value.toISOString() : value;
+          },
+          toView(value, control) {
+            return value ? new Date(value) : value;
+          },
+        },
       }),
     ),
     aclTags: v.pipe(
@@ -245,7 +263,30 @@ export const PreAuthkeyPageDefine = v.pipe(
                   applyValue: async (value) => {
                     const defineProps = defineField?.props()['user$$']() as User;
                     const api: ApiService = field.context['api'];
-                    await firstValueFrom(api.CreatePreAuthKey({ ...value, user: defineProps.id! }));
+                    let result = await firstValueFrom(
+                      api.CreatePreAuthKey({ ...value, user: defineProps.id! }),
+                    );
+
+                    field.injector.get(ConfirmService).open({
+                      title: 'apikey',
+                      message: result.preAuthKey!.key!,
+                      buttons: [
+                        {
+                          label: 'copy',
+                          close: async () => {
+                            let a = field.injector.get(Clipboard).copy(result.preAuthKey!.key!);
+                            if (a) {
+                              field.injector
+                                .get(ToastService)
+                                .add('Copy Success', { type: 'success' });
+                            }
+                            await new Promise(() => {});
+                          },
+                          class: 'btn-primary',
+                        },
+                        { label: 'close', close: async () => false, class: 'btn-error' },
+                      ],
+                    });
                     field.injector.get(TableResourceService).needUpdate();
                   },
                 });
