@@ -5,7 +5,7 @@ import {
   InsertFieldDirective,
   PI_VIEW_FIELD_TOKEN,
 } from '@piying/view-angular';
-import { fieldControlStatusClass } from '@piying/view-angular-core';
+import { fieldControlStatusClass, getDeepError } from '@piying/view-angular-core';
 import clsx from 'clsx';
 import { summarize } from 'valibot';
 @Component({
@@ -20,15 +20,8 @@ export class ValidateTooltipbWC {
   props$$ = computed(() => this.#field$$().props());
   errorStr$$ = computed(() => {
     const field = this.#field$$();
-    const valibot = field.form.control!.errors!['valibot'];
-    if (valibot) {
-      // todo 验证修改
-      return summarize(valibot);
-    } else {
-      return Object.values(field.form.control!.errors!)
-        .map((item) => (typeof item === 'string' ? item : JSON.stringify(item)))
-        .join('\n');
-    }
+    const valibot = getDeepError(field.form.control);
+    return valibot.map((item) => item.valibotIssueSummary).join('\n');
   });
 
   classStatus$$ = computed(() => fieldControlStatusClass(this.#field$$().form.control));
